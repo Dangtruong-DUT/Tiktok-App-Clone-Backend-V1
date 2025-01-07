@@ -1,0 +1,13 @@
+.wrapper {
+    display: flex;
+    justify-content: space-between;
+    height: var(--default-layout-header-height);
+    width: 100%;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px;
+}
+.content {
+    margin-left:var(--default-layout-content-margin-RL);
+    margin-right: var(--default-layout-content-margin-RL);
+    height: 100%;
+}
+
