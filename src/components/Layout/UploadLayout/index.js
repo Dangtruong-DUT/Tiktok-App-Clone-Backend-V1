@@ -1,5 +1,5 @@
 import Header from "./Header";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 
 function UploadLayout({children}) {
     return (
