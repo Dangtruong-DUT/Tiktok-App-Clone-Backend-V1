@@ -1,9 +1,11 @@
 .wrapper {
     height: var(--default-layout-header-height);
     width: 100%;
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px;
+    box-shadow: var(--header-boxShadow-cl) 0px 1px 1px;
 }
-
+.wrapper + .wrapper {
+    margin-left: 16px;
+}
 .content {
     margin-left: var(--default-layout-content-margin-RL);
     margin-right: var(--default-layout-content-margin-RL);
@@ -13,17 +15,15 @@
     justify-content: space-between;
 }
 
-.logo {
+.logo__link {
     width: 120px;
     height: 31px;
     object-fit: cover;
-
-    &__link {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        ;
-    }
+    color: var(--primary-text-cl);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    ;
 }
 
 .search-wrapper {
@@ -35,8 +35,8 @@
 
 
 .search {
-    --search-btn-width:52px;
-    --search-icon-color:rgba(22, 24, 35, .34);
+    --search-btn-width: 52px;
+    --search-icon-color: var(--secondary-text-cl);
     --search-icon-height: 16px;
     display: flex;
     align-items: center;
@@ -44,20 +44,21 @@
     height: 44px;
     border-radius: 92px;
     padding: 12px 16px;
-    background: rgba(22, 24, 35, 0.06);
+    background: var(--background-input-color);
     overflow: hidden;
     position: relative;
 
     &__input {
         background: transparent;
         flex-grow: 1;
+        color: var(--primary-text-cl);
         caret-color: var(--primary-cl);
         font-weight: 400;
         font-size: 1.6rem;
         line-height: 1.312;
 
         &::placeholder {
-            color: #4c4e57;
+            color: var(--primary-text-cl);
         }
 
         &:placeholder-shown {
@@ -71,19 +72,22 @@
     }
 
     &:hover &__btn-submit {
-            background: rgba(22, 24, 35, 0.06);
-            color: #171717;
+        background: var(--btn-hover-cl);
+        color: var(--primary-text-cl);
     }
-    &__input:not(:placeholder-shown) ~ &__btn-submit {
-        color: #2e2e2e;
+
+    &__input:not(:placeholder-shown)~&__btn-submit {
+        color: var(--primary-text-cl);
     }
+
     &__btn-submit {
         display: inline-block;
         width: var(--search-btn-width);
         padding: 13px 17px 7px 12px;
         margin-right: -17px;
-        color: rgba(22, 24, 35, .34);
+        color: var(--secondary-text-cl);
     }
+
     &__icon-clear,
     &__icon-spinner {
         color: var(--search-icon-color);
@@ -97,6 +101,7 @@
         opacity: 0;
         transition: visibility 0.25s, opacity 0.25s;
     }
+
     &__icon-spinner {
         display: flex;
         align-items: center;
@@ -104,14 +109,15 @@
         position: absolute;
         z-index: 2;
         top: 50%;
-        transform: translateY( -10%);
+        transform: translateY(-10%);
         right: calc(var(--search-btn-width) - 5px);
     }
+
     &__separate {
         width: 1px;
         height: 28px;
         margin: -3px 0px;
-        background: rgba(22, 24, 35, 0.12);
+        background: var(--border-cl);
     }
 
     &:hover,
@@ -120,16 +126,18 @@
     }
 
 }
+
 .search-results {
     width: calc(100vw /2 - 12px);
     max-width: 510px;
     min-width: 200px;
 
 }
+
 .actions {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     min-width: 222px;
     height: 37px;
     padding-right: 12px;
@@ -138,7 +146,6 @@
         margin-right: 21px;
         display: flex;
         align-items: center;
-        border: 1px solid #d5d5d6;
         min-width: 115px;
         padding: 5px 16px;
         font-size: 1.6rem;
@@ -147,9 +154,10 @@
         border: 1px solid rgba(22, 24, 35, 0.12);
         border-radius: 2px;
         transition: background 0.25s ease-in-out;
+        background-color: var(--background-second-color);
 
         &:hover {
-            background: rgba(22, 24, 35, 0.06);
+            background: var(--icon-hover-BG-color);
         }
     }
 
@@ -225,5 +233,5 @@
     font-size: 1.4rem;
     line-height: 1.29;
     font-weight: 600;
-    color: rgba(22, 24, 35, 0.5);
+    color: var(--secondary-text-cl);
 }
