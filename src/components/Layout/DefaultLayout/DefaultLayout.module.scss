@@ -5,13 +5,13 @@
 }
 
 .container {
-    width:calc(100% - 32px);
+    width: calc(100% - 32px);
     display: flex;
     margin-left: var(--default-layout-content-margin-RL);
     margin-right: var(--default-layout-content-margin-RL);
     justify-content: space-between;
 }
-.content {
-   flex-grow: 1;
-}
 
+.content {
+    flex-grow: 1;
+}
