@@ -26,6 +26,7 @@
         line-height: 1.29;
         color: rgba(22, 24, 35, 0.5);
         font-weight: 400;
+        color: var(--secondary-text-cl);
     }
 
     &__username {
@@ -33,7 +34,8 @@
         line-height: 1.325;
         font-weight: 600;
         display: flex;
-        justify-content: center;
+        color: var(--primary-text-cl);
+        justify-content: flex-start;
         align-items: center;
     }
 

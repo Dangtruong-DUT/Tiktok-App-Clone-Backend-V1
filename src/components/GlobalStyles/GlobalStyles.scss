@@ -8,8 +8,9 @@
 }
 
 :root {
+    --white-color: #fff;
+    --black-color: #000;
     --primary-cl: #fe2c55;
-    --border-cl: #d5d5d6;
 
 
     // Default Layout
@@ -17,7 +18,6 @@
     --default-layout-content-margin-RL: 16px;
 
     // Tooltip
-    --tooltip--background-color:  rgb(23, 23, 23,0.7);
     --tooltip-padding:  7px 6px;
     --tooltip-border-radius: 6px;
     --tooltip-transition: opacity 0.25s, visibility 0.25s;
@@ -52,7 +52,7 @@ html ::-webkit-scrollbar-thumb {
 
 html *::-webkit-scrollbar-thumb {
     border-radius: 4px;
-    background-color: rgba(22, 24, 35, .06);
+    background-color: rgba(164, 164, 164, 0.06);
 }
 
 html ::-webkit-scrollbar-track {
@@ -82,4 +82,60 @@ button, input, textarea {
 button {
     background: transparent;
     outline: none;
+}
+
+.App[data-theme="dark"] {
+    --background-color: rgb(18, 18, 18);
+    --background-second-color: rgb(37, 37, 37);
+    --background-input-color: rgba(255, 255, 255, 0.12);
+    --header-boxShadow-cl:rgba(255, 255, 255, 0.12);
+
+    --primary-text-cl: rgba(255, 255, 255, 0.9);
+    --secondary-text-cl: rgba(255, 255, 255, 0.5);
+
+    --border-focus-cl: 2px solid rgb(255, 76, 58);
+
+
+
+    --input-BG: rgba(255, 255, 255, 0.12);
+    --icon-hover-BG-color: rgba(255, 255, 255, 0.04);
+    --icon-color: rgba(22, 24, 35, .34);
+
+    //border-color
+    --border-cl: rgba(255, 255, 255, 0.2);
+
+    --btn-hover-cl: rgba(255, 255, 255, 0.08);
+
+    --tooltip--background-color:  rgba(98, 95, 95, 0.7);
+
+}
+
+.App[data-theme="light"] {
+    // color background
+    --background-color: #fff;
+    --background-second-color: rgb(255, 255, 255);
+    --background-input-color: rgba(22, 24, 35, 0.06);
+    --header-boxShadow-cl: rgba(0, 0, 0, 0.12);
+    //color text 
+    --primary-text-cl: #161823;
+    --secondary-text-cl: rgba(22, 24, 35, 0.5);
+
+    //icon
+    --input-BG: rgba(255, 255, 255, 0.12);
+    --icon-color: rgba(22, 24, 35, .34);
+    --search-icon-color:rgba(22, 24, 35, 0.34);
+    --icon-hover-BG-color: rgba(22, 24, 35, 0.03);
+    // border
+    --border-cl: #d5d5d6;
+    //button
+    --btn-hover-cl: rgba(22, 24, 35, 0.06);
+
+    --tooltip--background-color:  rgb(23, 23, 23,0.7);
+
+}
+
+.App {
+    background-color: var(--background-color);
+    color: var(--primary-text-cl);
+    transition: background-color 0.25s;
 }
