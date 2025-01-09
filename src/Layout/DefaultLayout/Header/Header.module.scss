@@ -128,7 +128,7 @@
 }
 
 .search-results {
-    width: calc(100vw /2 - 12px);
+    width: 100%;
     max-width: 510px;
     min-width: 200px;
 
@@ -235,3 +235,8 @@
     font-weight: 600;
     color: var(--secondary-text-cl);
 }
+.more-btn{
+    margin-left: 28px;
+    padding: 4px 8px;
+}
+
