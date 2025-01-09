@@ -1,0 +1,26 @@
+.menu-items {
+    width: 224px;
+    background-color: var(--background-second-color);
+    border-radius: 8px;
+    & .menu-item {
+        justify-content: flex-start;
+        align-items: center;
+        width: 100%;
+        margin-left: 0;
+        white-space: nowrap;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 16px;
+        color: var(--primary-text-cl);
+        font-weight: 500;
+        font-size: 1.6rem;
+        border-radius: 0;
+    }
+    & .menu-item:last-child {
+        margin-bottom: 8px;
+    }
+}
+
+.menu-item:hover {
+    background-color: var(--btn-hover-cl);
+}

@@ -6,7 +6,7 @@ const cx = classNames.bind(styles);
 
 function AccountItem({ username, nameAccount, verified, avatar, avatarSize = '32px' }) {
     return (
-        <div className={cx('wrapper')}>
+        <li className={cx('wrapper')}>
             <Avatar image={avatar} dataSize={avatarSize} altValue={nameAccount} />
             <div className={cx('info')}>
                 <h4 className={cx('info__username')}>
@@ -21,7 +21,7 @@ function AccountItem({ username, nameAccount, verified, avatar, avatarSize = '32
                     {nameAccount}
                 </p>
             </div>
-        </div>
+        </li>
     );
 }
 

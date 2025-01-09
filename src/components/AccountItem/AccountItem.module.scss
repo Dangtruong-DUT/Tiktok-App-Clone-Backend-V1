@@ -4,8 +4,10 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    transition: background-color 0.2s;
+
     &:hover {
-        background-color:rgba(22, 24, 35, 0.03);
+        background-color:var(--btn-hover-cl);
     }
 }
 

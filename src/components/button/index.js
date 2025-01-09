@@ -13,7 +13,7 @@ function Button({
     text,
     rounded =false,
     disabled = false,
-    size = 'medium',
+    size ,
     className,
     leftIcon,
     rightIcon,
@@ -43,13 +43,13 @@ function Button({
     }
 
     const classes = cx('wrapper', {
+        [size]:size,
         primary,
         outline,
         text,
         disabled,
         rounded,
-        [className]:className,
-        [size] :size
+        [className]:className
     });
 
     return (
