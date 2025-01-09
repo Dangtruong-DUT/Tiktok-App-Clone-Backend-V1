@@ -128,7 +128,7 @@
 }
 
 .search-results {
-    width: 100%;
+    width: calc(100vw/2 - 16px);
     max-width: 510px;
     min-width: 200px;
 
