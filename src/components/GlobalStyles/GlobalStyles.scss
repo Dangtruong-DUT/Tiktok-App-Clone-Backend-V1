@@ -1,5 +1,10 @@
-@import "normalize.css";
+//embedded fonts
+@use 'src/assets/fonts';
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+// reset css
+@import "normalize.css";
+
 
 * {
     box-sizing: border-box !important;
@@ -21,6 +26,10 @@
     --tooltip-padding: 7px 6px;
     --tooltip-border-radius: 6px;
     --tooltip-transition: opacity 0.25s, visibility 0.25s;
+
+    //fonts
+    --font-primary: TikTokFont,Poppins, sans-serif;
+    --font-secondary: TikTokDisplayFont ,Poppins, sans-serif;
 }
 
 html {
@@ -28,14 +37,14 @@ html {
 }
 
 body {
-    font-family: "Poppins", sans-serif;
+    font-family: var(--font-primary);
     font-size: 1.6rem;
     line-height: 1.5;
     text-rendering: optimizeSpeed; // optimize display font
     overflow: overlay;
 }
 
-
+//  reset styles
 a {
     text-decoration: none;
     color: inherit;
@@ -57,6 +66,7 @@ button {
     outline: none;
 }
 
+//  theme specific
 .App[data-theme="dark"] {
     --background-color: rgb(18, 18, 18);
     --background-second-color: rgb(37, 37, 37);
@@ -81,6 +91,7 @@ button {
 
     --tooltip--background-color: rgba(98, 95, 95, 0.7);
     --thumb-cl: rgba(164, 164, 164, 0.06);
+    
 
 }
 
@@ -115,6 +126,7 @@ button {
     transition: background-color 0.25s;
 }
 
+// customize scroll
 
 html *::-webkit-scrollbar {
     border-radius: 0;
