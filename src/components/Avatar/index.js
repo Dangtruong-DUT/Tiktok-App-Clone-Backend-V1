@@ -1,5 +1,6 @@
 import classNames from "classnames/bind";
 import styles from './Avatar.module.scss';
+import Image from "@/components/Image";
 
 const cx = classNames.bind(styles);
 
@@ -13,7 +14,7 @@ function Avatar({ image, className, altValue = "", dataSize = "32px" }) {
             className={classNames}
             style={{ '--size': dataSize }}
         >
-            <img className={cx('image')} src={image} alt={altValue} />
+            <Image className={cx('image')} src={image} alt={altValue} />
         </div>
     );
 }
