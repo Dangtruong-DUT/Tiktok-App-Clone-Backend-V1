@@ -14,5 +14,7 @@ export { default as InfoIcon } from './InfoIcon';
 export { default as WaningMoonIcon } from './WaningMoonIcon';
 export { default as LogoutIcon } from './LogoutIcon';
 export { default as LetterAIcon } from './LetterAIcon';
-
+export { default as ChevronLeftIcon } from './ChevronLeftIcon';
+export { default as TickMackIcon } from './TickMackIcon';
+export { default as MailboxIcon } from './MailboxIcon';
 
