@@ -2,6 +2,18 @@
     width: 224px;
     background-color: var(--background-second-color);
     border-radius: 8px;
+    position: relative;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: -18px;
+        right: 20px;
+        border-width: 9px;
+        border-style: solid;
+        border-color: transparent transparent var(--background-second-color) transparent;
+    }
+
     & &__item {
         justify-content: flex-start;
         align-items: center;
@@ -24,6 +36,10 @@
        position: relative;
        height: 50px;
        margin-top: -8px;
+    }
+
+    & .separate {
+        border-top: 1px solid var(--border-cl)
     }
 }
 
