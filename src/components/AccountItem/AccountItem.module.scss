@@ -1,9 +1,6 @@
 .wrapper {
     padding: 9px 16px;
     cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
     transition: background-color 0.2s;
 
     &:hover {
@@ -11,7 +8,13 @@
     }
 }
 
-
+.accountItem-content {
+    display: inline-block;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
 .info {
     margin-left: 12px;
     align-items: center;

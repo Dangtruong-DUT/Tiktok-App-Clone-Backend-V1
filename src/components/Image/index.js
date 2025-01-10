@@ -1,10 +1,10 @@
 import images from "@/assets/images";
 import { useState } from "react";
 
-function Image({ src, ...props }) {
+function Image({ src, fallBack: customFallBack = images.noImage, ...props }) {
     const [fallBack, setFallBack] = useState('');
     const handleImageError = () => {
-        setFallBack(images.noImage);
+        setFallBack(customFallBack);
     }
 
     return (
