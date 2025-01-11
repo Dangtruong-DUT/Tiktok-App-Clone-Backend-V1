@@ -21,7 +21,10 @@ function Avatar({ image, className, altValue = "", dataSize = "32px" }) {
 }
 
 Avatar.propTypes = {
-    image: PropTypes.string.isRequired
+    image: PropTypes.string.isRequired,
+    className: PropTypes.string,
+    altValue: PropTypes.string,
+    dataSize: PropTypes.string
 };
 
 export default Avatar;

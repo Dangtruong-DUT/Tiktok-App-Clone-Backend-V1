@@ -36,6 +36,7 @@ AccountItem.propTypes = {
     username: PropTypes.string,
     nameAccount: PropTypes.string,
     avatar: PropTypes.string,
+    verified: PropTypes.bool,
 };
 
 

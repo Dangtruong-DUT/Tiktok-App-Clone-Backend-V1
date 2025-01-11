@@ -6,10 +6,10 @@ import Avatar from '@/components/Avatar';
 import Button from '@/components/button';
 import Menu from '@/components/Popper/components/Menu';
 import Search from '../../Components/Search';
-import  config from '@/config';
+import config from '@/config';
 import {
-     LogoBrand, PersonIcon, PlusIcon,
-     ThreeDotIcon, CoinIcon, CreateIcon, BusinessSuiteIcon,
+    LogoBrand, PersonIcon, PlusIcon,
+    ThreeDotIcon, CoinIcon, CreateIcon, BusinessSuiteIcon,
     SettingIcon, InfoIcon, LightBulbIcon, WaningMoonIcon, LogoutIcon,
     LetterAIcon,
     MailboxIcon
@@ -238,16 +238,15 @@ function Header() {
                 <Search />
                 {currentUser ?
                     (
-
                         <div className={cx('actions')}>
                             <Link to={config.upload} className={cx('actions__upload')} >
                                 <PlusIcon width='1em' height='1em' />
                                 <span>Upload</span>
                             </Link>
                             <Link to="/inbox" className={cx(['actions__inbox', 'tooltip'])} data-tooltip='inbox'>
-                            <div className={cx('mailbox')} data-inbox='122'>
-                                <MailboxIcon width='32' height='32'/>
-                            </div>
+                                <div className={cx('mailbox')} data-inbox='122'>
+                                    <MailboxIcon width='32' height='32' />
+                                </div>
                             </Link>
                             <Menu items={USER_MENU} onChange={handleMenuChange}>
                                 <button>
