@@ -1,5 +1,3 @@
-import { upload } from "@testing-library/user-event/dist/upload";
-
 const routes = {
     home: '/',
     following: '/following',

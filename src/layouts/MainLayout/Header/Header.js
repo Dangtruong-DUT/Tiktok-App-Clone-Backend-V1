@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import classNames from "classnames/bind";
 import styles from "./Header.module.scss"
 import { Link } from "react-router-dom";
@@ -6,14 +7,15 @@ import Avatar from '@/components/Avatar';
 import Button from '@/components/button';
 import Menu from '@/components/Popper/components/Menu';
 import Search from '../../Components/Search';
-import  routerConfig from '@/Config/routes';
+import config from '@/config';
 import {
-     LogoBrand, PersonIcon, PlusIcon,
-     ThreeDotIcon, CoinIcon, CreateIcon, BusinessSuiteIcon,
+    LogoBrand, PersonIcon, PlusIcon,
+    ThreeDotIcon, CoinIcon, CreateIcon, BusinessSuiteIcon,
     SettingIcon, InfoIcon, LightBulbIcon, WaningMoonIcon, LogoutIcon,
     LetterAIcon,
     MailboxIcon
 } from '@/components/Icons';
+import { ThemeContext } from "@/theme";
 
 const cx = classNames.bind(styles);
 
@@ -62,12 +64,18 @@ const MENU_ITEMS = [
             menuItems: [
                 {
                     title: 'Use device theme',
+                    type: 'theme',
+                    data: 'system'
                 },
                 {
-                    title: 'Dark mode'
+                    title: 'Dark mode',
+                    type: 'theme',
+                    data: 'dark'
                 },
                 {
-                    title: 'Light mode'
+                    title: 'Light mode',
+                    type: 'theme',
+                    data: 'light'
                 }
             ],
         }
@@ -122,70 +130,6 @@ const USER_MENU = [
                 {
                     code: 'vi',
                     title: 'Vietnamese'
-                },
-                {
-                    code: 'en',
-                    title: 'English'
-                },
-                {
-                    code: 'vi',
-                    title: 'Vietnamese'
-                },
-                {
-                    code: 'en',
-                    title: 'English'
-                },
-                {
-                    code: 'vi',
-                    title: 'Vietnamese'
-                },
-                {
-                    code: 'en',
-                    title: 'English'
-                },
-                {
-                    code: 'vi',
-                    title: 'Vietnamese'
-                },
-                {
-                    code: 'en',
-                    title: 'English'
-                },
-                {
-                    code: 'vi',
-                    title: 'Vietnamese'
-                },
-                {
-                    code: 'en',
-                    title: 'English'
-                },
-                {
-                    code: 'vi',
-                    title: 'Vietnamese'
-                },
-                {
-                    code: 'en',
-                    title: 'English'
-                },
-                {
-                    code: 'vi',
-                    title: 'Vietnamese'
-                },
-                {
-                    code: 'en',
-                    title: 'English'
-                },
-                {
-                    code: 'vi',
-                    title: 'Vietnamese'
-                },
-                {
-                    code: 'en',
-                    title: 'English'
-                },
-                {
-                    code: 'vi',
-                    title: 'Vietnamese'
                 }
             ],
         }
@@ -204,12 +148,18 @@ const USER_MENU = [
             menuItems: [
                 {
                     title: 'Use device theme',
+                    type: 'theme',
+                    data: 'system'
                 },
                 {
-                    title: 'Dark mode'
+                    title: 'Dark mode',
+                    type: 'theme',
+                    data: 'dark'
                 },
                 {
-                    title: 'Light mode'
+                    title: 'Light mode',
+                    type: 'theme',
+                    data: 'light'
                 }
             ],
         }
@@ -224,30 +174,33 @@ const USER_MENU = [
 ]
 const currentUser = true;
 function Header() {
+    const {setThemeMode} = useContext(ThemeContext);
+
 
     const handleMenuChange = (menuItem) => {
-        console.log(menuItem);
+        if (menuItem.type === 'theme') {
+            setThemeMode(menuItem.data);
+        }
     };
 
     return (
         <header className={cx("wrapper")}>
             <div className={cx("content")}>
-                <Link className={cx('logo__link')} to={routerConfig.home}>
+                <Link className={cx('logo__link')} to={config.home}>
                     <LogoBrand />
                 </Link>
                 <Search />
                 {currentUser ?
                     (
-
                         <div className={cx('actions')}>
-                            <Link to={routerConfig.upload} className={cx('actions__upload')} >
+                            <Link to={config.upload} className={cx('actions__upload')} >
                                 <PlusIcon width='1em' height='1em' />
                                 <span>Upload</span>
                             </Link>
                             <Link to="/inbox" className={cx(['actions__inbox', 'tooltip'])} data-tooltip='inbox'>
-                            <div className={cx('mailbox')} data-inbox='122'>
-                                <MailboxIcon width='32' height='32'/>
-                            </div>
+                                <div className={cx('mailbox')} data-inbox='77880'>
+                                    <MailboxIcon width='32' height='32' />
+                                </div>
                             </Link>
                             <Menu items={USER_MENU} onChange={handleMenuChange}>
                                 <button>
