@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 const ThemeContext = createContext();
 
 function ThemeProvider({ children }) {
-    console.log(window.matchMedia("(prefers-color-scheme: dark)"))
     const [themeMode, setThemeMode] = useLocalStorage("theme", "system");
     const [theme, setTheme] = useState(() =>
         themeMode === "system"

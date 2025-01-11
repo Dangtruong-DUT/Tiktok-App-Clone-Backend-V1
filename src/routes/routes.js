@@ -1,4 +1,4 @@
-import  config from '@/config';
+import config from '@/Config';
 
 //Pages
 import HomePage from "@/pages/Home";
