@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import Tippy from '@tippyjs/react/headless';
 import classNames from 'classnames/bind';
@@ -5,11 +6,11 @@ import { useDebounce } from '@/Hooks';
 import { PopperWrapper } from '@/components/Popper';
 import AccountItem from '@/components/AccountItem';
 import Styles from './Search.module.scss'
+import * as searchService from '@/Services/searchService'
 import {
     ClearIcon, SearchIcon,
     SpinnerIcon
 } from '@/components/Icons';
-
 const cx = classNames.bind(Styles);
 
 function Search() {
@@ -26,24 +27,13 @@ function Search() {
     const inputRef = useRef();
     useEffect(() => {
         if (debounce.trim()) {
-            setShowLoading(true);
-            fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(debounce)}&type=less`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    setSearchResults(data.data);
-                    setShowResults(true);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                })
-                .finally(() => {
-                    setShowLoading(false);
-                });
+            const fetchApi = async () => {
+                setShowLoading(true);
+                const results = await searchService.search(debounce);
+                setSearchResults(results);
+                setShowLoading(false);
+            }
+            fetchApi();
         } else {
             setSearchResults([]);
         }
