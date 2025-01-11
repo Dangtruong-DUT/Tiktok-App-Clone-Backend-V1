@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import classNames from "classnames/bind";
 import styles from './Avatar.module.scss';
 import Image from "@/components/Image";
@@ -18,5 +19,9 @@ function Avatar({ image, className, altValue = "", dataSize = "32px" }) {
         </div>
     );
 }
+
+Avatar.propTypes = {
+    image: PropTypes.string.isRequired
+};
 
 export default Avatar;

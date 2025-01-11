@@ -6,7 +6,7 @@ import Avatar from '@/components/Avatar';
 import Button from '@/components/button';
 import Menu from '@/components/Popper/components/Menu';
 import Search from '../../Components/Search';
-import  routerConfig from '@/Config/routes';
+import  config from '@/config';
 import {
      LogoBrand, PersonIcon, PlusIcon,
      ThreeDotIcon, CoinIcon, CreateIcon, BusinessSuiteIcon,
@@ -232,7 +232,7 @@ function Header() {
     return (
         <header className={cx("wrapper")}>
             <div className={cx("content")}>
-                <Link className={cx('logo__link')} to={routerConfig.home}>
+                <Link className={cx('logo__link')} to={config.home}>
                     <LogoBrand />
                 </Link>
                 <Search />
@@ -240,7 +240,7 @@ function Header() {
                     (
 
                         <div className={cx('actions')}>
-                            <Link to={routerConfig.upload} className={cx('actions__upload')} >
+                            <Link to={config.upload} className={cx('actions__upload')} >
                                 <PlusIcon width='1em' height='1em' />
                                 <span>Upload</span>
                             </Link>

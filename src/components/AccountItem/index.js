@@ -1,8 +1,10 @@
+import PropTypes from "prop-types";
 import classNames from "classnames/bind";
 import styles from './AccountItem.module.scss';
 import Avatar from "@/components/Avatar";
 import { TickMackIcon } from "../Icons";
 import { Link } from "react-router-dom";
+
 
 const cx = classNames.bind(styles);
 
@@ -28,5 +30,13 @@ function AccountItem({ username, nameAccount, verified, avatar, avatarSize = '32
         </li>
     );
 }
+
+AccountItem.propTypes = {
+    avatarSize: PropTypes.string,
+    username: PropTypes.string,
+    nameAccount: PropTypes.string,
+    avatar: PropTypes.string,
+};
+
 
 export default AccountItem;

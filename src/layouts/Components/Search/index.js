@@ -1,12 +1,11 @@
-import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import Tippy from '@tippyjs/react/headless';
 import classNames from 'classnames/bind';
-import { useDebounce } from '@/Hooks';
+import { useDebounce } from '@/hooks';
 import { PopperWrapper } from '@/components/Popper';
 import AccountItem from '@/components/AccountItem';
 import Styles from './Search.module.scss'
-import * as searchService from '@/Services/searchService'
+import * as searchService from '@/services/searchService'
 import {
     ClearIcon, SearchIcon,
     SpinnerIcon
