@@ -14,7 +14,7 @@ import {
 const cx = classNames.bind(Styles);
 
 function Search() {
-    const [searchValue, setSearchValue] = useState(' ');
+    const [searchValue, setSearchValue] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [showResults, setShowResults] = useState(true);
     const [showLoading, setShowLoading] = useState(false);
@@ -39,6 +39,15 @@ function Search() {
         }
 
     }, [debounce]);
+
+    const handleChangeInputValue = (event) => {
+        const searchValue = event.target.value;
+        if (searchValue.startsWith(' ')) {
+            return;
+        }
+        setSearchValue(searchValue);
+        setShowResults(true);
+    }
 
     return (
         <div className={cx('search-wrapper')}>
@@ -76,9 +85,7 @@ function Search() {
                         placeholder="Search"
                         spellCheck='false'
                         value={searchValue}
-                        onChange={(event) => {
-                            setSearchValue(event.target.value);
-                        }}
+                        onChange={handleChangeInputValue}
                         onFocus={() => {
                             setShowResults(true);
                         }}
@@ -105,7 +112,6 @@ function Search() {
                 </div>
             </Tippy>
         </div>
-
     );
 }
 

@@ -28,7 +28,7 @@
         font-weight: 400;
         font-size: 1.6rem;
         line-height: 1.312;
-
+        font-family: var(--font-primary);
         &::placeholder {
             color: var(--primary-text-cl);
         }

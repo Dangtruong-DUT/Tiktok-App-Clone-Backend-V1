@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 const cx = classNames.bind(Styles);
 
-function Menu({ children, items = [], onChange }) {
+function Menu({ hideOnClick = false, children, items = [], onChange }) {
 
     const [history, setHistory] = useState([{ menuItems: items }]);
     const current = history[history.length - 1]
@@ -37,10 +37,11 @@ function Menu({ children, items = [], onChange }) {
             interactive
             offset={[12, 10]}
             placement='bottom-end'
+            hideOnClick={hideOnClick}
             render={(attrs) => {
                 return (
                     <div className={cx('list-items')} tabIndex={-1} {...attrs}>
-                        <PopperWrapper >
+                        <PopperWrapper className={cx('menu-wrapper')}>
                             {
                                 history.length > 1 &&
                                 <Header title={current.title}
@@ -49,14 +50,14 @@ function Menu({ children, items = [], onChange }) {
                                     }}
                                 />
                             }
-                            {renderItems()}
+                            <div className={cx('menu-body')}>{renderItems()}</div>
                         </PopperWrapper>
                     </div>
                 )
             }}
             onHide={
-                ()=> {
-                    setHistory((prev) =>prev.slice(0,1));
+                () => {
+                    setHistory((prev) => prev.slice(0, 1));
                 }
             }
         >
