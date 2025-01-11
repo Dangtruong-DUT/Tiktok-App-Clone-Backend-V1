@@ -7,7 +7,7 @@ import Avatar from '@/components/Avatar';
 import Button from '@/components/button';
 import Menu from '@/components/Popper/components/Menu';
 import Search from '../../Components/Search';
-import config from '@/Config';
+import config from '@/config';
 import {
     LogoBrand, PersonIcon, PlusIcon,
     ThreeDotIcon, CoinIcon, CreateIcon, BusinessSuiteIcon,
