@@ -7,7 +7,7 @@ import Avatar from '@/components/Avatar';
 import Button from '@/components/button';
 import Menu from '@/components/Popper/components/Menu';
 import Search from '../../Components/Search';
-import config from '@/config';
+import config from '@/Config';
 import {
     LogoBrand, PersonIcon, PlusIcon,
     ThreeDotIcon, CoinIcon, CreateIcon, BusinessSuiteIcon,
@@ -174,7 +174,7 @@ const USER_MENU = [
 ]
 const currentUser = true;
 function Header() {
-    const {setThemeMode} = useContext(ThemeContext);
+    const { setThemeMode } = useContext(ThemeContext);
 
 
     const handleMenuChange = (menuItem) => {
