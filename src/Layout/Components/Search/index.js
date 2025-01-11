@@ -1,14 +1,16 @@
+import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import Tippy from '@tippyjs/react/headless';
 import classNames from 'classnames/bind';
+import { useDebounce } from '@/Hooks';
 import { PopperWrapper } from '@/components/Popper';
 import AccountItem from '@/components/AccountItem';
 import Styles from './Search.module.scss'
+import * as searchService from '@/Services/searchService'
 import {
     ClearIcon, SearchIcon,
     SpinnerIcon
 } from '@/components/Icons';
-
 const cx = classNames.bind(Styles);
 
 function Search() {
@@ -16,6 +18,7 @@ function Search() {
     const [searchResults, setSearchResults] = useState([]);
     const [showResults, setShowResults] = useState(true);
     const [showLoading, setShowLoading] = useState(false);
+    const debounce = useDebounce(searchValue, 500);
 
     const handleHideResults = () => {
         setShowResults(false);
@@ -23,30 +26,28 @@ function Search() {
 
     const inputRef = useRef();
     useEffect(() => {
-        if(searchValue.trim()) {
-            setShowLoading(true);
-            fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(searchValue)}&type=less`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                setSearchResults(data.data);
-                setShowResults(true);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            })
-            .finally(() => {
+        if (debounce.trim()) {
+            const fetchApi = async () => {
+                setShowLoading(true);
+                const results = await searchService.search(debounce);
+                setSearchResults(results);
                 setShowLoading(false);
-            });
-        }else {
-                setSearchResults([]);
             }
+            fetchApi();
+        } else {
+            setSearchResults([]);
+        }
 
-    }, [searchValue]);
+    }, [debounce]);
+
+    const handleChangeInputValue = (event) => {
+        const searchValue = event.target.value;
+        if (searchValue.startsWith(' ')) {
+            return;
+        }
+        setSearchValue(searchValue);
+        setShowResults(true);
+    }
 
     return (
         <div className={cx('search-wrapper')}>
@@ -55,14 +56,14 @@ function Search() {
                 interactive={true}
                 placement='bottom'
                 onClickOutside={handleHideResults}
-                offset={[0,8]}
+                offset={[0, 8]}
                 render={(attr) => {
                     return (
                         <div className={cx('search-results')}>
                             <PopperWrapper >
                                 <h4 className={cx('search-title')}>Account</h4>
                                 <ul tabIndex={-1}>
-                                    {searchResults.length>0&&searchResults.map((result) =>
+                                    {searchResults.length > 0 && searchResults.map((result) =>
                                         <AccountItem
                                             key={result.id}
                                             avatarSize='40px'
@@ -84,15 +85,13 @@ function Search() {
                         placeholder="Search"
                         spellCheck='false'
                         value={searchValue}
-                        onChange={(event) => {
-                            setSearchValue(event.target.value);
-                        }}
+                        onChange={handleChangeInputValue}
                         onFocus={() => {
                             setShowResults(true);
                         }}
                     />
                     {
-                       !showLoading&& !!searchValue.length &&
+                        !showLoading && !!searchValue.length &&
                         <div className={cx('search__icon-clear')}
                             onClick={() => {
                                 setSearchValue('');
@@ -103,9 +102,9 @@ function Search() {
                             <ClearIcon width='16' height='16' />
                         </div>
                     }
-                    {showLoading&& <div className={cx('search__icon-spinner')} >
+                    {showLoading && <div className={cx('search__icon-spinner')} >
                         <SpinnerIcon width='24' />
-                    </div> }
+                    </div>}
                     <span className={cx('search__separate')} ></span>
                     <button className={cx('search__btn-submit')} type='submit'>
                         <SearchIcon width='24' height='24' />
@@ -113,7 +112,6 @@ function Search() {
                 </div>
             </Tippy>
         </div>
-
     );
 }
 

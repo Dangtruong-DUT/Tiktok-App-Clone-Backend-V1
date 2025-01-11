@@ -6,7 +6,7 @@ import { Fragment } from "react";
 function App() {
   return (
     <Router>
-      <div className="App" data-theme="light">
+      <div className="App" data-theme="dark">
         <Routes>
           {
             publicRoutes.map((route, index) => {

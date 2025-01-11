@@ -6,6 +6,7 @@ import Avatar from '@/components/Avatar';
 import Button from '@/components/button';
 import Menu from '@/components/Popper/components/Menu';
 import Search from '../../Components/Search';
+import  routerConfig from '@/Config/routes';
 import {
      LogoBrand, PersonIcon, PlusIcon,
      ThreeDotIcon, CoinIcon, CreateIcon, BusinessSuiteIcon,
@@ -121,6 +122,70 @@ const USER_MENU = [
                 {
                     code: 'vi',
                     title: 'Vietnamese'
+                },
+                {
+                    code: 'en',
+                    title: 'English'
+                },
+                {
+                    code: 'vi',
+                    title: 'Vietnamese'
+                },
+                {
+                    code: 'en',
+                    title: 'English'
+                },
+                {
+                    code: 'vi',
+                    title: 'Vietnamese'
+                },
+                {
+                    code: 'en',
+                    title: 'English'
+                },
+                {
+                    code: 'vi',
+                    title: 'Vietnamese'
+                },
+                {
+                    code: 'en',
+                    title: 'English'
+                },
+                {
+                    code: 'vi',
+                    title: 'Vietnamese'
+                },
+                {
+                    code: 'en',
+                    title: 'English'
+                },
+                {
+                    code: 'vi',
+                    title: 'Vietnamese'
+                },
+                {
+                    code: 'en',
+                    title: 'English'
+                },
+                {
+                    code: 'vi',
+                    title: 'Vietnamese'
+                },
+                {
+                    code: 'en',
+                    title: 'English'
+                },
+                {
+                    code: 'vi',
+                    title: 'Vietnamese'
+                },
+                {
+                    code: 'en',
+                    title: 'English'
+                },
+                {
+                    code: 'vi',
+                    title: 'Vietnamese'
                 }
             ],
         }
@@ -167,7 +232,7 @@ function Header() {
     return (
         <header className={cx("wrapper")}>
             <div className={cx("content")}>
-                <Link className={cx('logo__link')} to="/">
+                <Link className={cx('logo__link')} to={routerConfig.home}>
                     <LogoBrand />
                 </Link>
                 <Search />
@@ -175,7 +240,7 @@ function Header() {
                     (
 
                         <div className={cx('actions')}>
-                            <Link to="/upload" className={cx('actions__upload')} >
+                            <Link to={routerConfig.upload} className={cx('actions__upload')} >
                                 <PlusIcon width='1em' height='1em' />
                                 <span>Upload</span>
                             </Link>

@@ -1,4 +1,3 @@
-import Tippy from '@tippyjs/react/headless';
 import classNames from "classnames/bind";
 import Styles from "./Menu.module.scss";
 import { ChevronLeftIcon } from '@/components/Icons';

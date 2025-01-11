@@ -1,4 +1,4 @@
-function MailboxIcon({ className, width = '3.2rem', height = '3.2rem' }, color = 'currentColor') {
+function MailboxIcon({ className, width = '3.2rem', height = '3.2rem' , color = 'currentColor'}) {
     return (
         <svg className={className} width={width} height={height} fill={color} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
             <path fillRule="evenodd" clipRule="evenodd" d="M24.0362 21.3333H18.5243L15.9983 24.4208L13.4721 21.3333H7.96047L7.99557 

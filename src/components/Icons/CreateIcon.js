@@ -1,4 +1,4 @@
-function CreateIcon({ className, width = '118', height = '42' }, color = 'currentColor') {
+function CreateIcon({ className, width = '118', height = '42' , color = 'currentColor'}) {
     return (
         <svg className={className} width={width} height={height} fill={color} viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fillRule="evenodd" clipRule="evenodd" d="M10.5366 1.02886C10.2252 0.768225 9.77282 0.768225 9.46141 1.02886L0.729156

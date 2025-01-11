@@ -6,6 +6,7 @@
     &:hover {
         background-color:var(--btn-hover-cl);
     }
+    list-style: none;
 }
 
 .accountItem-content {
@@ -47,6 +48,6 @@
     &__verified {
         margin-left: 4px;
         display: flex;
-        width: 14px;
+        width: 15px;
     }
 }
