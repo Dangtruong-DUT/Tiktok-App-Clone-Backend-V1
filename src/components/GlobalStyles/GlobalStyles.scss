@@ -131,6 +131,12 @@ button {
     --thumb-cl: rgba(22, 24, 35, .06);
 
 }
+html, body {
+    overflow-y: overlay;
+    scroll-behavior: smooth;
+    background-color: var(--background-color);
+}
+
 
 .App {
     background-color: var(--background-color);
