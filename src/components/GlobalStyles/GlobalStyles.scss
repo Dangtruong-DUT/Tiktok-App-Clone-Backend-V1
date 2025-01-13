@@ -36,12 +36,18 @@ html {
     font-size: 62.5%;
 }
 
+
 body {
     font-family: var(--font-primary);
     font-size: 1.6rem;
     line-height: 1.5;
     text-rendering: optimizeSpeed; // optimize display font
-    overflow: overlay;
+    margin: 0;
+}
+
+html, body {
+    overflow-y: overlay;
+    scroll-behavior: smooth;
 }
 
 //  reset styles
@@ -73,7 +79,7 @@ button {
 }
 
 //  theme specific
-.App[data-theme="dark"] {
+.dark ,.App[data-theme="dark"] {
     --background-color: rgb(18, 18, 18);
     --background-second-color: rgb(37, 37, 37);
     --background-input-color: rgba(255, 255, 255, 0.12);
@@ -101,7 +107,7 @@ button {
 
 }
 
-.App[data-theme="light"] {
+.light ,.App[data-theme="light"] {
     // color background
     --background-color: #fff;
     --background-second-color: rgb(255, 255, 255);
@@ -148,5 +154,5 @@ html *::-webkit-scrollbar-thumb {
 
 html *::-webkit-scrollbar-track {
     border-radius: 0;
-    background-color: rgba(0, 0, 0, 0);
+    background-color: var(--background-color);
 }

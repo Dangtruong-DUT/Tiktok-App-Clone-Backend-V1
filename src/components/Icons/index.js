@@ -17,4 +17,8 @@ export { default as LetterAIcon } from './LetterAIcon';
 export { default as ChevronLeftIcon } from './ChevronLeftIcon';
 export { default as TickMackIcon } from './TickMackIcon';
 export { default as MailboxIcon } from './MailboxIcon';
-
+export { default as HomeIcon } from './HomeIcon';
+export { default as ExploreIcon } from './ExploreIcon';
+export { default as FollowingIcon } from './FollowingIcon';
+export { default as LiveIcon } from './LiveIcon';
+export { default as MessagesIcon } from './MessagesIcon';

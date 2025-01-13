@@ -63,6 +63,7 @@ function Search() {
                                 <h4 className={cx('search-title')}>Account</h4>
                                 <ul tabIndex={-1}>
                                     {searchResults.length > 0 && searchResults.map((result) =>
+                                    <li>
                                         <AccountItem
                                             key={result.id}
                                             avatarSize='40px'
@@ -71,6 +72,7 @@ function Search() {
                                             nameAccount={result.full_name}
                                             verified={result.tick}
                                         />
+                                    </li>
                                     )}
                                 </ul>
                             </PopperWrapper>
