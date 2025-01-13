@@ -1,0 +1,40 @@
+.menu-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 8px;
+}
+.menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 3.2rem;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 200ms ease-in-out;
+    color: var(--primary-text-cl);
+
+    &:hover {
+        background-color: var(--btn-hover-cl);
+    }
+    &__title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        line-height: 1.334;
+        margin-left: 8px;
+    }
+
+    &__icon {
+        width: 1em;
+        height: 1em;
+        stroke-width: 2px;
+        padding: 2px;
+        font-weight: 400;
+        stroke-width: 1em;
+    }
+}
+
+.active {
+    color: var(--primary-cl);
+}

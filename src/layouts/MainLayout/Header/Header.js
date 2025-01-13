@@ -198,7 +198,7 @@ function Header() {
                                 <span>Upload</span>
                             </Link>
                             <Link to="/inbox" className={cx(['actions__inbox', 'tooltip'])} data-tooltip='inbox'>
-                                <div className={cx('mailbox')} data-inbox='77880'>
+                                <div className={cx('mailbox')} data-inbox='1'>
                                     <MailboxIcon width='32' height='32' />
                                 </div>
                             </Link>

@@ -1,4 +1,20 @@
 .wrapper {
-    max-width: 224px;
+    display: flex;
+    flex-direction: column;
+    width: 224px;
+    padding: 20px 0px 26px 0px;
+    height: calc(100vh - 60px);
+    overflow: hidden scroll;
+    margin-left: -8px;
 }
 
+.wrapper::-webkit-scrollbar-thumb  {
+   background-color: transparent;
+   visibility: hidden;
+    transition: background-color 600ms ease-in-out, visibility 300ms ease-in-out, scale 300ms ease-in-out;
+}
+
+.wrapper:hover::-webkit-scrollbar-thumb {
+    background-color: var(--thumb-cl);
+    visibility: visible;
+}

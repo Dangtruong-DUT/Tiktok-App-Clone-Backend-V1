@@ -23,6 +23,7 @@ function ThemeProvider({ children }) {
                         : "light"
                     : themeMode;
             setTheme(newTheme);
+            document.documentElement.className = newTheme;
         };
 
         updateTheme();

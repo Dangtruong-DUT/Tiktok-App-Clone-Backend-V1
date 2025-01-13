@@ -1,0 +1,40 @@
+.suggested-accounts {
+    position: relative;
+    width: 100%;
+    height: 1000px;
+    padding : 16px 8px;
+    &__title {
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 1.4rem;
+        color: var(--secondary-text-cl);
+
+    }
+    & &__account {
+        margin-left: -8px;
+        transition: background-color 200ms ease-in-out;
+        padding: 5px 8px;
+        border-radius: 4px;
+        & p {
+            font-size: 12px;
+        }
+        &:hover {
+            background-color: var(--btn-hover-cl);
+        } 
+    }
+    &__cta {
+    color: var(--primary-cl);
+    font-weight: 600;
+    font-size: 1.4rem;
+    }
+    &::before {
+        display: block;
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 8px;
+        right: 8px;
+        border-top: 0.5px solid  var(--header-boxShadow-cl);
+        pointer-events: none;
+    }
+}

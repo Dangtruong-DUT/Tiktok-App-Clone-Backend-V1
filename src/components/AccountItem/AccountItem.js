@@ -8,11 +8,14 @@ import { Link } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
-function AccountItem({ username, nameAccount, verified, avatar, avatarSize = '32px' }) {
+function AccountItem({ username, nameAccount,
+    verified, avatar, avatarSize = '32px',
+    className, isLive = false}) {
+    const classNames = cx('wrapper', className);
     return (
-        <li className={cx('wrapper')}>
-            <Link className={cx('accountItem-content')}  to={`/@${username}`}>
-                <Avatar image={avatar} dataSize={avatarSize} altValue={nameAccount} />
+        <div className={classNames}>
+            <Link className={cx('accountItem-content')} to={`/@${username}`}>
+                <Avatar isLive= {isLive} image={avatar} dataSize={avatarSize} altValue={nameAccount} />
                 <div className={cx('info')}>
                     <h4 className={cx('info__username')}>
                         {username}
@@ -27,7 +30,7 @@ function AccountItem({ username, nameAccount, verified, avatar, avatarSize = '32
                     </p>
                 </div>
             </Link>
-        </li>
+        </div>
     );
 }
 
@@ -37,6 +40,7 @@ AccountItem.propTypes = {
     nameAccount: PropTypes.string,
     avatar: PropTypes.string,
     verified: PropTypes.bool,
+    isLive: PropTypes.bool
 };
 
 

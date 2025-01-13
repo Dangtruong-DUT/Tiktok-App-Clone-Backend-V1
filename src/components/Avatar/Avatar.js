@@ -5,9 +5,10 @@ import Image from "@/components/Image";
 
 const cx = classNames.bind(styles);
 
-function Avatar({ image, className, altValue = "", dataSize = "32px" }) {
+function Avatar({ image, className, altValue = "", dataSize = "32px", isLive = false }) {
     const classNames = cx('wrapper', {
-        [className]: className
+        [className]: className,
+        'live-avatar-border': isLive
     })
 
     return (
@@ -24,7 +25,8 @@ Avatar.propTypes = {
     image: PropTypes.string.isRequired,
     className: PropTypes.string,
     altValue: PropTypes.string,
-    dataSize: PropTypes.string
+    dataSize: PropTypes.string,
+    isLive: PropTypes.bool
 };
 
 export default Avatar;

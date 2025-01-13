@@ -97,13 +97,16 @@
         left: calc(100% - 13px);
         color: var(--white-color);
         height: 20px;
-        padding: 0px 4px;
         background-color: var(--primary-cl);
         font-size: 13px;
         line-height: 20px;
         font-weight: 600;
         border-radius: 9999px;
         max-width: 35px;
+        min-width: 20px;
+        height: 20px;
+        padding: 2px;
+        text-align: center;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

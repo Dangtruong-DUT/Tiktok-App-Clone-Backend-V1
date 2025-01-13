@@ -2,6 +2,7 @@
     padding: 9px 16px;
     cursor: pointer;
     transition: background-color 0.2s;
+    width: 100%;
 
     &:hover {
         background-color:var(--btn-hover-cl);
