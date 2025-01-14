@@ -1,0 +1,102 @@
+.sidebar-footer {
+    position: relative;
+    padding: 16px 0 0 8px;
+    &::before {
+        display: block;
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 8px;
+        right: 8px;
+        border-top: 0.5px solid var(--header-boxShadow-cl);
+        pointer-events: none;
+    }
+}
+
+.sidebar-footer__cpr {
+    display: inline-block;
+    margin-top: 15px;
+    color: var(--secondary-text-cl);
+    font-weight: 600;
+    font-size: 1.2rem;
+    line-height: 1.334;
+
+}
+
+.sidebar-banner {
+    &__link {
+        display: inline-block;
+        position: relative;
+        width: 208;
+        height: 52px;
+        border-radius: 4px;
+        padding-right: 8px;
+    }
+
+    &__link-img {
+        width: 100%;
+        object-fit: cover;
+    }
+
+    &__link-heading {
+        position: absolute;
+        top: 50%;
+        left: 8px;
+        transform: translate(0,-50%);
+        color: var(--black-color);
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 1.334;
+        width: 127px;
+    }
+}
+
+.links {
+    background-color: var(--background-color);
+
+    &__title {
+        margin-top: 15px;
+        font-size: 1.5rem;
+        line-height: 1.46;
+        cursor: pointer;
+        color: var(--secondary-text-cl);
+        font-family: TikTokDisplayFont;
+        font-weight: 700;
+    }
+
+    &-listItems {
+        display: none;
+    }
+
+    & &-listItems__item {
+        padding: 0;
+        display: inline-block;
+        min-width: fit-content;
+        margin-right: 3px;
+        margin-top: 5px;
+
+    }
+
+    &-listItems__item span {
+        color: var(--secondary-text-cl);
+        font-weight: 600;
+        font-size: 1.2rem;
+        line-height: 1.3;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    &-listItems__item+&-listItems__item {
+        margin: 0;
+    }
+}
+
+.displayLink .links-listItems {
+    display: block;
+}
+
+.displayLink .links__title {
+    color: var(--primary-text-cl);
+}
