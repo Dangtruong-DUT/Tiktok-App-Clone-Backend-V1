@@ -162,3 +162,10 @@ html *::-webkit-scrollbar-track {
     border-radius: 0;
     background-color: var(--background-color);
 }
+
+// cta
+.btn-cta-Fixed {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+}
