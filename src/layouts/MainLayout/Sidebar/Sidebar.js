@@ -3,12 +3,16 @@ import styles from "./Sidebar.module.scss"
 import config from "@/config";
 import {
     ExploreIcon, FollowingIcon,
-    HomeIcon, LiveIcon, PersonIcon
+    HomeIcon, LiveIcon,
 } from "@/components/Icons";
+import images from "@/assets/images";
 import FriendsIcon from "@/components/Icons/FriendsIcon";
 import MessagesIcon from "@/components/Icons/MessagesIcon";
 import { Menu, MenuItem } from "./Menu";
-import {SuggestedAccounts} from "./SuggestedAccounts";
+import { SuggestedAccounts } from "./SuggestedAccounts";
+import SidebarFooter from "./SidebarFooter";
+import Avatar from "@/components/Avatar";
+import { CallToAction } from "./CallToAction";
 
 const cx = classNames.bind(styles);
 
@@ -22,9 +26,12 @@ function Sidebar() {
                 <MenuItem title="Friends" to={config.routes.friends} Icon={FriendsIcon} />
                 <MenuItem title="Live" to={config.routes.live} Icon={LiveIcon} />
                 <MenuItem title="Messages" to={config.routes.messages} Icon={MessagesIcon} />
-                <MenuItem title="Profile" to={config.routes.profile} Icon={PersonIcon} />
+                <MenuItem title="Profile" to={config.routes.profile}
+                    avatar={<Avatar dataSize="28px" image={images.avatar} altValue="user" />} />
             </Menu>
-            <SuggestedAccounts title={'Following accounts'}/>
+            <CallToAction/>
+            <SuggestedAccounts title={'Following accounts'} />
+            <SidebarFooter />
         </aside>
     );
 }

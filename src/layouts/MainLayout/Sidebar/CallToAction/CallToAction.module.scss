@@ -1,0 +1,22 @@
+.wrapper {
+    padding: 16px 8px 16px 8px;
+}
+
+.cta-desc{
+    color: var(--secondary-text-cl);
+    font-size: 1.6rem;
+    line-height: 1.31;
+    font-weight: 600;
+    max-width: 208px;
+}
+
+.cta-btn {
+    margin-top: 20px;
+    min-width: 168px;
+    width: 100%;
+    min-height: 48px;
+    font-size: 1.8rem;
+    line-height: 1.4;
+    font-weight: 600;
+    font-family: TikTokDisplayFont, sans-serif;
+}

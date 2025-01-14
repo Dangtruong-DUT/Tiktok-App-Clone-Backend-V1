@@ -31,13 +31,18 @@
 // Button styles
 
 .rounded {
-    border-color: rgba(22, 24, 35, 0.12);
-    color: rgba(22, 24, 35, 0.75);
+    border-color:rgba(22, 24, 35, 0.12);
+    color: var(--secondary-text-cl);
     border-radius: 999px;
+    background-color: var(--background-second-color);
+    font-weight: 700;
+    font-size: 1.4rem;
+    min-width: 90px;
+    box-shadow: rgba(0, 0, 0, 0.06) 0px 2px 8px;
 
     &:hover {
         border-color: rgba(22, 24, 35, 0.2);
-        background-color: rgba(22, 24, 35, 0.06);
+        background-color: var(--btn-hover-cl);
     }
 }
 
