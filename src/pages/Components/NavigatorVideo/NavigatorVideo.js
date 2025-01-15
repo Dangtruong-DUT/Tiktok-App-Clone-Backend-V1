@@ -14,13 +14,13 @@ function NavigatorVideo({ handleClickPrevBtn, index, handleClickNextBtn }) {
                     className={cx('NavigatorVideo__btn', { disabled: index === 0 })}
                     onClick={handleClickPrevBtn}
                 >
-                    <ChevronLeftIcon width="0.8em" height="0.8em" rotate="90deg" />
+                    <ChevronLeftIcon width="0.5em" height="0.5em" rotate="90deg" />
                 </button>
                 <button
                     className={cx('NavigatorVideo__btn')}
                     onClick={handleClickNextBtn}
                 >
-                    <ChevronLeftIcon width="0.8em" height="0.8em" rotate="270deg" />
+                    <ChevronLeftIcon width="0.5em" height="0.5em" rotate="270deg" />
                 </button>
             </div>
         </div>

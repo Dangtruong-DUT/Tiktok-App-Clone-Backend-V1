@@ -1,3 +1,4 @@
+import ContentLoader, { Facebook } from 'react-content-loader'
 import PropTypes from "prop-types";
 import { memo, useRef, useEffect, useState } from "react";
 import classNames from "classnames/bind";
@@ -5,11 +6,12 @@ import styles from './Video.module.scss';
 
 const cx = classNames.bind(styles);
 
-function Video({ sources = [], className}) {
+function Video({ sources = [], className }) {
     const videoRef = useRef(null);
     const [isMuted, setIsMuted] = useState(true);
     const [isInViewport, setIsInViewport] = useState(false);
 
+    // handle auto play video
     useEffect(() => {
         const handleInteraction = () => {
             setIsMuted(false);
@@ -47,12 +49,12 @@ function Video({ sources = [], className}) {
         const handleVisibilityChange = () => {
             if (document.hidden) {
                 if (videoRef.current) {
-                    videoRef.current.pause();  // Dừng video khi tab không active
+                    videoRef.current?.pause();
                 }
             } else {
                 // Khi tab được kích hoạt lại, kiểm tra xem video có trong viewport không để phát lại
                 if (isInViewport && videoRef.current) {
-                    videoRef.current.play().catch((error) => {
+                    videoRef.current?.play().catch((error) => {
                         console.error("Error attempting to play video:", error);
                     });
                 }
@@ -79,6 +81,8 @@ function Video({ sources = [], className}) {
         <section className={cx('video-frame', {
             [className]: className
         })}>
+            <div className={cx('videoControls-top')}>
+            </div>
             <video
                 className={cx('video-frame__video')}
                 ref={videoRef}
@@ -92,6 +96,8 @@ function Video({ sources = [], className}) {
                 ))}
                 Your browser does not support the video tag.
             </video>
+            <div className={cx('videoControls-bottom')}>
+            </div>
         </section>
     );
 }

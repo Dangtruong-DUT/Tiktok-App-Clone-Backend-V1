@@ -9,45 +9,53 @@ const cx = classNames.bind(styles);
 
 const dataVideos = [
     {
+        avatarUrl: 'https://www.millenniumpost.in/h-upload/2024/08/29/804354-dev-in-khadaan.webp',
+        following : false,
         id: 1,
         title: 'Thủ tục trc khi tẩy trang của chị em =)) ',
         author: 'behocbong',
         postedDate: '2024-11-17',
         likes: 274,
-        Comments: 8,
+        comments: 8,
         save: 10,
         share: 5,
         data: videos.video1
     },
     {
+        avatarUrl: 'https://www.millenniumpost.in/h-upload/2024/08/29/804354-dev-in-khadaan.webp',
+        following : false,
         id: 2,
         title: 'Tín hiệu đi chụp áo dài 🧧 ',
         author: 'thanhngoc.tn76',
         postedDate: '6d ago',
         likes: 194,
-        Comments: 3,
+        comments: 3,
         save: 2,
         share: 5,
         data: videos.video2
     },
     {
+        avatarUrl: 'https://www.millenniumpost.in/h-upload/2024/08/29/804354-dev-in-khadaan.webp',
+        following : false,
         id: 3,
         title: 'Ughhhh',
         author: 'behocbong',
         postedDate: '2024-12-14',
         likes: 7190,
-        Comments: 35,
+        comments: 35,
         save: 231,
         share: 114,
         data: videos.video3
     },
     {
+        avatarUrl: 'https://www.millenniumpost.in/h-upload/2024/08/29/804354-dev-in-khadaan.webp',
+        following : false,
         id: 4,
         title: 'Ughhhh',
         author: '#CapCut   rau dắt răng không thể lấy ra',
         postedDate: '2024-12-13',
         likes: 125000,
-        Comments: 57,
+        comments: 57,
         save: 622,
         share: 117,
         data: videos.video4
