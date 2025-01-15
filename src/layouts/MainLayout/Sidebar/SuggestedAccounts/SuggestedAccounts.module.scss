@@ -45,3 +45,26 @@
         pointer-events: none;
     }
 }
+
+
+/* Tablet & Mobile */
+@media screen and (max-width:991px) {
+    .suggested-accounts {
+        &__title {
+            display: none;
+        }
+
+        &__cta {
+            display: none;
+        }
+
+        & &__account {
+            width: 55px;
+            padding-left: 13px;
+            h4,
+            p {
+                display: none;
+            }
+        }
+    }
+}

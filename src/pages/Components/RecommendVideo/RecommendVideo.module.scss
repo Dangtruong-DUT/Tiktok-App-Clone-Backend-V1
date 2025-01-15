@@ -1,0 +1,30 @@
+.recommend-videos {
+    height: 100%;
+    overflow: hidden auto;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+}
+
+.video-content {
+    height: calc(-60px + 100vh);
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    margin: 0px auto;
+    transition-property: width;
+    transition-duration: 300ms;
+    transition-timing-function: linear;
+    scroll-snap-stop: always;
+    scroll-snap-align: start center;
+    scrollbar-width: 0;
+    margin-right: 46px;
+
+}
+
+.video {
+    max-height: calc((-60px - 4rem + 100vh));
+    max-width: calc((-60px - 4rem + 100vh) * 0.5625);
+}

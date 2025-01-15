@@ -62,8 +62,8 @@ function Search() {
                             <PopperWrapper >
                                 <h4 className={cx('search-title')}>Account</h4>
                                 <ul tabIndex={-1}>
-                                    {searchResults.length > 0 && searchResults.map((result) =>
-                                    <li>
+                                    {searchResults.length > 0 && searchResults.map((result, index) =>
+                                    <li key={index}>
                                         <AccountItem
                                             key={result.id}
                                             avatarSize='40px'
