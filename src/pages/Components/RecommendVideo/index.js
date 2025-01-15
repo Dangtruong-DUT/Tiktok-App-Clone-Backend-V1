@@ -1,0 +1,1 @@
+export {default as RecommendVideo} from './RecommendVideo';

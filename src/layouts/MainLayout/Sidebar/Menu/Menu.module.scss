@@ -5,6 +5,7 @@
     align-items: stretch;
     margin-bottom: 8px;
 }
+
 .menu-item {
     display: flex;
     align-items: center;
@@ -19,6 +20,7 @@
     &:hover {
         background-color: var(--btn-hover-cl);
     }
+
     &__title {
         font-size: 1.8rem;
         font-weight: 700;
@@ -38,3 +40,41 @@
 .active {
     color: var(--primary-cl);
 }
+
+/* PC */
+@media screen and (min-width:992.98px) {}
+
+/* Tablet & Mobile */
+@media screen and (max-width:991px) {
+    .menu-list {
+        margin-bottom: 4px;
+    }
+
+    .menu-item {
+        width: 55px;
+        justify-content: center;
+
+        &:hover {
+            background-color: var(--btn-hover-cl);
+        }
+
+        &__title {
+           display: none;
+        }
+
+        &__icon {
+            min-width: 32px;
+            width: 1em;
+            height: 1em;
+            font-weight: 400;
+            stroke-width: 1em;
+        }
+    }
+
+}
+
+/* Tablet */
+@media screen and (min-width:768.98px) and (min-width: 991px) {}
+
+/* Mobile */
+@media screen and (max-width:767px) {}

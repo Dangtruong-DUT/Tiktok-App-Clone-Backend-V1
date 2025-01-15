@@ -6,6 +6,14 @@
 }
 
 
+/* Mobile */
+@media screen and (max-width:767px) {
+    .search-wrapper {
+        display: none;
+    }
+
+}
+
 .search {
     --search-btn-width: 52px;
     --search-icon-color: var(--secondary-text-cl);

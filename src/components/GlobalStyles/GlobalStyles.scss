@@ -99,7 +99,8 @@ button {
     //border-color
     --border-cl: rgba(255, 255, 255, 0.2);
 
-    --btn-hover-cl: rgba(255, 255, 255, 0.08);
+    --btn-hover-cl-second: rgba(255, 255, 255, 0.19);;
+    --btn-hover-cl: rgba(255, 255, 255, 0.04);
 
     --tooltip--background-color: rgba(98, 95, 95, 0.7);
     --thumb-cl: rgba(164, 164, 164, 0.06);
@@ -129,6 +130,8 @@ button {
 
     --tooltip--background-color: rgb(23, 23, 23, 0.7);
     --thumb-cl: rgba(22, 24, 35, .06);
+    --btn-hover-cl-second: rgba(0, 0, 0, 0.12);
+
 
 }
 html, body {

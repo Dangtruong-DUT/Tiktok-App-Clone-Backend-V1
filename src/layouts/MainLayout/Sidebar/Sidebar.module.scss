@@ -18,3 +18,27 @@
     background-color: var(--thumb-cl);
     visibility: visible;
 }
+
+/* PC */
+@media screen and (min-width:992.98px) {
+   
+}
+
+/* Tablet & Mobile */
+@media screen and (max-width:991px) {
+    .wrapper {
+        width: 63px;
+        overflow: hidden auto;
+        padding: 12px 0px 26px;
+        border-right: 1px solid var(--header-boxShadow-cl);
+    }
+}
+
+/* Tablet */
+@media screen and (min-width:768.98px) and (min-width: 991px) {}
+
+/* Mobile */
+@media screen and (max-width:767px) {
+
+
+}
