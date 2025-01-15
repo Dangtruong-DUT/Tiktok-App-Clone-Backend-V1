@@ -35,3 +35,4 @@ export { default as LikeIcon } from './LikeIcon';
 export { default as PictureInPictureIcon } from './PictureInPictureIcon';
 export { default as ShareIcon } from './ShareIcon';
 export { default as VideoSoundIcon } from './VideoSoundIcon';
+export { default as TickedIcon } from './TickedIcon';

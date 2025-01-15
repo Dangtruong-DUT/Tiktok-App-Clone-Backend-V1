@@ -7,8 +7,8 @@
 .NavigatorVideo__btn {
     border-radius: 999px;
     aspect-ratio: 1 / 1;
-    width: 1.5em;
-    font-size: clamp(0.8em, 2vw + 1rem, 1.08em);;
+    width: 1em;
+    font-size:  clamp(3.2rem, 3vw + 1rem, 4.8rem);
     background-color: var(--background-input-color);
     transition-property: height, width,font-size;
     transition-duration: 300ms;

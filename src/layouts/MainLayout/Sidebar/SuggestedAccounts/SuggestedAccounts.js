@@ -16,7 +16,7 @@ function SuggestedAccounts({ title }) {
                         className={cx('suggested-accounts__account')}
                         key={2}
                         avatarSize='32px'
-                        avatar={'https://p16-sign-sg.tiktokcdn.com/aweme/100x100/tos-alisg-avt-0068/7b19e9294d9c3e7bc45be1df71fea2ea.jpeg?lk3s=a5d48078&nonce=64010&refresh_token=5a5b66ab32dbb472940cbdaee15f0210&x-expires=1736953200&x-signature=CQxEdMyRDHrBYmr%2BLdubpmfQNzw%3D&shp=a5d48078&shcp=81f88b70'}
+                        avatar={'https://ttl.edu.vn/public/upload/2024/12/gai-xinh-cam-hoa-02.webp'}
                         username={'John Doe'}
                         nameAccount={'John Doe'}
                         verified={true}
@@ -28,7 +28,7 @@ function SuggestedAccounts({ title }) {
                         className={cx('suggested-accounts__account')}
                         key={2}
                         avatarSize='32px'
-                        avatar={'https://p16-sign-sg.tiktokcdn.com/aweme/100x100/tos-alisg-avt-0068/7b19e9294d9c3e7bc45be1df71fea2ea.jpeg?lk3s=a5d48078&nonce=64010&refresh_token=5a5b66ab32dbb472940cbdaee15f0210&x-expires=1736953200&x-signature=CQxEdMyRDHrBYmr%2BLdubpmfQNzw%3D&shp=a5d48078&shcp=81f88b70'}
+                        avatar={'https://ttl.edu.vn/public/upload/2024/12/gai-xinh-cam-hoa-02.webp'}
                         username={'John Doe'}
                         nameAccount={'John Doe'}
                         verified={true}
