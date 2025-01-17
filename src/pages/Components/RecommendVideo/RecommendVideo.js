@@ -6,16 +6,18 @@ import { ActionBar } from "../ActionBar";
 
 const cx = classNames.bind(styles);
 
-function RecommendVideo({ videos, videoRefs,onWheel }) {
+function RecommendVideo({ videos, videoRefs, onWheel }) {
     return (
-        <section className={cx('recommend-videos')} onWheel= {onWheel}>
+        <section className={cx('recommend-videos')} onWheel={onWheel}>
             {videos.map((video, index) => (
-                <div key={index} className={cx('video-content')} ref={(el) => (videoRefs.current[index] = el)}>
-                    <Video sources={video} className={cx('video')} />
-                    <ActionBar
-                        video={video}
-                    />
-                </div>
+                <article key={index} className={cx('video-content')} ref={(el) => (videoRefs.current[index] = el)}>
+                    <div className={cx('videoCenterViewPort')}>
+                        <Video sources={video} className={cx('video')} />
+                        <ActionBar
+                            video={video}
+                        />
+                    </div>
+                </article>
             ))}
         </section>
     );
