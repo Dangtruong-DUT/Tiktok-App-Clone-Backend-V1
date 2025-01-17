@@ -1,31 +1,26 @@
 .recommend-videos {
     display: flex;
-    height: calc(-60px + 100vh);
+    height: calc(100vh - 60px);
     margin-right: 17px;
-}
-.list-video {
-    margin: auto;
     flex-direction: column;
     overflow: hidden auto;
     scroll-snap-type: y mandatory;
     scrollbar-width: none;
-    height: calc(-60px + 100vh);
 }
 .video-content {
-    margin: auto;
-    height: calc(-60px + 100vh);
+    height: calc(100vh - 60px);
+    flex-shrink: 0;
     position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
     transition-property: width;
     transition-duration: 300ms;
     transition-timing-function: linear;
     scroll-snap-stop: always;
     scroll-snap-align: start center;
-    scrollbar-width: 0;
+    padding: 16px;
 }
 
 .video {

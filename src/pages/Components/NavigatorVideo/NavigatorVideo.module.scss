@@ -21,6 +21,9 @@
     &:hover {
         background-color: var(--btn-hover-cl-second);
     }
+    &:active {
+        background-color: var(--btn-hover-cl);
+    }
 }
 .NavigatorVideo-content {
     display: flex;

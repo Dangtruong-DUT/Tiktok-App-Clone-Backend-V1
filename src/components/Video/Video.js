@@ -78,7 +78,7 @@ function Video({ sources = [], className }) {
     }
 
     return (
-        <section className={cx('video-frame', {
+        <article className={cx('video-frame', {
             [className]: className
         })}>
             <div className={cx('videoControls-top')}>
@@ -98,7 +98,7 @@ function Video({ sources = [], className }) {
             </video>
             <div className={cx('videoControls-bottom')}>
             </div>
-        </section>
+        </article>
     );
 }
 

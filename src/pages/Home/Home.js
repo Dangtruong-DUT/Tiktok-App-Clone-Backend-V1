@@ -4,13 +4,14 @@ import styles from './Home.module.scss';
 import { RecommendVideo } from "../Components/RecommendVideo";
 import { NavigatorVideo } from "@/pages/Components/NavigatorVideo";
 import videos from "@/assets/videos";
+import { useDebounce } from "@/hooks";
 
 const cx = classNames.bind(styles);
 
 const dataVideos = [
     {
         avatarUrl: 'https://www.millenniumpost.in/h-upload/2024/08/29/804354-dev-in-khadaan.webp',
-        following : false,
+        following: false,
         id: 1,
         title: 'Thủ tục trc khi tẩy trang của chị em =)) ',
         author: 'behocbong',
@@ -23,7 +24,7 @@ const dataVideos = [
     },
     {
         avatarUrl: 'https://www.millenniumpost.in/h-upload/2024/08/29/804354-dev-in-khadaan.webp',
-        following : false,
+        following: false,
         id: 2,
         title: 'Tín hiệu đi chụp áo dài 🧧 ',
         author: 'thanhngoc.tn76',
@@ -36,7 +37,7 @@ const dataVideos = [
     },
     {
         avatarUrl: 'https://www.millenniumpost.in/h-upload/2024/08/29/804354-dev-in-khadaan.webp',
-        following : false,
+        following: false,
         id: 3,
         title: 'Ughhhh',
         author: 'behocbong',
@@ -49,7 +50,7 @@ const dataVideos = [
     },
     {
         avatarUrl: 'https://www.millenniumpost.in/h-upload/2024/08/29/804354-dev-in-khadaan.webp',
-        following : false,
+        following: false,
         id: 4,
         title: 'Ughhhh',
         author: '#CapCut   rau dắt răng không thể lấy ra',
@@ -66,14 +67,30 @@ function Home() {
     const [indexVideo, setIndexVideo] = useState(0);
     const videoContainerRef = useRef(null);
     const videoRefs = useRef([]);
+    const isThrottled = useRef(false);
 
     const handleScroll = useCallback((e) => {
-        if (e.deltaY > 0) {
-            setIndexVideo((prev) => Math.min(prev + 1, dataVideos.length - 1));
-        } else {
-            setIndexVideo((prev) => Math.max(prev - 1, 0));
-        }
+        if (isThrottled.current) return;
+
+        const threshold = 50; // Ngưỡng cuộn tối thiểu
+        if (Math.abs(e.deltaY) < threshold) return;
+
+        isThrottled.current = true;
+
+        setIndexVideo((prev) => {
+            const newIndex = e.deltaY > 0
+                ? Math.min(prev + 1, dataVideos.length - 1)
+                : Math.max(prev - 1, 0);
+
+            videoRefs.current[newIndex]?.scrollIntoView({ behavior: "smooth" });
+            return newIndex;
+        });
+
+        setTimeout(() => {
+            isThrottled.current = false;
+        }, 500); // Thời gian chặn cuộn: 500ms
     }, []);
+
 
     const handleChangePrevVideo = useCallback(() => {
         setIndexVideo((prev) => Math.max(prev - 1, 0));
@@ -86,8 +103,8 @@ function Home() {
     }, [indexVideo]);
 
     return (
-        <div className={cx('wrapper')} ref={videoContainerRef} onWheel={handleScroll}>
-            <RecommendVideo videos={dataVideos} videoRefs={videoRefs} />
+        <div className={cx('wrapper')} ref={videoContainerRef} >
+            <RecommendVideo videos={dataVideos} videoRefs={videoRefs} onWheel={handleScroll} />
             <NavigatorVideo
                 index={indexVideo}
                 handleClickPrevBtn={handleChangePrevVideo}
