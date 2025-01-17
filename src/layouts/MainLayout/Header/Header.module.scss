@@ -1,8 +1,12 @@
 .wrapper {
+    position: relative;
+    top: 0;
+    left: 0;
     width: 100%;
     height: var(--default-layout-header-height);
     background-color: var(--background-color);
     box-shadow: var(--header-boxShadow-cl) 0px 1px 1px;
+    z-index: 100;
 }
 
 .wrapper+.wrapper {
