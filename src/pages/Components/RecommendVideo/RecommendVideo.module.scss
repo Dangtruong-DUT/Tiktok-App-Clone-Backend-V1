@@ -7,20 +7,23 @@
     scroll-snap-type: y mandatory;
     scrollbar-width: none;
 }
+
 .video-content {
     height: calc(100vh - 60px);
     flex-shrink: 0;
-    position: relative;
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    transition-property: width;
-    transition-duration: 300ms;
-    transition-timing-function: linear;
     scroll-snap-stop: always;
     scroll-snap-align: start center;
     padding: 16px;
+}
+
+.videoCenterViewPort {
+    margin: auto;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
 }
 
 .video {
