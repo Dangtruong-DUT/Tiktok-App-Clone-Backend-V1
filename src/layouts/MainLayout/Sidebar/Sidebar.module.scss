@@ -6,6 +6,7 @@
     height: calc(100vh - 60px);
     overflow: hidden scroll;
     margin-left: -8px;
+    flex-shrink: 0;
 }
 
 .wrapper::-webkit-scrollbar-thumb  {

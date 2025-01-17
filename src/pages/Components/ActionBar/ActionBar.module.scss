@@ -32,11 +32,16 @@
         margin: 8px 0 6px 0;
         transition: background-color 500ms ease-in-out;
 
-
-        &:hover {
-            background-color: var(--btn-hover-cl);
+        & svg {
+            font-size: clamp(3.2rem, 3vw + 1rem, 3.6rem);
         }
 
+        &:hover {
+            background-color: var(--btn-hover-cl-second);
+        }
+        &:active {
+            background-color: var(--btn-hover-cl);
+        }
         &.liked svg {
             animation: scaleHeart 0.4s ease-in-out;
             color: var(--primary-cl);
@@ -108,7 +113,7 @@
 }
 @keyframes cancel {
     0% {
-        transform: scale(0);
+        transform: scale(0.5);
         opacity: 0;
     }
 

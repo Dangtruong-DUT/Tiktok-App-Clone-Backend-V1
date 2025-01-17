@@ -1,10 +1,8 @@
 .video-frame {
-    border-radius: 16px;
-    overflow: hidden;
-
     &__video {
         width: 100%;
         height: 100%;
+        border-radius: 16px;
         object-fit: cover;
     }
 }
