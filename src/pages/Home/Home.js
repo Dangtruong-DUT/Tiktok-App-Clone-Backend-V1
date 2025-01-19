@@ -105,7 +105,8 @@ function Home() {
     return (
         <div className={cx('wrapper')} ref={videoContainerRef} >
             <RecommendVideo videos={dataVideos} videoRefs={videoRefs} onWheel={handleScroll} />
-            <NavigatorVideo
+            <NavigatorVideo 
+            className={cx('hiddenOnMobile')} 
                 index={indexVideo}
                 handleClickPrevBtn={handleChangePrevVideo}
                 handleClickNextBtn={handleChangeNextVideo}

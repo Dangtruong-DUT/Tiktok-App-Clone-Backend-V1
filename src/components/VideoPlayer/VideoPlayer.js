@@ -123,23 +123,30 @@ function VideoPlayer({ sources = [], className }) {
 
     const handleMuteToggle = useCallback((newMutedState) => {
         setIsMuted(newMutedState);
+        setShowMutedIcon(true);
         if (videoRef.current) {
             videoRef.current.muted = newMutedState;
-
         }
+        setTimeout(() => {
+            setShowMutedIcon(false);
+        }, 500);
     }, []);
 
     const handleVolumeChange = useCallback((newVolume) => {
         setVolume(newVolume);
         if (newVolume === 0) {
             setIsMuted(true);
+            setShowMutedIcon(true);
+            setTimeout(() => {
+                setShowMutedIcon(false);
+            }, 500);
         } else {
             setIsMuted(false);
         }
         if (videoRef.current) {
             videoRef.current.volume = newVolume;
         }
-    }, [])
+    }, []);
 
     const handleProgressBarActive = useCallback((active) => {
         setIsProgressBarActive(active);
@@ -149,18 +156,12 @@ function VideoPlayer({ sources = [], className }) {
         sources = [sources];
     }
 
-    useEffect(() => {
-        setShowMutedIcon(true);
-        setTimeout(() => {
-            setShowMutedIcon(false);
-        }, 500);
-    }, [isMuted]);
-
     return (
+        <div className={cx('wrapper', {
+            [className]: className
+        })}>
         <section
-            className={cx('video-frame', {
-                [className]: className
-            })}
+            className={cx('video-frame')}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -222,6 +223,7 @@ function VideoPlayer({ sources = [], className }) {
                 />
             </div>
         </section>
+        </div>
     );
 }
 
