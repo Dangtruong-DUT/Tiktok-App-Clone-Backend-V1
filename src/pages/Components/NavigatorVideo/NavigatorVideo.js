@@ -6,9 +6,11 @@ import { memo } from "react";
 
 const cx = classNames.bind(styles);
 
-function NavigatorVideo({ handleClickPrevBtn, index, handleClickNextBtn }) {
+function NavigatorVideo({ handleClickPrevBtn, index, handleClickNextBtn, className }) {
     return (
-        <div className={cx('NavigatorVideo-wrapper')}>
+        <div className={cx('NavigatorVideo-wrapper', {
+            [className]: className
+        })}>
             <div className={cx('NavigatorVideo-content')}>
                 <button
                     className={cx('NavigatorVideo__btn', { disabled: index === 0 })}
@@ -23,7 +25,7 @@ function NavigatorVideo({ handleClickPrevBtn, index, handleClickNextBtn }) {
                     <ChevronLeftIcon width="0.5em" height="0.5em" rotate="270deg" />
                 </button>
             </div>
-        </div>
+        </div >
     );
 }
 

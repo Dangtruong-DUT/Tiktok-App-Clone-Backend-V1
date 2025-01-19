@@ -1,32 +1,35 @@
 .recommend-videos {
     display: flex;
-    height: calc(100vh - 60px);
-    margin-right: 17px;
+    height: calc(100vh - 0px);
     flex-direction: column;
     overflow: hidden auto;
     scroll-snap-type: y mandatory;
     scrollbar-width: none;
+    padding: 16px 176px 16px 16px;
 }
 
 .video-content {
-    height: calc(100vh - 60px);
+    height: calc(100vh - 0px);
     flex-shrink: 0;
     display: flex;
     scroll-snap-stop: always;
     scroll-snap-align: start center;
-    padding: 16px;
 }
 
 .videoCenterViewPort {
     margin: auto;
+    flex-grow: 1;
     position: relative;
     display: flex;
     flex-direction: row;
     align-items: flex-end;
     justify-content: center;
+    column-gap: 1em;
 }
 
 .video {
-    max-height: calc((-60px - 4rem + 100vh));
-    max-width: calc((-60px - 4rem + 100vh) * 0.5625);
+    max-height: calc((-0px - 2.2rem + 100vh));
+    max-width: calc((-0px -  2.2em + 100vh) * 0.5625);
+    aspect-ratio: 0.5625;
+    flex-grow: 1;
 }
