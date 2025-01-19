@@ -1,7 +1,7 @@
 import classNames from "classnames/bind";
 import styles from './RecommendVideo.module.scss';
 import { memo } from "react";
-import { Video } from "@/components/Video";
+import { Video } from "@/components/VideoPlayer";
 import { ActionBar } from "../ActionBar";
 
 const cx = classNames.bind(styles);

@@ -1,0 +1,31 @@
+.video-desc {
+    font-size: 14px;
+    line-height: 18px;
+    white-space: pre-wrap;
+    font-weight: 400;
+    display: -webkit-box;
+    -webkit-line-clamp: var(--line-clamp, 1);
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    width: 80%;
+}
+
+.video-desc.expanded {
+    -webkit-line-clamp: unset;
+    overflow: visible;
+}
+.more-less-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 0%;
+    transform: translate(-12px,-50%);
+    font-weight: 600;
+    font-size: 1.4rem;
+    line-height: 1.29;
+    background: none;
+    cursor: pointer;
+    height: 21px;
+    flex-shrink: 0;
+    padding: 1px 6px;
+    color: var(--white-color);
+}

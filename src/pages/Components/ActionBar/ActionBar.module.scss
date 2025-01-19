@@ -37,16 +37,15 @@
         }
 
         &:hover {
-            background-color: var(--btn-hover-cl-second);
+            background-color: var(--ui-action-hover);
         }
         &:active {
-            background-color: var(--btn-hover-cl);
+            background-color: var(--ui-action-active);
         }
         &.liked svg {
             animation: scaleHeart 0.4s ease-in-out;
             color: var(--primary-cl);
         }
-
         &.saved svg {
             transform-origin: top;
             animation: scaleSave 0.4s ease;

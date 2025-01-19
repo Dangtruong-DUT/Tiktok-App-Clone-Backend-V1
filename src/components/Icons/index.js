@@ -36,3 +36,5 @@ export { default as PictureInPictureIcon } from './PictureInPictureIcon';
 export { default as ShareIcon } from './ShareIcon';
 export { default as VideoSoundIcon } from './VideoSoundIcon';
 export { default as TickedIcon } from './TickedIcon';
+export { default as PauseIcon } from './PauseIcon';
+export { default as PlayIcon } from './PlayIcon';
