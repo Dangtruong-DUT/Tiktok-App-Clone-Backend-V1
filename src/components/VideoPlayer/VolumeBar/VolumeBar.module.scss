@@ -4,20 +4,29 @@
     justify-content: center;
     align-items: center;
 
-    &__icon{
+    &__icon {
         position: relative;
         padding: 8px;
-        opacity: 1;
+        opacity: 0;
         width: 40px;
         height: 40px;
         z-index: 6;
-        transition: opacity  0.3s;
+        transition: opacity 0.3s;
         cursor: pointer;
-        &.visible svg{
+
+        &.visible {
             opacity: 1;
         }
     }
 
+    .hovered &__icon {
+        opacity: 1;
+    }
+    &:hover  .volumeBar-container{
+        opacity: 1;
+        visibility: visible;
+        scale: 1;
+    }
     .volumeBar-container {
         width: 64px;
         height: 24px;
@@ -26,6 +35,11 @@
         border-radius: 32px;
         margin: 7px 8px 7px 0px;
         cursor: pointer;
+        opacity: 0;
+        visibility: hidden;
+        scale: 0.3;
+        transform-origin: left center;
+        transition: opacity 0.3s, visibility 0.3s, scale 0.3s ease-out;
 
         .volume-bar {
             width: 48px;
@@ -63,7 +77,7 @@
                 z-index: 4;
                 top: 50%;
                 left: 0;
-                translate: 0 -50%;
+                translate: -50% -50%;
                 cursor: grab;
 
                 &:active {

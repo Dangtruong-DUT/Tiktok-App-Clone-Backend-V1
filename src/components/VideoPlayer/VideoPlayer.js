@@ -3,7 +3,7 @@ import { memo, useRef, useEffect, useState, useCallback } from "react";
 import classNames from "classnames/bind";
 import styles from './Video.module.scss';
 import { ProgressBar } from "./ProgressBar";
-import { PauseIcon, PlayIcon } from "../Icons";
+import { DynamicVolumeIcon, PauseIcon, PlayIcon } from "../Icons";
 import VolumeBar from "./VolumeBar/VolumeBar";
 import { VideoDescription } from "./Description";
 
@@ -16,10 +16,11 @@ function VideoPlayer({ sources = [], className }) {
     const [isInViewport, setIsInViewport] = useState(false);
     const [isPlaying, setIsPlaying] = useState(true);
     const [showPlayPauseIcon, setShowPlayPauseIcon] = useState(false);
+    const [showMutedIcon, setShowMutedIcon] = useState(false);
+    const [isProgressBarActive, setIsProgressBarActive] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
 
     useEffect(() => {
-
-
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
@@ -128,16 +129,6 @@ function VideoPlayer({ sources = [], className }) {
         }
     }, []);
 
-    useEffect(() => {
-        if (videoRef.current) {
-            videoRef.current.volume = volume;
-            if (videoRef.current.muted !== isMuted) {
-                console.log('muted', videoRef.current.muted);
-                videoRef.current.muted = isMuted;
-            }
-        }
-    }, [volume, isMuted]);
-
     const handleVolumeChange = useCallback((newVolume) => {
         setVolume(newVolume);
         if (newVolume === 0) {
@@ -150,16 +141,28 @@ function VideoPlayer({ sources = [], className }) {
         }
     }, [])
 
+    const handleProgressBarActive = useCallback((active) => {
+        setIsProgressBarActive(active);
+    }, []);
 
     if (!Array.isArray(sources)) {
         sources = [sources];
     }
+
+    useEffect(() => {
+        setShowMutedIcon(true);
+        setTimeout(() => {
+            setShowMutedIcon(false);
+        }, 500);
+    }, [isMuted]);
 
     return (
         <section
             className={cx('video-frame', {
                 [className]: className
             })}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             <div className={cx('videoControls-top')}>
                 <VolumeBar
@@ -168,10 +171,11 @@ function VideoPlayer({ sources = [], className }) {
                     onVolumeChange={handleVolumeChange}
                     isMuted={isMuted}
                     onMuteToggle={handleMuteToggle}
+                    isParentHovered={isHovered}
                 />
             </div>
             {showPlayPauseIcon && (
-                <div className={cx('play-pause-icon')}>
+                <div className={cx('overlay-icon')}>
                     {!isPlaying ?
                         <PauseIcon width="1em" height="1em" />
                         :
@@ -179,6 +183,11 @@ function VideoPlayer({ sources = [], className }) {
                     }
                 </div>
             )}
+            {showMutedIcon &&
+                <div className={cx('overlay-icon')}>
+                    <DynamicVolumeIcon width="1em" height="1em" isMuted={isMuted} />
+                </div>
+            }
             <video
                 onClick={handlePlayPause}
                 className={cx('video-frame__video')}
@@ -195,7 +204,9 @@ function VideoPlayer({ sources = [], className }) {
             <div className={cx('videoControls-bottom')}
                 onClick={handlePlayPause}
             >
-                <div className={cx('video-multiText')}>
+                <div className={cx('video-multiText', {
+                    hidden: isProgressBarActive
+                })}>
                     <a href={`@${sources[0].author}`} className={cx('video-author-container')}>
                         <h3 className={cx('video-author')}>{sources[0].author}</h3>
                         {sources[0].postedDate}
@@ -207,6 +218,7 @@ function VideoPlayer({ sources = [], className }) {
                     currentTime={currentTime}
                     duration={duration}
                     onSeek={handleSeek}
+                    onActive={handleProgressBarActive}
                 />
             </div>
         </section>
