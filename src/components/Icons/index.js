@@ -38,3 +38,4 @@ export { default as VideoSoundIcon } from './VideoSoundIcon';
 export { default as TickedIcon } from './TickedIcon';
 export { default as PauseIcon } from './PauseIcon';
 export { default as PlayIcon } from './PlayIcon';
+export { default as DynamicVolumeIcon} from './DynamicVolumeIcon';
