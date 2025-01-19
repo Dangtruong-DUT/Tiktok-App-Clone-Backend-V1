@@ -7,7 +7,7 @@
 
 
 * {
-    box-sizing: border-box ;
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
@@ -17,6 +17,9 @@
     --black-color: #000;
     --primary-cl: #fe2c55;
     --yellow-color: #FACE15;
+
+    --overlay-black: rgba(0, 0, 0, 0.15);
+    --overlay-white: rgba(255, 255, 255, 0.4);
 
 
     // Default Layout
@@ -29,8 +32,8 @@
     --tooltip-transition: opacity 0.25s, visibility 0.25s;
 
     //fonts
-    --font-primary: TikTokFont,Poppins, sans-serif;
-    --font-secondary: TikTokDisplayFont ,Poppins, sans-serif;
+    --font-primary: TikTokFont, Poppins, sans-serif;
+    --font-secondary: TikTokDisplayFont, Poppins, sans-serif;
 }
 
 html {
@@ -46,7 +49,8 @@ body {
     margin: 0;
 }
 
-html, body {
+html,
+body {
     overflow-y: overlay;
     scroll-behavior: smooth;
 }
@@ -80,7 +84,8 @@ button {
 }
 
 //  theme specific
-.dark ,.App[data-theme="dark"] {
+.dark,
+.App[data-theme="dark"] {
     --background-color: rgb(18, 18, 18);
     --background-second-color: rgb(37, 37, 37);
     --background-input-color: rgba(255, 255, 255, 0.12);
@@ -100,16 +105,22 @@ button {
     //border-color
     --border-cl: rgba(255, 255, 255, 0.2);
 
-    --btn-hover-cl-second: rgba(255, 255, 255, 0.19);;
+    --btn-hover-cl-second: rgba(255, 255, 255, 0.19);
+    ;
     --btn-hover-cl: rgba(255, 255, 255, 0.04);
 
     --tooltip--background-color: rgba(98, 95, 95, 0.7);
     --thumb-cl: rgba(164, 164, 164, 0.06);
-    
+
+    // action bar
+    --ui-action-hover :rgba(255, 255, 255, 0.08);
+    --ui-action-active : rgba(22, 24, 35, 0.14);
+
 
 }
 
-.light ,.App[data-theme="light"] {
+.light,
+.App[data-theme="light"] {
     // color background
     --background-color: #fff;
     --background-second-color: rgb(255, 255, 255);
@@ -133,9 +144,13 @@ button {
     --thumb-cl: rgba(22, 24, 35, .06);
     --btn-hover-cl-second: rgba(0, 0, 0, 0.12);
 
-
+    // action bar
+    --ui-action-hover : rgba(22, 24, 35, 0.08);
+    --ui-action-active : rgba(22, 24, 35, 0.14);
 }
-html, body {
+
+html,
+body {
     overflow-y: overlay;
     scroll-behavior: smooth;
     background-color: var(--background-color);
