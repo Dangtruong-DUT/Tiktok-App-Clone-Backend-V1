@@ -14,6 +14,7 @@ function RecommendVideo({ videos, videoRefs, onWheel }) {
                     <div className={cx('videoCenterViewPort')}>
                         <Video sources={video} className={cx('video')} />
                         <ActionBar
+                            className={cx('actionBar')}
                             video={video}
                         />
                     </div>

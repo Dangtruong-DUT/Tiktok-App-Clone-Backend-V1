@@ -29,6 +29,10 @@
         height: 1em;
         font-size: 1em;
         color: var(--primary-text-cl);
+        @media screen and (max-width:414.98px) {
+           color: var(--white-color);
+           background-color: transparent;
+         }
         margin: 8px 0 6px 0;
         transition: background-color 500ms ease-in-out;
 

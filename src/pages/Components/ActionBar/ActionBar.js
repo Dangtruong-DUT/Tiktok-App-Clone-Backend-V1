@@ -7,9 +7,9 @@ import { useState } from "react";
 
 const cx = classNames.bind(styles)
 
-function ActionBar(
+function ActionBar({
     video,
-    className) {
+    className}) {
     const [Liked, setLike] = useState(false);
     const [Saved, setSave] = useState(false);
 
@@ -19,8 +19,6 @@ function ActionBar(
     const handleSave = () => {
         setSave(!Saved);
     }
-
-    video = video.video;
     return (
         <section className={cx('actionBar-container', {
             [className]: className
