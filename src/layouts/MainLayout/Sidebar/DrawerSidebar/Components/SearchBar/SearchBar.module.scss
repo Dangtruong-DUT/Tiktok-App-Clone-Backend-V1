@@ -40,7 +40,7 @@
 
     &__icon-clear,
     &__icon-spinner {
-        color: rgba(22, 24, 35, .34);
+        color: var(--search-icon-color);
         width: 40px;
         height: var(--search-icon-height);
     }
