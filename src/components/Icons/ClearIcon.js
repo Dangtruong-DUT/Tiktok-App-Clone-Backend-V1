@@ -1,7 +1,7 @@
 function ClearIcon({ className, width = '3.2rem', height = '3.2rem', color = 'currentColor' }) {
     return (
         <svg className={className} width={width} height={height} viewBox="0 0 48 48" fill={color}
-            xmlns="http://www.w3.org/2000/svg" style={{ margin: '0px 12px' }}>
+            xmlns="http://www.w3.org/2000/svg">
             <path fillRule="evenodd" clipRule="evenodd" d="M24 46C36.1503 46 46 36.1503 46 24C46
         11.8497 36.1503 2 24 2C11.8497 2 2 11.8497 2 24C2 36.1503 11.8497 46 24 46ZM15.1466
         30.7323L21.8788 24.0001L15.1466 17.2679C14.756 16.8774 14.756 16.2442 15.1466

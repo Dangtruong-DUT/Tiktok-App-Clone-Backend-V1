@@ -74,30 +74,6 @@ const USER_MENU = [
         to: '/profile'
     },
     {
-        icon: <CoinIcon width='1em' height='1em' />,
-        title: 'Get Coins',
-        to: '/get-coins'
-    },
-    {
-        icon: <CreateIcon width='1em' height='1em' />,
-        title: 'Creator tools',
-        children: {
-            title: 'Creator tools',
-            menuItems: [
-                {
-                    icon: <LightBulbIcon width='1em' height='1em' />,
-                    title: 'LIVE Creator Hub'
-                }
-            ]
-        }
-    },
-    {
-        icon: <BusinessSuiteIcon width='1em' height='1em' />,
-        title: 'Business Suite',
-        to: '/business- Suite'
-
-    },
-    {
         icon: <SettingIcon width='1em' height='1em' />,
         title: 'Settings',
         to: '/settings'
@@ -153,8 +129,6 @@ const USER_MENU = [
         icon: <LogoutIcon width='1em' height='1em' />,
         title: 'Log out',
         to: '/logout',
-        separate: true
-
     }
 ]
 

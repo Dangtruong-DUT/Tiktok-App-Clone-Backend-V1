@@ -1,0 +1,30 @@
+.DrawerSidebar{
+    &__header {
+        padding: 0 8px;
+        display: flex;
+        justify-content: space-between;
+        .DrawerSidebar__header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            line-height: 1.5625;
+            font-family: var(--font-secondary);
+        }
+
+    }
+    &__btn {
+        cursor: pointer;
+        position: relative;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        background-color: var(--background-input-color);
+        color: var(--primary-text-cl);
+        &:hover {
+            background-color: var(--btn-hover-cl);
+        }
+    }
+}
