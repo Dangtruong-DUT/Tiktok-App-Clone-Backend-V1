@@ -29,10 +29,12 @@
         height: 1em;
         font-size: 1em;
         color: var(--primary-text-cl);
+
         @media screen and (max-width:414.98px) {
-           color: var(--white-color);
-           background-color: transparent;
-         }
+            color: var(--white-color);
+            background-color: transparent;
+        }
+
         margin: 8px 0 6px 0;
         transition: background-color 500ms ease-in-out;
 
@@ -43,13 +45,16 @@
         &:hover {
             background-color: var(--ui-action-hover);
         }
+
         &:active {
             background-color: var(--ui-action-active);
         }
+
         &.liked svg {
             animation: scaleHeart 0.4s ease-in-out;
             color: var(--primary-cl);
         }
+
         &.saved svg {
             transform-origin: top;
             animation: scaleSave 0.4s ease;
@@ -114,6 +119,7 @@
         transform: scaleY(1.2);
     }
 }
+
 @keyframes cancel {
     0% {
         transform: scale(0.5);

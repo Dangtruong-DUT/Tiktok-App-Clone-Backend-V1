@@ -1,13 +1,22 @@
+import React, { memo } from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames/bind";
-import styles from  './Menu.module.scss';
+import styles from "./Menu.module.scss";
+import { useSidebar } from "../../Context";
 
 const cx = classNames.bind(styles);
 
-function Menu({ children }) {
+function Menu({ children ,className}) {
+
+    const { isSmall } = useSidebar();
+
+
     return (
-        <nav className={cx('menu-list')}>
-            <ul>
+        <nav className={cx("wrapper",{
+            [className] : className,
+            'wrapper-menuList--small': isSmall
+        })}>
+            <ul className={cx("menu-list")}>
                 {children}
             </ul>
         </nav>
@@ -15,7 +24,7 @@ function Menu({ children }) {
 }
 
 Menu.propTypes = {
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
 };
 
-export default Menu;
+export default memo(Menu);

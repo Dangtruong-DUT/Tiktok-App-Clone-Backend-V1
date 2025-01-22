@@ -7,7 +7,8 @@ const routes = {
     live: '/live',
     messages: '/messages',
     explore: '/explore',
-    friends: '/friends'
+    friends: '/friends',
+    activity: '/activity',
 }
 
 export default routes;

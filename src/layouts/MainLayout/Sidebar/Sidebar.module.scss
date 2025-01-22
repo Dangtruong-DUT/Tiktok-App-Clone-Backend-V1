@@ -1,45 +1,59 @@
-.wrapper {
+@mixin smallSidebar {
+    width: 56px;
+    border-right: 1px solid var(--header-boxShadow-cl);
+}
+
+.container {
+    position: relative;
+    width: 232px;
+    height: calc(100vh);
+}
+
+.SideBar {
     display: flex;
     flex-direction: column;
-    width: 232px;
-    padding: 20px 0px 26px 0px;
-    height: calc(100vh - 0px);
-    overflow: hidden scroll;
-    margin-left: -8px;
+    width: 100%;
+    padding: 20px 0 26px 0;
+    height: 100%;
     flex-shrink: 0;
+    transition: width 400ms ease;
 }
 
-.wrapper::-webkit-scrollbar-thumb  {
-   background-color: transparent;
-   visibility: hidden;
-    transition: background-color 600ms ease-in-out, visibility 300ms ease-in-out, scale 300ms ease-in-out;
+.sidebar-scroll-container {
+    flex-shrink: 0;
+    flex: 1;
+    overflow: hidden scroll;
+    scrollbar-width: none;
 }
 
-.wrapper:hover::-webkit-scrollbar-thumb {
-    background-color: var(--thumb-cl);
-    visibility: visible;
+/* Áp dụng cho chế độ nhỏ (small) */
+.SlidingSidebar {
+    @include smallSidebar;
 }
+
+/* Media Queries */
 
 /* PC */
-@media screen and (min-width:992.98px) {
-   
+@media screen and (min-width: 992.98px) {
+    .wrapper {}
 }
 
 /* Tablet & Mobile */
-@media screen and (max-width:991px) {
-    .wrapper {
-        width: 63px;
-        overflow: hidden auto;
-        padding: 12px 0px 26px;
-        border-right: 1px solid var(--header-boxShadow-cl);
+@media screen and (max-width: 991px) {
+    .container {
+        @include smallSidebar;
     }
 }
 
-/* Tablet */
-@media screen and (min-width:768.98px) and (min-width: 991px) {}
+@media screen and (min-width: 768.98px) and (max-width: 991px) {
+    .wrapper {
+        @include smallSidebar;
+    }
+}
 
 /* Mobile */
-@media screen and (max-width:767px) {
-
-
+@media screen and (max-width: 767px) {
+    .wrapper {
+        @include smallSidebar;
+    }
 }

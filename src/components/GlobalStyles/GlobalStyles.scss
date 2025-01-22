@@ -93,6 +93,7 @@ button {
 
     --primary-text-cl: rgba(255, 255, 255, 0.9);
     --secondary-text-cl: rgba(255, 255, 255, 0.5);
+    --placeholder-text-cl: rgba(255, 255, 255, 0.4);
 
     --border-focus-cl: 2px solid rgb(255, 76, 58);
 
@@ -129,6 +130,7 @@ button {
     //color text 
     --primary-text-cl: #161823;
     --secondary-text-cl: rgba(22, 24, 35, 0.5);
+    --placeholder-text-cl:rgba(0, 0, 0, 0.34);
 
     //icon
     --input-BG: rgba(255, 255, 255, 0.12);
@@ -155,6 +157,7 @@ body {
     scroll-behavior: smooth;
     background-color: var(--background-color);
 }
+
 
 
 .App {

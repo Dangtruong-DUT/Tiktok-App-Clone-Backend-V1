@@ -2,8 +2,10 @@ import classNames from "classnames/bind"
 import Styles from './SidebarFooter.module.scss';
 import ListLink from './ListLink';
 import images from "@/assets/images";
-import { LINKS_FOR_COMPANY, LINKS_FOR_TERM_POLICY,
-     LINKS_FOR_PROGRAM } from '@/constants/Links';
+import {
+    LINKS_FOR_COMPANY, LINKS_FOR_TERM_POLICY,
+    LINKS_FOR_PROGRAM
+} from '@/constants/Links';
 
 const cx = classNames.bind(Styles);
 
