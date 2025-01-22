@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Sidebar.module.scss";
 import config from "@/config";
@@ -21,6 +21,7 @@ import { useSidebar } from "../Context";
 import DrawerSidebar from "./DrawerSidebar/DrawerSidebar";
 import MenuMore from "./DrawerSidebar/Components/MenuMore/MenuMore";
 import { SearchBar } from "./DrawerSidebar/Components/SearchBar";
+import { ThemeContext } from "@/theme";
 
 const cx = classNames.bind(styles);
 
@@ -29,6 +30,15 @@ function Sidebar() {
     const [isShowDrawerBar, setShowDrawerBar] = useState(false);
     const [activeMenuItem, setActiveMenuItem] = useState(config.routes.home);
     const [drawerContent, setDrawerContent] = useState(null);
+
+    const { setThemeMode } = useContext(ThemeContext);
+
+
+    const handleMenuChange = (menuItem) => {
+        if (menuItem.type === 'theme') {
+            setThemeMode(menuItem.data);
+        }
+    };
 
     const toggleDrawerBar = (content) => {
         setSideBarSmallSize(true);
@@ -88,7 +98,7 @@ function Sidebar() {
                 {isShowDrawerBar && (
                     <DrawerSidebar onClose={closeDrawer}>
                         {drawerContent === "search" && <SearchBar onClose={closeDrawer} />}
-                        {drawerContent === "more" && <MenuMore onClose={closeDrawer} />}
+                        {drawerContent === "more" && <MenuMore onClose={closeDrawer} onChange={handleMenuChange}  />}
                     </DrawerSidebar>
                 )}
                 <SidebarHeader onToggleSearchBar={() => toggleDrawerBar("search")} />

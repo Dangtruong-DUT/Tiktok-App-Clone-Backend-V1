@@ -1,7 +1,7 @@
 import Menu from "@/layouts/MainLayout/Sidebar/DrawerSidebar/Components/MenuMore/Menu";
 import { MENU_ITEMS, USER_MENU } from "@/constants/Menus";
 
-function MenuMore({ isUser, onChange, onClose }) {
+function MenuMore({ isUser, onChange, onClose}) {
     return (
         <Menu
             items={
