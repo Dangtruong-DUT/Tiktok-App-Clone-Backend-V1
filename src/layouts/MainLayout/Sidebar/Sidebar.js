@@ -22,14 +22,17 @@ import DrawerSidebar from "./DrawerSidebar/DrawerSidebar";
 import MenuMore from "./DrawerSidebar/Components/MenuMore/MenuMore";
 import { SearchBar } from "./DrawerSidebar/Components/SearchBar";
 import { ThemeContext } from "@/theme";
+import { useLocation } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
 function Sidebar() {
     const { isSmall, setSideBarSmallSize } = useSidebar();
     const [isShowDrawerBar, setShowDrawerBar] = useState(false);
-    const [activeMenuItem, setActiveMenuItem] = useState(config.routes.home);
+    const location = useLocation();
+    const [activeMenuItem, setActiveMenuItem] = useState(location.pathname);
     const [drawerContent, setDrawerContent] = useState(null);
+    const [searchValue, setSearchValue] = useState('');
 
     const { setThemeMode } = useContext(ThemeContext);
 
@@ -97,11 +100,11 @@ function Sidebar() {
             <aside className={cx("SideBar", { SlidingSidebar: isSmall })}>
                 {isShowDrawerBar && (
                     <DrawerSidebar onClose={closeDrawer}>
-                        {drawerContent === "search" && <SearchBar onClose={closeDrawer} />}
+                        {drawerContent === "search" && <SearchBar onClose={closeDrawer}  setSearchValue = {setSearchValue} searchValue= {searchValue}/>}
                         {drawerContent === "more" && <MenuMore onClose={closeDrawer} onChange={handleMenuChange}  />}
                     </DrawerSidebar>
                 )}
-                <SidebarHeader onToggleSearchBar={() => toggleDrawerBar("search")} />
+                <SidebarHeader searchValue={searchValue} onToggleSearchBar={() => toggleDrawerBar("search")} />
                 <div className={cx("sidebar-scroll-container")}>
                     <Menu>{renderMenuItems()}</Menu>
                     {!isSmall && (

@@ -6,6 +6,7 @@ import { ProgressBar } from "./ProgressBar";
 import { DynamicVolumeIcon, PauseIcon, PlayIcon } from "../Icons";
 import VolumeBar from "./VolumeBar/VolumeBar";
 import { VideoDescription } from "./Description";
+import { TimeAgo } from "../TimeAgo";
 
 const cx = classNames.bind(styles);
 
@@ -198,7 +199,7 @@ function VideoPlayer({ sources = [], className }) {
                 muted={isMuted}
             >
                 {sources.map((source, index) => (
-                    <source key={index} src={source.data} type={source.type} />
+                    <source key={index} src={source.file_url} type={source.type} />
                 ))}
                 Your browser does not support the video tag.
             </video>
@@ -209,10 +210,10 @@ function VideoPlayer({ sources = [], className }) {
                     hidden: isProgressBarActive
                 })}>
                     <a href={`@${sources[0].author}`} className={cx('video-author-container')}>
-                        <h3 className={cx('video-author')}>{sources[0].author}</h3>
-                        {sources[0].postedDate}
+                        <h3 className={cx('video-author')}>{sources[0].user.nickname}</h3>
+                        <TimeAgo timestamp={sources[0].created_at} />
                     </a>
-                    <VideoDescription description={sources[0].title} />
+                    <VideoDescription description={sources[0].description} />
                 </div>
                 <ProgressBar
                     className={cx('progress')}

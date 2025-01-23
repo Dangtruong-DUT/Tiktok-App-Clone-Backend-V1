@@ -1,0 +1,1 @@
+export {default as ProfileAuthor} from './ProfileAuthor';

@@ -67,7 +67,7 @@
     }
 
     &__value {
-        color: var(--secondary-text-cl);
+        color: var(--primary-text-cl);
         font-size: 1.2rem;
         line-height: 1.334;
         font-weight: 700;
@@ -92,6 +92,11 @@
         align-items: center;
         border-radius: 9999px;
         outline: 1px solid var(--primary-cl);
+    }
+    &__btn-following.following {
+        background-color: var(--white-color);
+        color: var(--primary-cl);
+        outline: 1px solid var(--border-cl);
     }
 }
 

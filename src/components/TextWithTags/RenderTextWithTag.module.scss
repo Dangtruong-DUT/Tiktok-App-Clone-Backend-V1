@@ -1,0 +1,24 @@
+.text-with-tags {
+    &__normal {
+        color: var(--primary-text-cl);
+    }
+    &__tag {
+        color: var(--hashTag-text-cl);
+        font-weight: bold;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline var(--primary-text-cl);
+        }
+    }
+
+    &__hashtag {
+        color: var(--hashTag-text-cl);
+        font-weight: bold;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline var(--primary-text-cl);
+        }
+    }
+}

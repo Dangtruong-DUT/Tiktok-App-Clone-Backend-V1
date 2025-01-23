@@ -1,0 +1,65 @@
+.profileAuthor {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    background-color: var(--background-card-profile);
+    border-radius: 12px;
+
+    &__row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__contact {
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
+    }
+
+    &__info {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+
+        &__name {
+            font-weight: 700;
+            font-size: 1.8rem;
+            line-height: 1.334;
+            color: var(--primary-text-cl);
+        }
+        .profileAuthor-info__row {
+            display: flex;
+            align-items: center;
+            column-gap: 0.8rem;
+        }
+        &__nickName {
+            font-size: 1.4rem;
+            line-height: 1.29;
+            display: flex;
+            -webkit-box-align: center;
+            color: var(--primary-text-cl);
+            align-items: center;
+        }
+
+        &__time {
+            font-size: 1.4rem;
+            line-height: 1.29;
+            display: flex;
+            -webkit-box-align: center;
+            color: var(--primary-text-cl);
+            align-items: center;
+        }
+    }
+
+    &__btn-follow {
+
+    }
+
+    &__desc {
+        font-size: 1.6rem;
+        line-height: 1.3125;
+            color: var(--primary-text-cl);
+            word-break: break-word;
+    }
+}

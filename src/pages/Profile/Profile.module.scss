@@ -1,0 +1,11 @@
+.wrapper {
+    display: flex;
+    padding: 32px 8px 36px  24px;
+    flex-direction: column;
+    flex: 1 1 auto;
+    height: calc(100vh);
+    margin: 0 auto;
+    background-color: var(--background-color);
+    overflow: hidden auto;
+    scrollbar-width: none;
+}

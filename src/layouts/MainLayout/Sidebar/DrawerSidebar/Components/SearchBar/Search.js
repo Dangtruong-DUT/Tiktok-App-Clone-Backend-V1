@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames/bind';
 import { useDebounce } from '@/hooks';
 import AccountItem from '@/components/AccountItem';
@@ -11,8 +11,7 @@ import {
 import { DrawerSidebarHeader } from '../DrawerSidebarHeader';
 const cx = classNames.bind(Styles);
 
-function Search({onClose}) {
-    const [searchValue, setSearchValue] = useState('');
+function Search({ onClose, setSearchValue, searchValue }) {
     const [searchResults, setSearchResults] = useState([]);
     const [showLoading, setShowLoading] = useState(false);
     const debounceValue = useDebounce(searchValue, 500);
@@ -44,7 +43,7 @@ function Search({onClose}) {
 
     return (
         <div className={cx('search-wrapper')}>
-            <DrawerSidebarHeader title='Search' onExit= {onClose} />
+            <DrawerSidebarHeader title='Search' onExit={onClose} />
             <div className={cx('search')}>
                 <input ref={inputRef} className={cx('search__input')}
                     type="text"
@@ -97,4 +96,4 @@ function Search({onClose}) {
     );
 }
 
-export default Search;
+export default memo(Search);
