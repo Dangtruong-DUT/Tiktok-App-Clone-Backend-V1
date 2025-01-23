@@ -47,6 +47,9 @@
             letter-spacing: 0.15px;
             transition: display 200ms ease-out;
         }
+        &__label.hasValueSearch {
+            color: var(--primary-text-cl);
+        }
     }
 }
 

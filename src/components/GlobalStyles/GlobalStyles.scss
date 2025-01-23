@@ -18,6 +18,7 @@
     --primary-cl: #fe2c55;
     --yellow-color: #FACE15;
 
+
     --overlay-black: rgba(0, 0, 0, 0.15);
     --overlay-white: rgba(255, 255, 255, 0.4);
 
@@ -88,12 +89,15 @@ button {
 .App[data-theme="dark"] {
     --background-color: rgb(18, 18, 18);
     --background-second-color: rgb(37, 37, 37);
+    --background-card-profile: rgba(255, 255, 255, 0.04);
     --background-input-color: rgba(255, 255, 255, 0.12);
     --header-boxShadow-cl: rgba(255, 255, 255, 0.12);
 
     --primary-text-cl: rgba(255, 255, 255, 0.9);
     --secondary-text-cl: rgba(255, 255, 255, 0.5);
     --placeholder-text-cl: rgba(255, 255, 255, 0.4);
+    --hashTag-text-cl: rgb(143, 190, 233);
+
 
     --border-focus-cl: 2px solid rgb(255, 76, 58);
 
@@ -127,10 +131,14 @@ button {
     --background-second-color: rgb(255, 255, 255);
     --background-input-color: rgba(22, 24, 35, 0.06);
     --header-boxShadow-cl: rgba(0, 0, 0, 0.12);
+    --background-card-profile: rgba(22, 24, 35, 0.03);
+
     //color text 
     --primary-text-cl: #161823;
     --secondary-text-cl: rgba(22, 24, 35, 0.5);
     --placeholder-text-cl:rgba(0, 0, 0, 0.34);
+    --hashTag-text-cl: rgb(43, 93, 185);
+
 
     //icon
     --input-BG: rgba(255, 255, 255, 0.12);
@@ -190,4 +198,5 @@ html *::-webkit-scrollbar-track {
     position: fixed;
     bottom: 24px;
     right: 24px;
+    z-index: 1000;
 }

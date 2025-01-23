@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, memo } from 'react';
 import PropTypes from "prop-types";
 import classNames from "classnames/bind";
 import styles from './VideoDescription.module.scss';
+import { TextWithTags } from '@/components/TextWithTags';
 
 const cx = classNames.bind(styles);
 
@@ -37,7 +38,7 @@ function VideoDescription({ description }) {
             })}
                 ref={textRef}
             >
-                {description}
+                <TextWithTags text={description}/>
             </h1>
 
             {isTextLong && (

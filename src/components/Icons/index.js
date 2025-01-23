@@ -41,3 +41,6 @@ export { default as PlayIcon } from './PlayIcon';
 export { default as DynamicVolumeIcon} from './DynamicVolumeIcon';
 export { default as horizontalThreeDotIcon} from './HorizontalThreedotIcon';
 export { default as CrossIcon} from './CrossIcon';
+export {default as EmbedIcon} from './EmbedIcon';
+export {default as FacebookIcon} from './FacebookIcon';
+export {default as LetterIcon} from './LetterIcon';

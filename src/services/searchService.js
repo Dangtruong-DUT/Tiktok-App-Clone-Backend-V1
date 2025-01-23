@@ -13,3 +13,4 @@ export const search = async(query, type= 'less') => {
         console.error(error);
     }
 }
+

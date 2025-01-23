@@ -8,6 +8,8 @@ import Upload from "@/pages/Upload";
 
 //Layouts
 import { UploadLayout } from "@/layouts";
+import { FluidLayout } from '@/layouts/FluidLayout';
+import { VideoPage } from '@/pages/VideoPage';
 
 // guest routes
 const publicRoutes = [
@@ -15,6 +17,7 @@ const publicRoutes = [
     { path: config.routes.following, component: FollowingPage },
     { path: config.routes.profile, component: ProfilePage },
     { path: config.routes.upload, component: Upload, layout: UploadLayout },
+    { path: config.routes.video, component: VideoPage, layout: FluidLayout},
 
 ];
 

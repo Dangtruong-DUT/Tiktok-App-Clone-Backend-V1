@@ -1,0 +1,16 @@
+.videoPage {
+    display: flex;
+    flex-direction: row;
+}
+
+.videoPlayer {
+    flex-grow: 1;
+}
+
+.listComment {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh);
+    flex: 0 0 544px;
+
+}

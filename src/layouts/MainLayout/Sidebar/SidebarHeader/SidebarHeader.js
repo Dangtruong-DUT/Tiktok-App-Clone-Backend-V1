@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import classNames from "classnames/bind";
 import Styles from './SidebarHeader.module.scss';
 import { LogoBrand, SearchIcon } from "@/components/Icons";
@@ -8,7 +8,7 @@ import { useSidebar } from "../../Context";
 
 const cx = classNames.bind(Styles);
 
-function SidebarHeader({onToggleSearchBar}) {
+function SidebarHeader({ onToggleSearchBar, searchValue }) {
     const { isSmall } = useSidebar();
     return (
         <header className={cx('sidebar-header', {
@@ -16,7 +16,7 @@ function SidebarHeader({onToggleSearchBar}) {
         })}>
             <Link className={cx('sidebar-header__logo')} to={config.home}>
                 <LogoBrand
-                    small= {isSmall}
+                    small={isSmall}
                 />
             </Link>
             <button className={cx('sidebar-header__search')} onClick={onToggleSearchBar}>
@@ -24,11 +24,17 @@ function SidebarHeader({onToggleSearchBar}) {
                     <div className={cx('sidebar-search__icon')}>
                         <SearchIcon width="1.9rem" height="1.9rem" />
                     </div>
-                    <div className={cx('sidebar-search__label')}>Search</div>
+                    <div className={cx('sidebar-search__label',
+                        {
+                            hasValueSearch: searchValue
+                        }
+                    )}>
+                        {searchValue || 'search'}
+                    </div>
                 </div>
             </button>
         </header>
     );
 }
 
-export default SidebarHeader;
+export default memo(SidebarHeader);

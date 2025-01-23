@@ -3,9 +3,8 @@
     top: 0;
     bottom: 0;
     left: calc(56px);
-    width: min(336px, 70vw);
     z-index: 99;
-    animation: slide-in 400ms ease-in forwards;
+    animation: slide-in 400ms ease forwards;
 
     .DrawerSidebar-content {
         position: relative;
@@ -33,10 +32,10 @@
 @keyframes slide-in {
     0% {
         opacity: 0;
-        left:0;
+        width: 0;
     }
     100% {
         opacity: 1;
-        left: calc(56px);
+        width: min(336px, 70vw);
     }
 }
