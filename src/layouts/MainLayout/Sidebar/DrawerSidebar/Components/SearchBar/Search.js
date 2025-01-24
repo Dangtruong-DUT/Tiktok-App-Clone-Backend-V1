@@ -41,6 +41,10 @@ function Search({ onClose, setSearchValue, searchValue }) {
         setSearchValue(searchValue);
     }
 
+    const handleClickAccountItem = () => {
+        onClose();
+    };
+
     return (
         <div className={cx('search-wrapper')}>
             <DrawerSidebarHeader title='Search' onExit={onClose} />
@@ -83,6 +87,7 @@ function Search({ onClose, setSearchValue, searchValue }) {
                                             username={result.nickname}
                                             nameAccount={result.full_name}
                                             verified={result.tick}
+                                            onClick ={handleClickAccountItem}
                                         />
                                     </li>
                                 )}

@@ -1,10 +1,11 @@
 .text-with-tags {
     &__normal {
-        color: var(--primary-text-cl);
+        font-size: inherit;
+        font-weight: inherit;
     }
     &__tag {
         color: var(--hashTag-text-cl);
-        font-weight: bold;
+        font-weight: 600;
         text-decoration: none;
 
         &:hover {
@@ -14,7 +15,7 @@
 
     &__hashtag {
         color: var(--hashTag-text-cl);
-        font-weight: bold;
+        font-weight: 600;
         text-decoration: none;
 
         &:hover {

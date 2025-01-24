@@ -5,7 +5,13 @@ import styles from './RenderTextWithTag.module.scss';
 
 const cx = classNames.bind(styles);
 
-function TextWithTags({ text }) {
+function TextWithTags({
+    className,
+    classTextNormal,
+    classTextHasTag,
+    classTextHasHashTag,
+    text
+}) {
     const renderContent = (text) => {
         const words = text.split(' ');
         return words.map((word, index) => {
@@ -14,7 +20,10 @@ function TextWithTags({ text }) {
                     <a
                         key={index}
                         href={`/user/${word.substring(1)}`}
-                        className={cx('text-with-tags__tag')}
+                        className={cx('text-with-tags__tag', {
+                            [classTextHasTag]: classTextHasTag,
+                            [className]: className
+                        })}
                     >
                         {word}
                     </a>
@@ -24,13 +33,19 @@ function TextWithTags({ text }) {
                     <a
                         key={index}
                         href={`/hashtag/${word.substring(1)}`}
-                        className={cx('text-with-tags__hashtag')}
+                        className={cx('text-with-tags__hashtag', {
+                            [classTextHasHashTag]: classTextHasHashTag,
+                            [className]: className
+                        })}
                     >
                         {word}
                     </a>
                 );
             }
-            return <span key={index} className={cx('text-with-tags__normal')}> {word} </span>;
+            return <span key={index} className={cx('text-with-tags__normal', {
+                [classTextNormal]: classTextNormal,
+                [className]: className
+            })}> {word} </span>;
         });
     };
 

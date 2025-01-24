@@ -38,7 +38,7 @@ function VideoDescription({ description }) {
             })}
                 ref={textRef}
             >
-                <TextWithTags text={description}/>
+                <TextWithTags text={description} className={cx('text-styles')} />
             </h1>
 
             {isTextLong && (
