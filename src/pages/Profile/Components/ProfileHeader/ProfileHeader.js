@@ -2,23 +2,23 @@ import Avatar from '@/components/Avatar';
 import styles from './ProfileHeader.module.scss';
 import classNames from 'classnames/bind';
 import Button from '@/components/button';
-import { SettingIcon, ShareIcon } from '@/components/Icons';
+import { SettingIcon, ShareIcon, TickMackIcon } from '@/components/Icons';
 import EditIcon from '@/components/Icons/EditIcon';
 
 const cx = classNames.bind(styles);
 
-function ProfileHeader({ nickname, name, bio, avatar, following, followers, likes }) {
+function ProfileHeader({ nickname, name, bio, avatar, following, followers, likes,tick }) {
     return (
         <div className={cx('wrapper')}>
             <Avatar dataSize='150px' className={cx('profile-avatar')} image={avatar} alt={nickname} />
             <div className={cx('profile-info')}>
                 <div className={cx('profile-info__row')}>
                     <h1 className={cx('profile-info__name')}>{name}</h1>
+                    {tick&&<TickMackIcon width='1em' height='1em' className={cx('profile-info__iconTick')}/>}
                     <h2 className={cx('profile-info__nickName')}>{nickname}</h2>
                 </div>
                 <div className={cx('profile-info__row')}>
                     <Button primary className={cx('profile-info__btn')} >
-
                         <span className={cx('profile-info-btn__icon')}>
                             <EditIcon className={cx('profile-info-btn__icon')} width='1.2em' height='1.2em' />
                         </span>

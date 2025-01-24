@@ -1,0 +1,24 @@
+:root {
+    --white-color: #fff;
+    --black-color: #000;
+    --primary-cl: #fe2c55;
+    --yellow-color: #FACE15;
+
+
+    --overlay-black: rgba(0, 0, 0, 0.15);
+    --overlay-white: rgba(255, 255, 255, 0.4);
+
+
+    // Default Layout
+    --default-layout-header-height: 60px;
+    --default-layout-content-margin-RL: 16px;
+
+    // Tooltip
+    --tooltip-padding: 7px 6px;
+    --tooltip-border-radius: 6px;
+    --tooltip-transition: opacity 0.25s, visibility 0.25s;
+
+    //fonts
+    --font-primary: TikTokFont, Poppins, sans-serif;
+    --font-secondary: TikTokDisplayFont, Poppins, sans-serif;
+}

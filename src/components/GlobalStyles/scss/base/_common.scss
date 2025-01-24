@@ -1,0 +1,32 @@
+//embedded fonts
+@use 'src/assets/fonts';
+
+html {
+    font-size: 62.5%;
+}
+
+
+body {
+    font-family: var(--font-primary);
+    font-size: 1.6rem;
+    line-height: 1.5;
+    text-rendering: optimizeSpeed;
+    margin: 0;
+}
+
+
+
+
+html,
+body {
+    overflow-y: overlay;
+    scroll-behavior: smooth;
+    background-color: var(--background-color);
+}
+
+
+.App {
+    background-color: var(--background-color);
+    color: var(--primary-text-cl);
+    transition: background-color 0.25s;
+}

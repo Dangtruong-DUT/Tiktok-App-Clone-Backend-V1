@@ -25,41 +25,39 @@
         &__name {
             font-weight: 700;
             font-size: 1.8rem;
-            line-height: 1.334;
+            line-height: 1.3;
+            line-height: normal;
             color: var(--primary-text-cl);
-        }
-        .profileAuthor-info__row {
-            display: flex;
-            align-items: center;
-            column-gap: 0.8rem;
-        }
-        &__nickName {
-            font-size: 1.4rem;
-            line-height: 1.29;
-            display: flex;
-            -webkit-box-align: center;
-            color: var(--primary-text-cl);
-            align-items: center;
         }
 
-        &__time {
+        .profileAuthor-info__row {
             font-size: 1.4rem;
-            line-height: 1.29;
+            line-height: 1.28;
             display: flex;
             -webkit-box-align: center;
-            color: var(--primary-text-cl);
             align-items: center;
+            color: var(--primary-text-cl);
         }
     }
 
     &__btn-follow {
-
+        min-width: 96px;
+        border-radius: 2px;
+        padding: 5px 15px;
+        font-weight: 500;
+        line-height: 1.5;
     }
 
     &__desc {
+        margin-top: 15px;
         font-size: 1.6rem;
         line-height: 1.3125;
-            color: var(--primary-text-cl);
-            word-break: break-word;
+        font-weight: 400;
+        color: var(--primary-text-cl);
+        word-break: break-word;
     }
+}
+
+.dotSeparate {
+    margin: 0px 4px;
 }

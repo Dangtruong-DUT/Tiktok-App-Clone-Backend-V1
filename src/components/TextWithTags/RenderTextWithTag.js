@@ -19,7 +19,7 @@ function TextWithTags({
                 return (
                     <a
                         key={index}
-                        href={`/user/${word.substring(1)}`}
+                        href={`/@${word.substring(1)}`}
                         className={cx('text-with-tags__tag', {
                             [classTextHasTag]: classTextHasTag,
                             [className]: className

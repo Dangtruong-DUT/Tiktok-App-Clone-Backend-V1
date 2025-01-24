@@ -43,6 +43,7 @@ function Profile() {
                 following={userData.followings_count}
                 followers={userData.followers_count}
                 likes={userData.likes_count}
+                tick={userData.tick}
             />
             <TabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
             <VideoGrid videos={userData.videos || []} />
