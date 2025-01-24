@@ -14,11 +14,12 @@
     -webkit-line-clamp: unset;
     overflow: visible;
 }
+
 .more-less-btn {
     position: absolute;
     bottom: 0;
     right: 0%;
-    transform: translate(-12px,-50%);
+    transform: translate(-12px, -50%);
     font-weight: 600;
     font-size: 1.4rem;
     line-height: 1.29;
@@ -27,5 +28,12 @@
     height: 21px;
     flex-shrink: 0;
     padding: 1px 6px;
+    color: var(--white-color);
+}
+
+.text-styles {
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: 400;
     color: var(--white-color);
 }
