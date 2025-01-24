@@ -44,10 +44,14 @@ function Sidebar() {
     };
 
     const toggleDrawerBar = (content) => {
-        setSideBarSmallSize(true);
+        setSideBarSmallSize(!isShowDrawerBar);
         setShowDrawerBar((prev) => !prev);
-        setActiveMenuItem(null);
-        setDrawerContent(content);
+        const activeName = !isShowDrawerBar ===true ?
+        null : location.pathname;
+        const drawerContent = !isShowDrawerBar ===true ?
+        content : null;
+        setActiveMenuItem(activeName);
+        setDrawerContent(drawerContent);
     };
 
     const closeDrawer = () => {

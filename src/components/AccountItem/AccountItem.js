@@ -16,11 +16,11 @@ function AccountItem({
     avatarSize = '32px',
     className,
     isLive = false,
-    onClick 
+    onClick
 }) {
     const classNames = cx('wrapper', className);
     return (
-        <div className={classNames} onClick= {onClick}>
+        <div className={classNames} onClick={onClick}>
             <Link className={cx('accountItem-content')} to={`/@${username}`}>
                 <Avatar isLive={isLive} image={avatar} dataSize={avatarSize} altValue={nameAccount} />
                 <div className={cx('info')}>
