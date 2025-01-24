@@ -10,19 +10,21 @@ import {
     LikeIcon,
     ShareIcon,
 } from "@/components/Icons";
+import { ActionButton } from "@/components/ActionButton";
 
 const cx = classNames.bind(styles);
 
-function ActionBarItem({ icon: Icon, onClick, value, isActive, activeClass }) {
+function ActionBarItem({ icon, onClick, value, isActive, activeClass }) {
     return (
         <div className={cx("actionBar-item")}>
-            <button
-                type="button"
-                className={cx("actionBar-item__btn", { [activeClass]: isActive })}
+            <ActionButton
+                icon={icon}
                 onClick={onClick}
-            >
-                <Icon width="0.6em" height="0.6em" />
-            </button>
+                isActive={isActive}
+                activeClass={activeClass}
+                iconSize="0.6em"
+                className={cx('transitionBGC')}
+            />
             <strong className={cx("actionBar-item__value")}>{value}</strong>
         </div>
     );

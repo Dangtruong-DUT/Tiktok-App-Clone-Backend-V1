@@ -20,16 +20,6 @@
     font-size: clamp(3.2rem, 3vw + 1rem, 4.8rem);
 
     &__btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: var(--background-input-color);
-        border-radius: 999px;
-        width: 1em;
-        height: 1em;
-        font-size: 1em;
-        color: var(--primary-text-cl);
-
         @media screen and (max-width:414.98px) {
             color: var(--white-color);
             background-color: transparent;
@@ -41,15 +31,6 @@
         & svg {
             font-size: clamp(3.2rem, 3vw + 1rem, 3.6rem);
         }
-
-        &:hover {
-            background-color: var(--ui-action-hover);
-        }
-
-        &:active {
-            background-color: var(--ui-action-active);
-        }
-
         &.liked svg {
             animation: scaleHeart 0.4s ease-in-out;
             color: var(--primary-cl);
@@ -67,14 +48,14 @@
     }
 
     &__value {
-        color: var(--ui-text-a75);
+        color: var(--primary-text-cl);
         font-size: 1.2rem;
         line-height: 1.334;
         font-weight: 700;
         text-align: center;
     }
 
-    &__btn-following {
+    & &__btn-following {
         display: block;
         font-size: clamp(1.5rem, 1vw + 1rem, 2.4rem);
         position: absolute;
@@ -93,45 +74,10 @@
         border-radius: 9999px;
         outline: 1px solid var(--primary-cl);
     }
-    &__btn-following.following {
+
+    & &__btn-following.following {
         background-color: var(--white-color);
         color: var(--primary-cl);
         outline: 1px solid var(--border-cl);
-    }
-}
-
-@keyframes scaleHeart {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.4);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-@keyframes scaleSave {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
-
-    50% {
-        transform: scaleY(1.2);
-    }
-}
-
-@keyframes cancel {
-    0% {
-        transform: scale(0.5);
-        opacity: 0;
-    }
-
-    50% {
-        transform: scaleY(1.1);
     }
 }
