@@ -25,9 +25,13 @@
     //border-color
     --border-cl: rgba(255, 255, 255, 0.2);
 
-    --btn-hover-cl-second: rgba(255, 255, 255, 0.19);
-    ;
+    // button
+    
     --btn-hover-cl: rgba(255, 255, 255, 0.04);
+    --ui-color-button-A08:rgba(255, 255, 255, 0.08);
+    --ui-color-button-hover-A04: rgba(255, 255, 255, 0.04);
+    --btn-hover-cl-second: rgba(255, 255, 255, 0.19);
+
 
     --tooltip--background-color: rgba(98, 95, 95, 0.7);
     --thumb-cl: rgba(164, 164, 164, 0.06);
@@ -35,6 +39,6 @@
     // action bar
     --ui-action-hover: rgba(255, 255, 255, 0.08);
     --ui-action-active: rgba(22, 24, 35, 0.14);
-
+    
 
 }

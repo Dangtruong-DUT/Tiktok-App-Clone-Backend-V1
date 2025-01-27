@@ -20,6 +20,7 @@
     font-size: clamp(3.2rem, 3vw + 1rem, 4.8rem);
 
     &__btn {
+
         @media screen and (max-width:414.98px) {
             color: var(--white-color);
             background-color: transparent;
@@ -28,9 +29,18 @@
         margin: 8px 0 6px 0;
         transition: background-color 500ms ease-in-out;
 
+        &:hover {
+            background-color: var(--ui-action-hover);
+        }
+
+        &:active {
+            background-color: var(--ui-action-active);
+        }
+
         & svg {
             font-size: clamp(3.2rem, 3vw + 1rem, 3.6rem);
         }
+
         &.liked svg {
             animation: scaleHeart 0.4s ease-in-out;
             color: var(--primary-cl);
@@ -76,8 +86,44 @@
     }
 
     & &__btn-following.following {
-        background-color: var(--white-color);
+        background-color: var(--background-second-color);
         color: var(--primary-cl);
-        outline: 1px solid var(--border-cl);
+        outline: 1px solid transparent;
+    }
+}
+
+@keyframes scaleHeart {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.3);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes scaleSave {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scaleY(1.2);
+    }
+}
+
+@keyframes cancel {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scaleY(1.1);
     }
 }

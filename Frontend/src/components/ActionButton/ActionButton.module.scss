@@ -1,0 +1,15 @@
+.icon-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-input-color);
+    border-radius: 999px;
+    width: 1em;
+    height: 1em;
+    font-size: 1em;
+    color: var(--primary-text-cl);
+
+    & svg {
+        font-size: clamp(3.2rem, 3vw + 1rem, 4rem);
+    }
+}
