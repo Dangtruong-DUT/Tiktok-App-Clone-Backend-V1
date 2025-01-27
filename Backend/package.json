@@ -1,0 +1,35 @@
+{
+  "name": "servernodejs-typescript",
+  "version": "1.0.0",
+  "main": "index.js",
+"scripts": {
+  "dev": "npx nodemon",
+  "build": "rimraf ./dist && tsc && tsc-alias",
+  "start": "node dist/index.js",
+  "lint": "eslint .",
+  "lint:fix": "eslint . --fix",
+  "prettier": "prettier --check .",
+  "prettier:fix": "prettier --write ."
+},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@types/node": "^22.10.10",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-react": "^7.37.4",
+    "globals": "^15.14.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.4.2",
+    "rimraf": "^6.0.1",
+    "tsc-alias": "^1.8.10",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.21.0"
+  }
+}
