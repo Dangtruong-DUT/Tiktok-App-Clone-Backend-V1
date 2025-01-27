@@ -1,3 +1,10 @@
+@mixin animation($name, $duration, $timing-function, $iteration) {
+    animation-name: $name;
+    animation-duration: $duration;
+    animation-timing-function: $timing-function;
+    animation-iteration-count: $iteration;
+}
+
 @keyframes scaleHeart {
     0% {
         transform: scale(1);

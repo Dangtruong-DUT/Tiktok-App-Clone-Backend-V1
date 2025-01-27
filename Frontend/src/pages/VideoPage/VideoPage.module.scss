@@ -4,11 +4,12 @@
 }
 
 .videoPlayer {
-    flex-grow: 1;
+   flex: 1 1;
 }
 
 .listComment {
     display: flex;
+    width: 544px;
     flex-direction: column;
     min-height: calc(100vh);
     flex: 0 0 544px;
