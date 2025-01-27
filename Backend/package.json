@@ -2,15 +2,15 @@
   "name": "servernodejs-typescript",
   "version": "1.0.0",
   "main": "index.js",
-"scripts": {
-  "dev": "npx nodemon",
-  "build": "rimraf ./dist && tsc && tsc-alias",
-  "start": "node dist/index.js",
-  "lint": "eslint .",
-  "lint:fix": "eslint . --fix",
-  "prettier": "prettier --check .",
-  "prettier:fix": "prettier --write ."
-},
+  "scripts": {
+    "dev": "npx nodemon",
+    "build": "rimraf ./dist && tsc && tsc-alias",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write ."
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -31,5 +31,9 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.21.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "mongodb": "^6.12.0"
   }
 }
