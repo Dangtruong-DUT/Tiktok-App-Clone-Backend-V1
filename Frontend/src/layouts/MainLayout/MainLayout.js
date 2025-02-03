@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import classNames from "classnames/bind";
-import styles from "./MainLayout.module.scss"
+import styles from "./MainLayout.module.scss";
 import Sidebar from "./Sidebar";
 import { SidebarProvider } from "./Context";
 
@@ -13,9 +13,7 @@ function MainLayout({ children }) {
                 <SidebarProvider>
                     <Sidebar />
                 </SidebarProvider>
-                <main className={cx("content")}>
-                    {children}
-                </main>
+                <main className={cx("content")}>{children}</main>
             </div>
         </div>
     );
@@ -23,6 +21,6 @@ function MainLayout({ children }) {
 
 MainLayout.propTypes = {
     children: PropTypes.node.isRequired,
-}
+};
 
 export default MainLayout;
