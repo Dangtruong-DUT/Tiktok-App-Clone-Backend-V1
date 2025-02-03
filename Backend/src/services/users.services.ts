@@ -5,6 +5,8 @@ import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import { TokenType } from '~/constants/enum'
 import { StringValue } from 'ms'
+import RefreshToken from '~/models/schemas/RefreshToken.schemas'
+import { ObjectId } from 'mongodb'
 
 class UserService {
     private signAccessToken(userId: string) {
@@ -29,6 +31,9 @@ class UserService {
             }
         })
     }
+    private signAccessAndRefreshToken(userId: string) {
+        return Promise.all([this.signAccessToken(userId), this.signRefreshToken(userId)])
+    }
     async register(payload: RegisterRequestBody) {
         const result = await databaseService.users.insertOne(
             new User({
@@ -38,12 +43,22 @@ class UserService {
             })
         )
         const user_id = result.insertedId.toString()
-        const [accessToken, refreshToken] = await Promise.all([
-            this.signAccessToken(user_id),
-            this.signRefreshToken(user_id)
-        ])
+        const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(user_id)
+        await databaseService.refreshToken.insertOne(
+            new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken })
+        )
         return {
-            user_id,
+            accessToken,
+            refreshToken
+        }
+    }
+
+    async login(user_id: string) {
+        const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(user_id)
+        await databaseService.refreshToken.insertOne(
+            new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken })
+        )
+        return {
             accessToken,
             refreshToken
         }
