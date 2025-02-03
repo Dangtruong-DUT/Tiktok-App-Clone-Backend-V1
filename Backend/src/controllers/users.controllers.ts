@@ -3,10 +3,14 @@ import User from '~/models/schemas/User.schema'
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
 import usersServices from '~/services/users.services'
 import { RegisterRequestBody } from '~/models/requests/user.requests'
-export const loginController = (req: Request, res: Response) => {
-    return res.status(200).json({
-        message: 'login successful'
-    })
+import { ObjectId } from 'mongodb'
+import { USER_MESSAGES } from '~/constants/messages'
+import HTTP_STATUS from '~/constants/httpStatus'
+export const loginController = async (req: Request, res: Response) => {
+    const user = req.user as User
+    const user_id = user._id as ObjectId
+    const result = await usersServices.login(user_id.toString())
+    res.status(HTTP_STATUS.OK).json({ message: USER_MESSAGES.LOGIN_SUCCESS, result })
 }
 export const registerController = async (
     req: Request<ParamsDictionary, any, RegisterRequestBody>,
@@ -14,5 +18,8 @@ export const registerController = async (
     next: NextFunction
 ) => {
     const result = await usersServices.register(req.body)
-    res.status(200).json(result)
+    res.status(HTTP_STATUS.OK).json({
+        message: USER_MESSAGES.REGISTER_SUCCESS,
+        result
+    })
 }
