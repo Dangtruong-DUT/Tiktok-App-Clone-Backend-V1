@@ -1,4 +1,7 @@
 export const USER_MESSAGES = {
+    RESEND_VERIFY_EMAIL_SUCCESS: 'Resend verify email success',
+    EMAIL_ALREADY_VERIFIED_BEFORE: 'Email already verified',
+    EMAIL_VERIFIED_SUCCESSFULLY: 'Email verified',
     REFRESH_TOKEN_EXPIRED_OR_NOT_FOUND: 'Refresh token has expired or does not exist.',
     INVALID_REFRESH_TOKEN: 'Refresh token is invalid',
     INVALID_ACCESS_TOKEN: 'Access token is invalid',
@@ -15,7 +18,7 @@ export const USER_MESSAGES = {
     REGISTER_SUCCESS: 'Register success',
     REGISTER_FAILED: 'Register failed',
     USER_ALREADY_EXISTS: 'User already exists',
-    USER_NOT_FOUND: 'Email or password incorrect',
+    USER_NOT_FOUND: 'user not found',
     VALIDATION_ERROR: 'Validation error',
     NAME_IS_REQUIRED: 'Name is required',
     NAME_LENGTH_MUST_BE_FROM_1_TO_100: 'Name must be from 1 to 100 characters',
