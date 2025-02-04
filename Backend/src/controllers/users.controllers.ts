@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import User from '~/models/schemas/User.schema'
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
 import usersServices from '~/services/users.services'
-import { RegisterRequestBody } from '~/models/requests/user.requests'
+import { LogoutRequestBody, RegisterRequestBody } from '~/models/requests/user.requests'
 import { ObjectId } from 'mongodb'
 import { USER_MESSAGES } from '~/constants/messages'
 import HTTP_STATUS from '~/constants/httpStatus'
@@ -22,4 +22,13 @@ export const registerController = async (
         message: USER_MESSAGES.REGISTER_SUCCESS,
         result
     })
+}
+
+export const logoutController = async (req: Request<ParamsDictionary, any, LogoutRequestBody>, res: Response) => {
+    const { refresh_token } = req.body
+    const result = await usersServices.logout(refresh_token)
+    if (result === false) {
+        throw new Error(USER_MESSAGES.LOGOUT_FAILED)
+    }
+    res.status(HTTP_STATUS.OK).json({ message: USER_MESSAGES.LOGOUT_SUCCESS })
 }

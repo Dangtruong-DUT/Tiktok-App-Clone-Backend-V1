@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import { TokenPayload } from '~/models/requests/user.requests'
 export const signToken = ({
     payload,
     privateKey = process.env.JWT_SECRET as string,
@@ -16,6 +17,24 @@ export const signToken = ({
                 reject(err)
             } else {
                 resolve(token as string)
+            }
+        })
+    })
+}
+
+export const verifyToken = ({
+    token,
+    secretOrPublicKey = process.env.JWT_SECRET as string
+}: {
+    token: string
+    secretOrPublicKey?: string
+}) => {
+    return new Promise<TokenPayload>((resolve, reject) => {
+        jwt.verify(token, secretOrPublicKey, (err, decoded) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(decoded as TokenPayload)
             }
         })
     })

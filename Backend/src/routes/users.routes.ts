@@ -1,7 +1,13 @@
-import { Router } from 'express'
-import { loginController, registerController } from '~/controllers/users.controllers'
-import { loginValidator, registerValidator } from '~/middlewares/user.middlewares'
-import { wrapAsync } from '~/utils/handlers'
+import { Router, Request, Response } from 'express'
+import { USER_MESSAGES } from '~/constants/messages'
+import { loginController, logoutController, registerController } from '~/controllers/users.controllers'
+import {
+    accessTokenValidator,
+    loginValidator,
+    refreshTokenValidate,
+    registerValidator
+} from '~/middlewares/user.middlewares'
+import { wrapRequestHandler } from '~/utils/handlers'
 const userRouter = Router()
 
 /**
@@ -13,7 +19,7 @@ const userRouter = Router()
  * password: string
  */
 
-userRouter.post('/login', loginValidator, wrapAsync(loginController))
+userRouter.post('/login', loginValidator, wrapRequestHandler(loginController))
 
 /**
  * Description. registers a new user
@@ -28,6 +34,17 @@ userRouter.post('/login', loginValidator, wrapAsync(loginController))
  * }
  */
 
-userRouter.post('/register', registerValidator, wrapAsync(registerController))
+userRouter.post('/register', registerValidator, wrapRequestHandler(registerController))
 
+/**
+ *Description. logout a user
+ * Path: /logout
+ * Method: POST
+ * header: <Authorization: Bearer <access_token>
+ * body: {
+ * refresh_token: String
+ * }
+ */
+
+userRouter.post('/logout', accessTokenValidator, refreshTokenValidate, wrapRequestHandler(logoutController))
 export default userRouter

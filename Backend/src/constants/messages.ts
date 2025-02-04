@@ -1,7 +1,17 @@
 export const USER_MESSAGES = {
+    REFRESH_TOKEN_EXPIRED_OR_NOT_FOUND: 'Refresh token has expired or does not exist.',
+    INVALID_REFRESH_TOKEN: 'Refresh token is invalid',
+    INVALID_ACCESS_TOKEN: 'Access token is invalid',
+    ACCESS_TOKEN_IS_REQUIRED: 'Access token is required',
+    ACCESS_TOKEN_IS_INVALID: 'Access token is invalid',
+    REFRESH_TOKEN_IS_REQUIRED: 'Refresh token is required',
+    REFRESH_TOKEN_IS_INVALID: 'Refresh token is invalid',
+    NOT_AUTHORIZED: 'Not authorized',
+    FORBIDDEN: 'Forbidden',
     LOGIN_SUCCESS: 'Login success',
     LOGIN_FAILED: 'Login failed',
     LOGOUT_SUCCESS: 'Logout success',
+    LOGOUT_FAILED: 'Logout failed',
     REGISTER_SUCCESS: 'Register success',
     REGISTER_FAILED: 'Register failed',
     USER_ALREADY_EXISTS: 'User already exists',
@@ -13,7 +23,6 @@ export const USER_MESSAGES = {
     EMAIL_IS_REQUIRED: 'Email is required',
     EMAIL_IS_INVALID: 'Invalid email format',
     PASSWORD_IS_REQUIRED: 'Password is required',
-
     PASSWORD_MUST_BE_STRONG:
         'Password must be at least 6 characters long and contain at least one number and one symbol.',
     CONFIRM_PASSWORD_IS_REQUIRED: 'Confirm password is required',
