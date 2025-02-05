@@ -543,3 +543,31 @@ export const updateUserValidator = validate(
         ['body']
     )
 )
+
+export const followValidator = validate(
+    checkSchema(
+        {
+            user_id: {
+                notEmpty: {
+                    errorMessage: USER_MESSAGES.USER_ID_IS_REQUIRED
+                },
+                isString: {
+                    errorMessage: USER_MESSAGES.USERNAME_MUST_BE_A_STRING
+                },
+                custom: {
+                    options: async (value: string) => {
+                        const user = await usersServices.getUserById(value)
+                        if (!user) {
+                            throw new ErrorWithStatus({
+                                message: USER_MESSAGES.USER_NOT_FOUND,
+                                status: HTTP_STATUS.NOT_FOUND
+                            })
+                        }
+                    }
+                },
+                trim: true
+            }
+        },
+        ['body']
+    )
+)

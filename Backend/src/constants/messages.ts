@@ -1,4 +1,7 @@
 export const USER_MESSAGES = {
+    FOLLOW_USER_ALREADY_FOLLOWED: 'Followed',
+    USER_ID_IS_REQUIRED: 'userId is required',
+    FOLLOW_USER_SUCCESS: 'following User Success',
     USERNAME_ALREADY_EXISTS: 'Username already exists',
     UPDATE_USER_SUCCESS: 'Update user success',
     USER_NOT_VERIFIED: 'User not verified',

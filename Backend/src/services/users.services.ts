@@ -9,6 +9,7 @@ import { ObjectId } from 'mongodb'
 import { USER_MESSAGES } from '~/constants/messages'
 import User from '~/models/schemas/User.schema'
 import generateTimeBasedUsername from '~/utils/GenerateUserName'
+import Follower from '~/models/schemas/Follower.schemas'
 
 class UserService {
     private signAccessToken({ verify, userId }: { userId: string; verify: UserVerifyStatus }) {
@@ -234,6 +235,26 @@ class UserService {
             }
         )
         return updateResult
+    }
+    async followUser(user_id: string, followed_user_id: string) {
+        const followerCount = await databaseService.followers.countDocuments({
+            user_id: new ObjectId(user_id),
+            followed_user_id: new ObjectId(followed_user_id)
+        })
+        if (followerCount > 0) {
+            return {
+                message: USER_MESSAGES.FOLLOW_USER_ALREADY_FOLLOWED
+            }
+        }
+        const result = await databaseService.followers.insertOne(
+            new Follower({
+                user_id: new ObjectId(user_id),
+                followed_user_id: new ObjectId(followed_user_id)
+            })
+        )
+        return {
+            message: USER_MESSAGES.FOLLOW_USER_SUCCESS
+        }
     }
     async checkEmailExist(email: string) {
         const user = await databaseService.users.findOne({ email })

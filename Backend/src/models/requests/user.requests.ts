@@ -53,3 +53,7 @@ export interface TokenPayload extends JwtPayload {
 export interface GetProfileReqParams {
     username: string
 }
+
+export interface followUserReqBody {
+    user_id: string
+}
