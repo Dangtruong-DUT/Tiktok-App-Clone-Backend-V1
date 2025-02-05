@@ -113,6 +113,10 @@ class UserService {
         const deleteResult = await databaseService.refreshToken.deleteOne({ token: refresh_token })
         return deleteResult.deletedCount > 0
     }
+    async logoutAll(user_id: string) {
+        const deleteResult = await databaseService.refreshToken.deleteMany({ user_id: new ObjectId(user_id) })
+        return deleteResult.deletedCount > 0
+    }
     async verifyEmail(user_id: string) {
         const [token] = await Promise.all([
             this.signAccessAndRefreshToken({ userId: user_id, verify: UserVerifyStatus.Verified }),
