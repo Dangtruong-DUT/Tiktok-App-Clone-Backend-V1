@@ -12,11 +12,13 @@ import {
     updateUserController,
     getMeProfileController,
     followUserController,
-    unFollowUserController
+    unFollowUserController,
+    changePasswordController
 } from '~/controllers/users.controllers'
 import { filterReqBodyMiddleWare } from '~/middlewares/common.middlewares'
 import {
     accessTokenValidator,
+    changePasswordValidator,
     emailVerifyTokenValidator,
     followValidator,
     forgotPasswordValidator,
@@ -243,7 +245,7 @@ userRouter.put(
     '/change-password',
     accessTokenValidator,
     verifiedUserValidator,
-    unFollowValidator,
-    wrapRequestHandler(unFollowUserController)
+    changePasswordValidator,
+    wrapRequestHandler(changePasswordController)
 )
 export default userRouter

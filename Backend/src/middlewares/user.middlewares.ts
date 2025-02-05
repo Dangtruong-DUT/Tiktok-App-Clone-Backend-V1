@@ -11,6 +11,7 @@ import { ErrorWithStatus } from '~/models/Errors'
 import { TokenPayload } from '~/models/requests/user.requests'
 import databaseService from '~/services/database.services'
 import usersServices from '~/services/users.services'
+import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
 
@@ -533,5 +534,38 @@ export const unFollowValidator = validate(
             user_id: userIdSchema
         },
         ['params']
+    )
+)
+
+export const changePasswordValidator = validate(
+    checkSchema(
+        {
+            current_password: {
+                ...passwordSchema,
+                custom: {
+                    options: async (value: string, { req }) => {
+                        const decoded_authorization = (req as Request).decoded_authorization
+                        const { user_id } = decoded_authorization as TokenPayload
+                        const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+                        if (!user) {
+                            throw new ErrorWithStatus({
+                                message: USER_MESSAGES.USER_NOT_FOUND,
+                                status: HTTP_STATUS.NOT_FOUND
+                            })
+                        }
+                        const isMatch = hashPassword(value) === user.password
+                        if (!isMatch) {
+                            throw new ErrorWithStatus({
+                                message: USER_MESSAGES.CURRENT_PASSWORD_IS_INCORRECT,
+                                status: HTTP_STATUS.UNAUTHORIZED
+                            })
+                        }
+                    }
+                }
+            },
+            password: passwordSchema,
+            confirm_password: confirm_passwordSchema
+        },
+        ['body']
     )
 )

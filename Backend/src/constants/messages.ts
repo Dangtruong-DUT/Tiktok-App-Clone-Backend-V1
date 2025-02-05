@@ -1,4 +1,6 @@
 export const USER_MESSAGES = {
+    CHANGE_PASSWORD_SUCCESS: 'Change Password Success',
+    CURRENT_PASSWORD_IS_INCORRECT: 'Current password incorrect',
     CANNOT_UPDATE_YOURSELF: 'can not update yourself',
     UNFOLLOW_USER_SUCCESS: 'Successfully unfollowed the user',
     FOLLOW_USER_ALREADY_FOLLOWED: 'Followed',

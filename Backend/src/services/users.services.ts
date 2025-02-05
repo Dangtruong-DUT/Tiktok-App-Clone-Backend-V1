@@ -103,6 +103,7 @@ class UserService {
         await databaseService.refreshToken.insertOne(
             new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken })
         )
+
         return {
             accessToken,
             refreshToken
@@ -131,6 +132,12 @@ class UserService {
             )
         ])
         const [access_token, refresh_token] = token
+        await databaseService.refreshToken.deleteMany({
+            user_id: new ObjectId(user_id)
+        })
+        await databaseService.refreshToken.insertOne(
+            new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
+        )
         return {
             access_token,
             refresh_token
@@ -264,6 +271,19 @@ class UserService {
         })
         return {
             message: USER_MESSAGES.UNFOLLOW_USER_SUCCESS
+        }
+    }
+    async changePassword(user_id: string, password: string) {
+        await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
+            {
+                $set: {
+                    password: hashPassword(password),
+                    updated_at: '$$NOW'
+                }
+            }
+        ])
+        return {
+            message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESS
         }
     }
     async checkEmailExist(email: string) {

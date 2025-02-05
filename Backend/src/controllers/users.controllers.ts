@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
 import usersServices from '~/services/users.services'
 import {
+    ChangePasswordRequestBody,
     followUserReqBody,
     ForgotPasswordRequestBody,
     GetProfileReqParams,
@@ -184,5 +185,16 @@ export const unFollowUserController = async (
     const { user_id } = req.decoded_authorization as TokenPayload
     const { user_id: followed_user_id } = req.params
     const result = await usersServices.unfollowUser(user_id, followed_user_id)
+    res.json(result)
+}
+
+export const changePasswordController = async (
+    req: Request<ParamsDictionary, any, ChangePasswordRequestBody>,
+    res: Response,
+    next: NextFunction
+) => {
+    const { user_id } = req.decoded_authorization as TokenPayload
+    const { password } = req.body
+    const result = await usersServices.changePassword(user_id, password)
     res.json(result)
 }
