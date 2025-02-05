@@ -10,6 +10,7 @@ import {
     RegisterRequestBody,
     ResetPasswordRequestBody,
     TokenPayload,
+    unFollowUserReqParams,
     UpdateUserRequestBody,
     VerifyEmailRequestBody,
     VerifyForgotPasswordTokenRequestBody
@@ -173,5 +174,15 @@ export const followUserController = async (
     const { user_id } = req.decoded_authorization as TokenPayload
     const { user_id: followed_user_id } = req.body
     const result = await usersServices.followUser(user_id, followed_user_id)
+    res.json(result)
+}
+export const unFollowUserController = async (
+    req: Request<unFollowUserReqParams>,
+    res: Response,
+    next: NextFunction
+) => {
+    const { user_id } = req.decoded_authorization as TokenPayload
+    const { user_id: followed_user_id } = req.params
+    const result = await usersServices.unfollowUser(user_id, followed_user_id)
     res.json(result)
 }

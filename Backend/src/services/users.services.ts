@@ -256,6 +256,16 @@ class UserService {
             message: USER_MESSAGES.FOLLOW_USER_SUCCESS
         }
     }
+
+    async unfollowUser(user_id: string, followed_user_id: string) {
+        await databaseService.followers.deleteOne({
+            user_id: new ObjectId(user_id),
+            followed_user_id: new ObjectId(followed_user_id)
+        })
+        return {
+            message: USER_MESSAGES.UNFOLLOW_USER_SUCCESS
+        }
+    }
     async checkEmailExist(email: string) {
         const user = await databaseService.users.findOne({ email })
         return !!user

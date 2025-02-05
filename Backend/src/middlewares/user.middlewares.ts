@@ -1,7 +1,8 @@
 import { Request } from 'express'
 import express from 'express'
-import { checkSchema } from 'express-validator'
+import { checkSchema, ParamSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
+import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
@@ -13,6 +14,53 @@ import usersServices from '~/services/users.services'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
 
+const passwordSchema: ParamSchema = {
+    notEmpty: {
+        errorMessage: USER_MESSAGES.PASSWORD_IS_REQUIRED
+    },
+    isLength: {
+        options: {
+            min: 6,
+            max: 50
+        },
+        errorMessage: USER_MESSAGES.PASSWORD_MUST_BE_STRONG
+    },
+    isStrongPassword: {
+        options: {
+            minLength: 6,
+            minNumbers: 1,
+            minSymbols: 1
+        },
+        errorMessage: USER_MESSAGES.PASSWORD_MUST_BE_STRONG
+    },
+    trim: true
+}
+
+const confirm_passwordSchema: ParamSchema = {
+    notEmpty: {
+        errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_IS_REQUIRED
+    },
+    isLength: {
+        options: {
+            min: 6,
+            max: 50
+        },
+        errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_MUST_BE_STRONG
+    },
+    isStrongPassword: {
+        options: {
+            minLength: 6,
+            minNumbers: 1,
+            minSymbols: 1
+        },
+        errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_MUST_BE_STRONG
+    },
+    trim: true,
+    custom: {
+        options: (value: any, { req }) => value === req.body.password,
+        errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_DOES_NOT_MATCH
+    }
+}
 const nameSchema = (isRequired: boolean) => ({
     optional: !isRequired,
     notEmpty: isRequired
@@ -52,6 +100,40 @@ const dateOfBirthSchema = (isRequired: boolean) => ({
     }
 })
 
+const userIdSchema: ParamSchema = {
+    notEmpty: {
+        errorMessage: USER_MESSAGES.USER_ID_IS_REQUIRED
+    },
+    isString: {
+        errorMessage: USER_MESSAGES.USER_ID_MUST_BE_STRING
+    },
+    custom: {
+        options: async (value: string, { req }) => {
+            if (!ObjectId.isValid(value)) {
+                throw new ErrorWithStatus({
+                    message: USER_MESSAGES.INVALID_USER_ID,
+                    status: HTTP_STATUS.NOT_FOUND
+                })
+            }
+            const user = await usersServices.getUserById(value)
+            if (!user) {
+                throw new ErrorWithStatus({
+                    message: USER_MESSAGES.USER_NOT_FOUND,
+                    status: HTTP_STATUS.NOT_FOUND
+                })
+            }
+            const { user_id } = (req as Request).decoded_authorization as TokenPayload
+            if (user._id.toString() === user_id) {
+                throw new ErrorWithStatus({
+                    message: USER_MESSAGES.CANNOT_UPDATE_YOURSELF,
+                    status: HTTP_STATUS.FORBIDDEN
+                })
+            }
+            return true
+        }
+    },
+    trim: true
+}
 export const registerValidator = validate(
     checkSchema(
         {
@@ -73,52 +155,8 @@ export const registerValidator = validate(
                     }
                 }
             },
-            password: {
-                notEmpty: {
-                    errorMessage: USER_MESSAGES.PASSWORD_IS_REQUIRED
-                },
-                isLength: {
-                    options: {
-                        min: 6,
-                        max: 50
-                    },
-                    errorMessage: USER_MESSAGES.PASSWORD_MUST_BE_STRONG
-                },
-                isStrongPassword: {
-                    options: {
-                        minLength: 6,
-                        minNumbers: 1,
-                        minSymbols: 1
-                    },
-                    errorMessage: USER_MESSAGES.PASSWORD_MUST_BE_STRONG
-                },
-                trim: true
-            },
-            confirm_password: {
-                notEmpty: {
-                    errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_IS_REQUIRED
-                },
-                isLength: {
-                    options: {
-                        min: 6,
-                        max: 50
-                    },
-                    errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_MUST_BE_STRONG
-                },
-                isStrongPassword: {
-                    options: {
-                        minLength: 6,
-                        minNumbers: 1,
-                        minSymbols: 1
-                    },
-                    errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_MUST_BE_STRONG
-                },
-                trim: true,
-                custom: {
-                    options: (value: any, { req }) => value === req.body.password,
-                    errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_DOES_NOT_MATCH
-                }
-            }
+            password: passwordSchema,
+            confirm_password: confirm_passwordSchema
         },
         ['body']
     )
@@ -144,27 +182,7 @@ export const loginValidator = validate(
                 },
                 trim: true
             },
-            password: {
-                notEmpty: {
-                    errorMessage: USER_MESSAGES.PASSWORD_IS_REQUIRED
-                },
-                isLength: {
-                    options: {
-                        min: 6,
-                        max: 50
-                    },
-                    errorMessage: USER_MESSAGES.PASSWORD_MUST_BE_STRONG
-                },
-                isStrongPassword: {
-                    options: {
-                        minLength: 6,
-                        minNumbers: 1,
-                        minSymbols: 1
-                    },
-                    errorMessage: USER_MESSAGES.PASSWORD_MUST_BE_STRONG
-                },
-                trim: true
-            }
+            password: passwordSchema
         },
         ['body']
     )
@@ -368,52 +386,8 @@ export const verifyForgotPasswordTokenValidator = validate(
 export const resetPasswordValidator = validate(
     checkSchema(
         {
-            password: {
-                notEmpty: {
-                    errorMessage: USER_MESSAGES.PASSWORD_IS_REQUIRED
-                },
-                isLength: {
-                    options: {
-                        min: 6,
-                        max: 50
-                    },
-                    errorMessage: USER_MESSAGES.PASSWORD_MUST_BE_STRONG
-                },
-                isStrongPassword: {
-                    options: {
-                        minLength: 6,
-                        minNumbers: 1,
-                        minSymbols: 1
-                    },
-                    errorMessage: USER_MESSAGES.PASSWORD_MUST_BE_STRONG
-                },
-                trim: true
-            },
-            confirm_password: {
-                notEmpty: {
-                    errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_IS_REQUIRED
-                },
-                isLength: {
-                    options: {
-                        min: 6,
-                        max: 50
-                    },
-                    errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_MUST_BE_STRONG
-                },
-                isStrongPassword: {
-                    options: {
-                        minLength: 6,
-                        minNumbers: 1,
-                        minSymbols: 1
-                    },
-                    errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_MUST_BE_STRONG
-                },
-                trim: true,
-                custom: {
-                    options: (value: any, { req }) => value === req.body.password,
-                    errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_DOES_NOT_MATCH
-                }
-            }
+            password: passwordSchema,
+            confirm_password: confirm_passwordSchema
         },
         ['body']
     )
@@ -547,27 +521,17 @@ export const updateUserValidator = validate(
 export const followValidator = validate(
     checkSchema(
         {
-            user_id: {
-                notEmpty: {
-                    errorMessage: USER_MESSAGES.USER_ID_IS_REQUIRED
-                },
-                isString: {
-                    errorMessage: USER_MESSAGES.USERNAME_MUST_BE_A_STRING
-                },
-                custom: {
-                    options: async (value: string) => {
-                        const user = await usersServices.getUserById(value)
-                        if (!user) {
-                            throw new ErrorWithStatus({
-                                message: USER_MESSAGES.USER_NOT_FOUND,
-                                status: HTTP_STATUS.NOT_FOUND
-                            })
-                        }
-                    }
-                },
-                trim: true
-            }
+            user_id: userIdSchema
         },
         ['body']
+    )
+)
+
+export const unFollowValidator = validate(
+    checkSchema(
+        {
+            user_id: userIdSchema
+        },
+        ['params']
     )
 )

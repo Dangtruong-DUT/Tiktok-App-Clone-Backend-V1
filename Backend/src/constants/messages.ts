@@ -1,6 +1,10 @@
 export const USER_MESSAGES = {
+    CANNOT_UPDATE_YOURSELF: 'can not update yourself',
+    UNFOLLOW_USER_SUCCESS: 'Successfully unfollowed the user',
     FOLLOW_USER_ALREADY_FOLLOWED: 'Followed',
+    INVALID_USER_ID: 'Invalid User ID',
     USER_ID_IS_REQUIRED: 'userId is required',
+    USER_ID_MUST_BE_STRING: 'userId must be a string',
     FOLLOW_USER_SUCCESS: 'following User Success',
     USERNAME_ALREADY_EXISTS: 'Username already exists',
     UPDATE_USER_SUCCESS: 'Update user success',

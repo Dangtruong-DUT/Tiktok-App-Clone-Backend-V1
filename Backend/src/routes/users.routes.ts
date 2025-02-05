@@ -11,7 +11,8 @@ import {
     getUserController,
     updateUserController,
     getMeProfileController,
-    followUserController
+    followUserController,
+    unFollowUserController
 } from '~/controllers/users.controllers'
 import { filterReqBodyMiddleWare } from '~/middlewares/common.middlewares'
 import {
@@ -23,6 +24,7 @@ import {
     refreshTokenValidate,
     registerValidator,
     resetPasswordValidator,
+    unFollowValidator,
     updateUserValidator,
     verifiedUserValidator,
     verifyForgotPasswordTokenValidator
@@ -202,10 +204,46 @@ userRouter.get('/:username', wrapRequestHandler(getUserController))
 
 userRouter.post(
     '/follow',
-    followValidator,
     accessTokenValidator,
     verifiedUserValidator,
+    followValidator,
     wrapRequestHandler(followUserController)
 )
 
+/**
+ * Description . unfollow someone
+ * method: delete
+ * path: /follow/:user_id
+ *  header: {
+ * Authorization: Bearer <access_token>
+ * }
+ */
+
+userRouter.delete(
+    '/follow/:user_id',
+    accessTokenValidator,
+    verifiedUserValidator,
+    unFollowValidator,
+    wrapRequestHandler(unFollowUserController)
+)
+
+/**
+ * Description. Change password
+ * Path: /change-password
+ * Method: PUT
+ * header: {Authorization: Bearer <access_token>}
+ * body: {
+ * current_password: string,
+ * password: string,
+ * confirm_password: string
+ * }
+ */
+
+userRouter.put(
+    '/change-password',
+    accessTokenValidator,
+    verifiedUserValidator,
+    unFollowValidator,
+    wrapRequestHandler(unFollowUserController)
+)
 export default userRouter
