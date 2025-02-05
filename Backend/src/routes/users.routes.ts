@@ -1,18 +1,31 @@
-import { Router, Request, Response } from 'express'
-import { USER_MESSAGES } from '~/constants/messages'
+import { Router } from 'express'
 import {
     verifyEmailController,
     loginController,
     logoutController,
     registerController,
-    resendVerifyEmailController
+    resendVerifyEmailController,
+    forgotPasswordController,
+    verifyForgotPasswordTokenController,
+    resetPasswordController,
+    getUserController,
+    updateUserController,
+    getMeProfileController
 } from '~/controllers/users.controllers'
+import { filterReqBodyMiddleWare } from '~/middlewares/common.middlewares'
 import {
     accessTokenValidator,
+    emailVerifyTokenValidator,
+    forgotPasswordValidator,
     loginValidator,
     refreshTokenValidate,
-    registerValidator
+    registerValidator,
+    resetPasswordValidator,
+    updateUserValidator,
+    verifiedUserValidator,
+    verifyForgotPasswordTokenValidator
 } from '~/middlewares/user.middlewares'
+import { UpdateUserRequestBody } from '~/models/requests/user.requests'
 import { wrapRequestHandler } from '~/utils/handlers'
 const userRouter = Router()
 
@@ -63,8 +76,7 @@ userRouter.post('/logout', accessTokenValidator, refreshTokenValidate, wrapReque
  * }
  */
 
-//emailVerifyTokenValidator
-userRouter.post('/verify-email', wrapRequestHandler(verifyEmailController))
+userRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(verifyEmailController))
 
 /**
  * Description. resend verify email when user client click on the link in email
@@ -74,5 +86,115 @@ userRouter.post('/verify-email', wrapRequestHandler(verifyEmailController))
  * Body:  {}
  */
 userRouter.post('/resend-verify-email', accessTokenValidator, wrapRequestHandler(resendVerifyEmailController))
+
+/**
+ * Description .  submit verify email when user client click on the link forgot password
+ * Path: /forgot-password
+ * method: post
+ * body:
+ *
+ * {
+ * email: string
+ * }
+ */
+userRouter.post('/forgot-password', forgotPasswordValidator, wrapRequestHandler(forgotPasswordController))
+
+/**
+ * Description . verify link in email when user client click on the link
+ * Path: /verify-forgot-password
+ * method: post
+ * body:
+ *
+ * {
+ * forgot-password-token: string
+ * }
+ */
+
+userRouter.post(
+    '/verify-forgot-password',
+    verifyForgotPasswordTokenValidator,
+    wrapRequestHandler(verifyForgotPasswordTokenController)
+)
+
+/**
+ * Description . Reset password
+ * Path: /reset-password
+ * method: post
+ * body: {
+ * forgot-password-token: string,
+ * password: string,
+ * confirm_password: string
+ * }
+ */
+
+userRouter.post(
+    '/reset-password',
+    verifyForgotPasswordTokenValidator,
+    resetPasswordValidator,
+    wrapRequestHandler(resetPasswordController)
+)
+
+/**
+ * Description . Get my profile
+ * Path: /me
+ * method: GET
+ * header: {
+ * Authorization: Bearer <access_token>
+ * }
+ * body: {}
+ *
+ */
+
+userRouter.get('/me', accessTokenValidator, wrapRequestHandler(getUserController))
+
+/**
+ * Description . Update my profile
+ * Path: /me
+ * method: GET
+ * header: {
+ * Authorization: Bearer <access_token>
+ * }
+ * body: {
+ *  UserSchema
+ * }
+ *
+ */
+
+userRouter.patch(
+    '/me',
+    accessTokenValidator,
+    verifiedUserValidator,
+    updateUserValidator,
+    filterReqBodyMiddleWare<UpdateUserRequestBody>([
+        'name',
+        'date_of_birth',
+        'bio',
+        'location',
+        'website',
+        'username',
+        'avatar',
+        'cover_photo'
+    ]),
+    wrapRequestHandler(getMeProfileController)
+)
+
+/**
+ * Description . Get user profile
+ * method: GET
+ * path: /:username
+ */
+
+userRouter.get('/:username', wrapRequestHandler(getUserController))
+
+/**
+ * Description . follow someone
+ * method: POST
+ * path: /:username
+ * body: {
+ * user_id: string
+ * }
+ */
+
+userRouter.post('/:username', wrapRequestHandler(getUserController))
 
 export default userRouter
