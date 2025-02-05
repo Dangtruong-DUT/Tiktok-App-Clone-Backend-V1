@@ -145,7 +145,7 @@ userRouter.post(
  *
  */
 
-userRouter.get('/me', accessTokenValidator, wrapRequestHandler(getUserController))
+userRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeProfileController))
 
 /**
  * Description . Update my profile
@@ -175,7 +175,7 @@ userRouter.patch(
         'avatar',
         'cover_photo'
     ]),
-    wrapRequestHandler(getMeProfileController)
+    wrapRequestHandler(updateUserController)
 )
 
 /**
@@ -185,16 +185,5 @@ userRouter.patch(
  */
 
 userRouter.get('/:username', wrapRequestHandler(getUserController))
-
-/**
- * Description . follow someone
- * method: POST
- * path: /:username
- * body: {
- * user_id: string
- * }
- */
-
-userRouter.post('/:username', wrapRequestHandler(getUserController))
 
 export default userRouter
