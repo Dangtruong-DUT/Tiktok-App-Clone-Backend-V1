@@ -2,11 +2,13 @@ import express from 'express'
 import userRouter from './routes/users.routes'
 import databaseService from '~/services/database.services'
 import errorHandler from './middlewares/error.middlewares'
+import mediasRouter from './routes/medias.routes'
 databaseService.connect()
 const app = express()
 const port = 3000
 app.use(express.json())
-app.use('/users', userRouter)
+app.use('/api/users', userRouter)
+app.use('/api/medias', mediasRouter)
 app.use(errorHandler)
 
 app.listen(port, () => {
