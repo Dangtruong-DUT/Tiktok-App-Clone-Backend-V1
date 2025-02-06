@@ -10,17 +10,24 @@ import {
     resetPasswordController,
     getUserController,
     updateUserController,
-    getMeProfileController
+    getMeProfileController,
+    followUserController,
+    unFollowUserController,
+    changePasswordController,
+    logoutAllController
 } from '~/controllers/users.controllers'
 import { filterReqBodyMiddleWare } from '~/middlewares/common.middlewares'
 import {
     accessTokenValidator,
+    changePasswordValidator,
     emailVerifyTokenValidator,
+    followValidator,
     forgotPasswordValidator,
     loginValidator,
     refreshTokenValidate,
     registerValidator,
     resetPasswordValidator,
+    unFollowValidator,
     updateUserValidator,
     verifiedUserValidator,
     verifyForgotPasswordTokenValidator
@@ -66,6 +73,16 @@ userRouter.post('/register', registerValidator, wrapRequestHandler(registerContr
  */
 
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidate, wrapRequestHandler(logoutController))
+
+/**
+ * Description: Logout from all devices
+ * Path: /logout-all
+ * Method: POST
+ * Header: <Authorization: Bearer <access_token>>
+ * Body: { }
+ */
+
+userRouter.post('/logout-all', accessTokenValidator, wrapRequestHandler(logoutAllController))
 
 /**
  * Description. verify email when user client click on the link in email
@@ -186,4 +203,60 @@ userRouter.patch(
 
 userRouter.get('/:username', wrapRequestHandler(getUserController))
 
+/**
+ * Description . follow someone
+ * method: Post
+ * path: /follow
+ *  header: {
+ * Authorization: Bearer <access_token>
+ * }
+ * body: {
+ * user_id: string
+ * }
+ */
+
+userRouter.post(
+    '/follow',
+    accessTokenValidator,
+    verifiedUserValidator,
+    followValidator,
+    wrapRequestHandler(followUserController)
+)
+
+/**
+ * Description . unfollow someone
+ * method: delete
+ * path: /follow/:user_id
+ *  header: {
+ * Authorization: Bearer <access_token>
+ * }
+ */
+
+userRouter.delete(
+    '/follow/:user_id',
+    accessTokenValidator,
+    verifiedUserValidator,
+    unFollowValidator,
+    wrapRequestHandler(unFollowUserController)
+)
+
+/**
+ * Description. Change password
+ * Path: /change-password
+ * Method: PUT
+ * header: {Authorization: Bearer <access_token>}
+ * body: {
+ * current_password: string,
+ * password: string,
+ * confirm_password: string
+ * }
+ */
+
+userRouter.put(
+    '/change-password',
+    accessTokenValidator,
+    verifiedUserValidator,
+    changePasswordValidator,
+    wrapRequestHandler(changePasswordController)
+)
 export default userRouter

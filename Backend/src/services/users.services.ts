@@ -9,6 +9,7 @@ import { ObjectId } from 'mongodb'
 import { USER_MESSAGES } from '~/constants/messages'
 import User from '~/models/schemas/User.schema'
 import generateTimeBasedUsername from '~/utils/GenerateUserName'
+import Follower from '~/models/schemas/Follower.schemas'
 
 class UserService {
     private signAccessToken({ verify, userId }: { userId: string; verify: UserVerifyStatus }) {
@@ -102,6 +103,7 @@ class UserService {
         await databaseService.refreshToken.insertOne(
             new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken })
         )
+
         return {
             accessToken,
             refreshToken
@@ -109,6 +111,10 @@ class UserService {
     }
     async logout(refresh_token: string) {
         const deleteResult = await databaseService.refreshToken.deleteOne({ token: refresh_token })
+        return deleteResult.deletedCount > 0
+    }
+    async logoutAll(user_id: string) {
+        const deleteResult = await databaseService.refreshToken.deleteMany({ user_id: new ObjectId(user_id) })
         return deleteResult.deletedCount > 0
     }
     async verifyEmail(user_id: string) {
@@ -130,6 +136,12 @@ class UserService {
             )
         ])
         const [access_token, refresh_token] = token
+        await databaseService.refreshToken.deleteMany({
+            user_id: new ObjectId(user_id)
+        })
+        await databaseService.refreshToken.insertOne(
+            new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
+        )
         return {
             access_token,
             refresh_token
@@ -234,6 +246,49 @@ class UserService {
             }
         )
         return updateResult
+    }
+    async followUser(user_id: string, followed_user_id: string) {
+        const followerCount = await databaseService.followers.countDocuments({
+            user_id: new ObjectId(user_id),
+            followed_user_id: new ObjectId(followed_user_id)
+        })
+        if (followerCount > 0) {
+            return {
+                message: USER_MESSAGES.FOLLOW_USER_ALREADY_FOLLOWED
+            }
+        }
+        const result = await databaseService.followers.insertOne(
+            new Follower({
+                user_id: new ObjectId(user_id),
+                followed_user_id: new ObjectId(followed_user_id)
+            })
+        )
+        return {
+            message: USER_MESSAGES.FOLLOW_USER_SUCCESS
+        }
+    }
+
+    async unfollowUser(user_id: string, followed_user_id: string) {
+        await databaseService.followers.deleteOne({
+            user_id: new ObjectId(user_id),
+            followed_user_id: new ObjectId(followed_user_id)
+        })
+        return {
+            message: USER_MESSAGES.UNFOLLOW_USER_SUCCESS
+        }
+    }
+    async changePassword(user_id: string, password: string) {
+        await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
+            {
+                $set: {
+                    password: hashPassword(password),
+                    updated_at: '$$NOW'
+                }
+            }
+        ])
+        return {
+            message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESS
+        }
     }
     async checkEmailExist(email: string) {
         const user = await databaseService.users.findOne({ email })
