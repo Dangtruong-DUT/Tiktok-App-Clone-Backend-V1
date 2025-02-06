@@ -73,3 +73,12 @@ export const USER_MESSAGES = {
     DATA_OF_BIRTH_IS_INVALID_FORMAT: 'Date of birth must be a valid ISO 8601 date',
     DATE_OF_BIRTH_MUST_BE_IN_THE_PAST: 'Date of birth must be in the past'
 } as const
+
+export const FILE_MESSAGES = {
+    UPLOAD_SUCCESS: 'File uploaded successfully',
+    UPLOAD_FAILED: 'Failed to upload file',
+    UPLOAD_SIZE_EXCEEDS_LIMIT: 'File size exceeds the limit',
+    UPLOAD_INVALID_FORMAT: 'Invalid file format',
+    UPLOAD_FILE_MUST_BE_NON_EMPTY: 'File must not be empty',
+    FILE_NOT_FOUND: 'File not found'
+}

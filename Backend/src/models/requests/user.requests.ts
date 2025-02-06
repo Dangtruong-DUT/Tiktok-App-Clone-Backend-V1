@@ -58,6 +58,9 @@ export interface GetProfileReqParams extends ParamsDictionary {
 export interface unFollowUserReqParams extends ParamsDictionary {
     user_id: string
 }
+export interface getImageReqParams extends ParamsDictionary {
+    name: string
+}
 
 export interface followUserReqBody {
     user_id: string
