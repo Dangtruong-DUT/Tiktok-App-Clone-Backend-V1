@@ -15,8 +15,6 @@ initFolder()
 app.use(express.json())
 app.use('/api', apiRouter)
 
-// Serve static files
-// app.use('/static', express.static(UPLOAD_FOLDER_DIR))
 // Error handling middleware
 app.use(errorHandler)
 
