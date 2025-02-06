@@ -80,5 +80,6 @@ export const FILE_MESSAGES = {
     UPLOAD_SIZE_EXCEEDS_LIMIT: 'File size exceeds the limit',
     UPLOAD_INVALID_FORMAT: 'Invalid file format',
     UPLOAD_FILE_MUST_BE_NON_EMPTY: 'File must not be empty',
-    FILE_NOT_FOUND: 'File not found'
+    FILE_NOT_FOUND: 'File not found',
+    RANGE_ERROR: 'Requires range header'
 }
