@@ -49,6 +49,15 @@ export const logoutController = async (req: Request<ParamsDictionary, any, Logou
     res.status(HTTP_STATUS.OK).json({ message: USER_MESSAGES.LOGOUT_SUCCESS })
 }
 
+export const logoutAllController = async (req: Request, res: Response) => {
+    const { user_id } = req.decoded_authorization as TokenPayload
+    const result = await usersServices.logoutAll(user_id)
+    if (result === false) {
+        throw new Error(USER_MESSAGES.LOGOUT_FAILED)
+    }
+    res.status(HTTP_STATUS.OK).json({ message: USER_MESSAGES.LOGOUT_SUCCESS })
+}
+
 export const verifyEmailController = async (
     req: Request<ParamsDictionary, any, VerifyEmailRequestBody>,
     res: Response,

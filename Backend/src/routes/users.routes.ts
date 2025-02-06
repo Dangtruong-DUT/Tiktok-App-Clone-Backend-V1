@@ -13,7 +13,8 @@ import {
     getMeProfileController,
     followUserController,
     unFollowUserController,
-    changePasswordController
+    changePasswordController,
+    logoutAllController
 } from '~/controllers/users.controllers'
 import { filterReqBodyMiddleWare } from '~/middlewares/common.middlewares'
 import {
@@ -72,6 +73,16 @@ userRouter.post('/register', registerValidator, wrapRequestHandler(registerContr
  */
 
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidate, wrapRequestHandler(logoutController))
+
+/**
+ * Description: Logout from all devices
+ * Path: /logout-all
+ * Method: POST
+ * Header: <Authorization: Bearer <access_token>>
+ * Body: { }
+ */
+
+userRouter.post('/logout-all', accessTokenValidator, wrapRequestHandler(logoutAllController))
 
 /**
  * Description. verify email when user client click on the link in email
