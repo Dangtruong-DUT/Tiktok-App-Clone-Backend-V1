@@ -1,5 +1,10 @@
 import { Router } from 'express'
-import { uploadImagesController, uploadVideosController } from '~/controllers/medias.controllers'
+import {
+    checkEncodingProgressController,
+    uploadHLSVideosController,
+    uploadImagesController,
+    uploadVideosController
+} from '~/controllers/medias.controllers'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/user.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 const mediasRouter = Router()
@@ -43,7 +48,7 @@ mediasRouter.post(
 )
 
 /**
- * Description. upload video HLS
+ * Description. upload single video
  * Path: /upload-video-hls
  * method: POST
  * headers: { authorization: bearer <access_token>}
@@ -58,6 +63,24 @@ mediasRouter.post(
     '/upload-video-hls',
     accessTokenValidator,
     verifiedUserValidator,
-    wrapRequestHandler(uploadVideosController)
+    wrapRequestHandler(uploadHLSVideosController)
 )
+
+/**
+ *
+ * Description. get status of video
+ * Path: /upload-video-status/:id
+ * method: get
+ * headers: { authorization: bearer <access_token>}
+ * body:  {
+ * }
+ *
+ * */
+mediasRouter.get(
+    '/upload-hls-status/:id',
+    accessTokenValidator,
+    verifiedUserValidator,
+    wrapRequestHandler(checkEncodingProgressController)
+)
+
 export default mediasRouter

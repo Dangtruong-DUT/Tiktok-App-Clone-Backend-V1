@@ -82,5 +82,6 @@ export const FILE_MESSAGES = {
     UPLOAD_INVALID_FORMAT: 'Invalid file format',
     UPLOAD_FILE_MUST_BE_NON_EMPTY: 'File must not be empty',
     FILE_NOT_FOUND: 'File not found',
-    RANGE_ERROR: 'Requires range header'
-}
+    RANGE_ERROR: 'Requires range header',
+    GET_VIDEO_HLS_STATUS_SUCCESS: 'Get video HLS status success'
+} as const

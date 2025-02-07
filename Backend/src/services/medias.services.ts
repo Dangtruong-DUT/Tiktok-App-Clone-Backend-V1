@@ -8,6 +8,8 @@ import { isProduction } from '~/constants/config'
 import { config } from 'dotenv'
 import { MediaType } from '~/constants/enum'
 import { Media } from '~/models/Other'
+import { hlsVideoEncoder } from './HLSVideoEncoder'
+import databaseService from './database.services'
 
 // Load environment variables from.env file
 config()
@@ -33,10 +35,12 @@ class MediasService {
     }
     async UploadVideos(req: Request) {
         const files = await handleUploadVideos(req)
-
         const urls: Media[] = files.map((file) => {
             const newFilename = file.newFilename as string
             return {
+                'url-stream': isProduction
+                    ? `${process.env.HOST}/api/static/video-stream/${newFilename}`
+                    : `http://localhost:${process.env.PORT}/api/static/video-stream/${newFilename}`,
                 url: isProduction
                     ? `${process.env.HOST}/api/static/video/${newFilename}`
                     : `http://localhost:${process.env.PORT}/api/static/video/${newFilename}`,
@@ -44,6 +48,29 @@ class MediasService {
             }
         })
         return urls
+    }
+    async UploadHLSVideos(req: Request) {
+        const files = await handleUploadVideos(req)
+        const urls: Media[] = await Promise.all(
+            files.map(async (file) => {
+                const newFilename = file.newFilename as string
+                hlsVideoEncoder.enqueueVideo(file.filepath)
+                const nameFileWithoutExtension = getFileNameWithoutExtension(newFilename)
+                return {
+                    url: isProduction
+                        ? `${process.env.HOST}/api/static/video-hls/${nameFileWithoutExtension}/master.m3u8`
+                        : `http://localhost:${process.env.PORT}/api/static/video-hls/${nameFileWithoutExtension}/master.m3u8`,
+                    type: MediaType.HLSVideo
+                }
+            })
+        )
+        return urls
+    }
+    async CheckEncodingProgress(id: string) {
+        const data = await databaseService.videoStatus.findOne({
+            name: id
+        })
+        return data
     }
 }
 
