@@ -1,4 +1,13 @@
 export const USER_MESSAGES = {
+    CHANGE_PASSWORD_SUCCESS: 'Change Password Success',
+    CURRENT_PASSWORD_IS_INCORRECT: 'Current password incorrect',
+    CANNOT_UPDATE_YOURSELF: 'can not update yourself',
+    UNFOLLOW_USER_SUCCESS: 'Successfully unfollowed the user',
+    FOLLOW_USER_ALREADY_FOLLOWED: 'Followed',
+    INVALID_USER_ID: 'Invalid User ID',
+    USER_ID_IS_REQUIRED: 'userId is required',
+    USER_ID_MUST_BE_STRING: 'userId must be a string',
+    FOLLOW_USER_SUCCESS: 'following User Success',
     USERNAME_ALREADY_EXISTS: 'Username already exists',
     UPDATE_USER_SUCCESS: 'Update user success',
     USER_NOT_VERIFIED: 'User not verified',
@@ -64,3 +73,13 @@ export const USER_MESSAGES = {
     DATA_OF_BIRTH_IS_INVALID_FORMAT: 'Date of birth must be a valid ISO 8601 date',
     DATE_OF_BIRTH_MUST_BE_IN_THE_PAST: 'Date of birth must be in the past'
 } as const
+
+export const FILE_MESSAGES = {
+    UPLOAD_SUCCESS: 'File uploaded successfully',
+    UPLOAD_FAILED: 'Failed to upload file',
+    UPLOAD_SIZE_EXCEEDS_LIMIT: 'File size exceeds the limit',
+    UPLOAD_INVALID_FORMAT: 'Invalid file format',
+    UPLOAD_FILE_MUST_BE_NON_EMPTY: 'File must not be empty',
+    FILE_NOT_FOUND: 'File not found',
+    RANGE_ERROR: 'Requires range header'
+}
