@@ -13,5 +13,13 @@ export enum TokenType {
 
 export enum MediaType {
     Image,
-    Video
+    Video,
+    HLSVideo
+}
+
+export enum EncodingStatus {
+    Pending,
+    Processing,
+    Completed,
+    Failed
 }

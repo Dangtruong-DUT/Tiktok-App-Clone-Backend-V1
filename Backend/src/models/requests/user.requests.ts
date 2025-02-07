@@ -61,7 +61,13 @@ export interface unFollowUserReqParams extends ParamsDictionary {
 export interface getImageReqParams extends ParamsDictionary {
     name: string
 }
+export interface getVideoReqParam extends ParamsDictionary {
+    name: string
+}
 
+export interface getVideoHLSReqParam extends ParamsDictionary {
+    id: string
+}
 export interface followUserReqBody {
     user_id: string
 }
