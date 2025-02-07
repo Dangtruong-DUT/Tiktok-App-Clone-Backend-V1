@@ -42,4 +42,22 @@ mediasRouter.post(
     wrapRequestHandler(uploadVideosController)
 )
 
+/**
+ * Description. upload video HLS
+ * Path: /upload-video-hls
+ * method: POST
+ * headers: { authorization: bearer <access_token>}
+ * body:  {
+ *   form-data {
+ *          videos: file
+ *   }
+ * }
+ *
+ * */
+mediasRouter.post(
+    '/upload-video-hls',
+    accessTokenValidator,
+    verifiedUserValidator,
+    wrapRequestHandler(uploadVideosController)
+)
 export default mediasRouter
