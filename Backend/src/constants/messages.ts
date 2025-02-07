@@ -44,6 +44,7 @@ export const USER_MESSAGES = {
     ACCESS_TOKEN_IS_INVALID: 'Access token is invalid',
     REFRESH_TOKEN_IS_REQUIRED: 'Refresh token is required',
     REFRESH_TOKEN_IS_INVALID: 'Refresh token is invalid',
+    REFRESH_TOKEN_SUCCESS: 'Refresh token success',
     NOT_AUTHORIZED: 'Not authorized',
     FORBIDDEN: 'Forbidden',
     LOGIN_SUCCESS: 'Login success',

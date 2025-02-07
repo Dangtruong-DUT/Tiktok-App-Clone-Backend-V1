@@ -113,6 +113,29 @@ class UserService {
         const deleteResult = await databaseService.refreshToken.deleteOne({ token: refresh_token })
         return deleteResult.deletedCount > 0
     }
+
+    async refreshToken({
+        refresh_token,
+        user_id,
+        verify
+    }: {
+        refresh_token: string
+        user_id: string
+        verify: UserVerifyStatus
+    }) {
+        const [accessToken, newRefreshToken] = await this.signAccessAndRefreshToken({
+            userId: user_id,
+            verify
+        })
+        await databaseService.refreshToken.deleteOne({ token: refresh_token })
+        await databaseService.refreshToken.insertOne(
+            new RefreshToken({ user_id: new ObjectId(user_id), token: newRefreshToken })
+        )
+        return {
+            accessToken,
+            refreshToken: newRefreshToken
+        }
+    }
     async logoutAll(user_id: string) {
         const deleteResult = await databaseService.refreshToken.deleteMany({ user_id: new ObjectId(user_id) })
         return deleteResult.deletedCount > 0
