@@ -14,7 +14,8 @@ import {
     followUserController,
     unFollowUserController,
     changePasswordController,
-    logoutAllController
+    logoutAllController,
+    refreshTokenController
 } from '~/controllers/users.controllers'
 import { filterReqBodyMiddleWare } from '~/middlewares/common.middlewares'
 import {
@@ -73,6 +74,17 @@ userRouter.post('/register', registerValidator, wrapRequestHandler(registerContr
  */
 
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidate, wrapRequestHandler(logoutController))
+
+/**
+ * Description. refresh token
+ * Path: /refresh-token
+ * method: POST
+ * body: {
+ * refresh_token: String
+ * }
+ */
+
+userRouter.post('/refresh-token', refreshTokenValidate, wrapRequestHandler(refreshTokenController))
 
 /**
  * Description: Logout from all devices

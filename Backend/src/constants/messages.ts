@@ -44,6 +44,7 @@ export const USER_MESSAGES = {
     ACCESS_TOKEN_IS_INVALID: 'Access token is invalid',
     REFRESH_TOKEN_IS_REQUIRED: 'Refresh token is required',
     REFRESH_TOKEN_IS_INVALID: 'Refresh token is invalid',
+    REFRESH_TOKEN_SUCCESS: 'Refresh token success',
     NOT_AUTHORIZED: 'Not authorized',
     FORBIDDEN: 'Forbidden',
     LOGIN_SUCCESS: 'Login success',
@@ -80,5 +81,6 @@ export const FILE_MESSAGES = {
     UPLOAD_SIZE_EXCEEDS_LIMIT: 'File size exceeds the limit',
     UPLOAD_INVALID_FORMAT: 'Invalid file format',
     UPLOAD_FILE_MUST_BE_NON_EMPTY: 'File must not be empty',
-    FILE_NOT_FOUND: 'File not found'
+    FILE_NOT_FOUND: 'File not found',
+    RANGE_ERROR: 'Requires range header'
 }
