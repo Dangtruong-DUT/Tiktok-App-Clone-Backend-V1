@@ -7,7 +7,7 @@ import fs from 'fs'
 import { isProduction } from '~/constants/config'
 import { config } from 'dotenv'
 import { MediaType } from '~/constants/enum'
-import { Media } from '~/models/Other'
+import { Media } from '~/models/Common'
 import { hlsVideoEncoder } from './HLSVideoEncoder'
 import databaseService from './database.services'
 

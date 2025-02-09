@@ -23,3 +23,16 @@ export enum EncodingStatus {
     Completed,
     Failed
 }
+
+export enum Audience {
+    public,
+    private,
+    friends
+}
+
+export enum PosterType {
+    post,
+    Reports,
+    Comment,
+    quotePost
+}
