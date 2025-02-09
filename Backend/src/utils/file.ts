@@ -6,16 +6,14 @@ import { FILE_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_DIR, UPLOAD_VIDEO_TEMP_DIR } from '~/constants/dir'
+import { nanoid } from 'nanoid'
 
 /**
- * The `initFolder` function ensures that the temporary directories for storing uploaded images and videos are created if they do not exist.
- * If the directories are not already present, it will automatically create them.
- *
- * - `UPLOAD_IMAGE_TEMP_DIR`: The temporary directory for storing images uploaded by the user.
- * - `UPLOAD_VIDEO_TEMP_DIR`: The temporary directory for storing videos uploaded by the user.
- *
- * This ensures that the necessary directories for handling user-uploaded static data (images and videos) are ready for use on the server.
+ * Ensures the temporary directories for uploaded images and videos are created if they don't exist.
+ * @note Creates `UPLOAD_IMAGE_TEMP_DIR` for images and `UPLOAD_VIDEO_TEMP_DIR` for videos.
+ * This prepares the necessary directories for storing user-uploaded data on the server.
  */
+
 export const initFolder = () => {
     if (!fs.existsSync(UPLOAD_IMAGE_TEMP_DIR)) {
         fs.mkdirSync(UPLOAD_IMAGE_TEMP_DIR, {
@@ -70,10 +68,16 @@ export const handleUploadImages = (req: Request) => {
 }
 
 export const handleUploadVideos = (req: Request) => {
+    const idName = nanoid()
+    const folderPath = path.resolve(UPLOAD_VIDEO_DIR, idName)
+    fs.mkdirSync(folderPath)
     const form = formidable({
-        uploadDir: UPLOAD_VIDEO_DIR,
+        uploadDir: folderPath,
         maxFiles: 1,
-        maxFileSize: 200 * 1024 * 1024,
+        maxFileSize: 50 * 1024 * 1024, // 50MB
+        filename: () => {
+            return idName
+        },
         filter: ({ name, mimetype }) => {
             const valid = name === 'video' && Boolean(mimetype?.startsWith('video/'))
             if (!valid) {
@@ -106,9 +110,10 @@ export const handleUploadVideos = (req: Request) => {
             videos.forEach((video) => {
                 const ext = getExtensionFileName(video.originalFilename as string)
                 const basePath = path.basename(video.filepath)
-                const newPath = path.join(UPLOAD_VIDEO_DIR, basePath + '.' + ext)
+                const newPath = path.join(folderPath, basePath + '.' + ext)
                 fs.renameSync(video.filepath, newPath)
-                video.newFilename = basePath + '.' + ext
+                video.newFilename = video.newFilename + '.' + ext
+                video.filepath = video.filepath + '.' + ext
             })
             resolve(files.video as File[])
         })

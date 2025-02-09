@@ -82,5 +82,47 @@ export const FILE_MESSAGES = {
     UPLOAD_INVALID_FORMAT: 'Invalid file format',
     UPLOAD_FILE_MUST_BE_NON_EMPTY: 'File must not be empty',
     FILE_NOT_FOUND: 'File not found',
-    RANGE_ERROR: 'Requires range header'
-}
+    RANGE_ERROR: 'Requires range header',
+    GET_VIDEO_HLS_STATUS_SUCCESS: 'Get video HLS status success'
+} as const
+
+export const TIKTOK_POST_MESSAGE = {
+    THE_POST_HAS_NOT_BEEN_LIKED_OR_UNLIKED_PREVIOUSLY: 'The post has been liked or unlinked previously',
+    INVALID_ID: 'InValid ID',
+    LIKED_ID_IS_REQUIRED: 'Liked id is required',
+    LIKED_ID_MUST_BE_STRING: 'Liked id must be string',
+    LIKE_POST_SUCCESS: 'Post is linked successfully',
+    UNLIKE_POST_SUCCESS: 'Post is unlinked successfully',
+    COMMENT_POST_SUCCESS: 'Comment is linked successfully',
+    COMMENT_POST_FAILED: 'Failed to comment on post',
+    BOOKMARKS_ID_MUST_BE_A_STRING: 'Bookmarks must be a string',
+    BOOKMARKS_ID_IS_REQUIRED: 'Bookmarks id is required',
+    THE_POST_HAS_NOT_BEEN_BOOKMARKS_OR_UNBOOKMARK_PREVIOUSLY:
+        'The post has not been bookmarked or has been unBookmarked',
+    UNBOOKMARKS_SUCCESS: 'UnBookmarks success',
+    BOOKMARKS_SUCCESS: 'Bookmarks success',
+    INVALID_POST_ID: 'Invalid post ID',
+    POST_ID_IS_REQUIRED: 'Post ID is required',
+    POSt_ID_MUST_BE_STRING: 'Post ID must be a string',
+    HASHTAG_MUST_BE_STRING: 'Hashtag must be a string',
+    USER_ID_REQUIRED: 'User ID is required',
+    INVALID_POST_TYPE: 'Invalid post type',
+    INVALID_AUDIENCE_TYPE: 'Invalid audience type',
+    CONTENT_MAX_LENGTH: 'Content must be at most 500 characters',
+    HASHTAGS_MUST_BE_ARRAY: 'Hashtags must be an array of strings',
+    MENTIONS_MUST_BE_ARRAY: 'Mentions must be an array of strings',
+    GUEST_VIEWS_MUST_BE_INTEGER: 'Guest views must be an integer',
+    USER_VIEWS_MUST_BE_INTEGER: 'User views must be an integer',
+    MEDIA_FILES_REQUIRED: 'Media files are required',
+    MEDIA_FILES_MUST_BE_ARRAY: 'Media files must be an array',
+    INVALID_PARENT_ID: 'Invalid parent ID',
+    PARENT_ID_MUST_BE_NULL: 'Parent ID must be a null',
+    POST_SUCCESS: 'Post created successfully',
+    POST_UPDATE_SUCCESS: 'Post updated successfully',
+    POST_DELETE_SUCCESS: 'Post deleted successfully',
+    POST_NOT_FOUND: 'Post not found',
+    POST_ALREADY_EXISTS: 'Post already exists',
+    CONTENT_REQUIRED: 'Content is required',
+    INVALID_MENTION: 'User mentioned was not found',
+    INVALID_MEDIA_TYPE: 'Medias must be a valid media object type'
+} as const
