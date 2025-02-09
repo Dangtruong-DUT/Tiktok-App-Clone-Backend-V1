@@ -1,6 +1,6 @@
 node_modules/
 dist/
-/uploads
+uploads/
 
 # dependencies
 /node_modules
