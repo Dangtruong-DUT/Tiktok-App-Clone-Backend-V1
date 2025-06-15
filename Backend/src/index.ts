@@ -1,6 +1,6 @@
 import express from 'express'
 import databaseService from '~/services/database.services'
-import errorHandler from './middlewares/error.middlewares'
+import defaultErrorHandler from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
 import { config } from 'dotenv'
 import apiRouter from './routes/api.routes'
@@ -16,13 +16,13 @@ initFolder()
 app.use(express.json())
 app.use(corsMiddleware())
 app.use('/api', apiRouter)
+app.use((req, res, next) => {
+    res.status(404).send("Sorry, the page you're looking for was not found.")
+})
 
 // Error handling middleware
-app.use(errorHandler)
+app.use(defaultErrorHandler)
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`)
 })
-function customCors(): any {
-    throw new Error('Function not implemented.')
-}

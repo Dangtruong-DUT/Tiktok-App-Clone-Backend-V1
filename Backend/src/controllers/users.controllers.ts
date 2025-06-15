@@ -23,6 +23,7 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import databaseService from '~/services/database.services'
 import { UserVerifyStatus } from '~/constants/enum'
 import User from '~/models/schemas/User.schema'
+
 export const loginController = async (req: Request<ParamsDictionary, any, LoginRequestBody>, res: Response) => {
     const user = req.user as User
     const user_id = user._id as ObjectId

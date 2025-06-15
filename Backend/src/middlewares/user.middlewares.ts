@@ -37,7 +37,8 @@ const passwordSchema: ParamSchema = {
     trim: true
 }
 
-const confirm_passwordSchema: ParamSchema = {
+const confirm_password_schema: ParamSchema = {
+    trim: true,
     notEmpty: {
         errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_IS_REQUIRED
     },
@@ -56,13 +57,13 @@ const confirm_passwordSchema: ParamSchema = {
         },
         errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_MUST_BE_STRONG
     },
-    trim: true,
     custom: {
         options: (value: any, { req }) => value === req.body.password,
         errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_DOES_NOT_MATCH
     }
 }
 const nameSchema = (isRequired: boolean) => ({
+    trim: true,
     optional: !isRequired,
     notEmpty: isRequired
         ? {
@@ -78,11 +79,10 @@ const nameSchema = (isRequired: boolean) => ({
             max: 100
         },
         errorMessage: USER_MESSAGES.NAME_LENGTH_MUST_BE_FROM_1_TO_100
-    },
-    trim: true
+    }
 })
 
-const dateOfBirthSchema = (isRequired: boolean) => ({
+const dateOfBirthSchema = (isRequired: boolean): ParamSchema => ({
     optional: !isRequired,
     notEmpty: isRequired
         ? {
@@ -102,6 +102,7 @@ const dateOfBirthSchema = (isRequired: boolean) => ({
 })
 
 const userIdSchema: ParamSchema = {
+    trim: true,
     notEmpty: {
         errorMessage: USER_MESSAGES.USER_ID_IS_REQUIRED
     },
@@ -132,8 +133,7 @@ const userIdSchema: ParamSchema = {
             }
             return true
         }
-    },
-    trim: true
+    }
 }
 export const registerValidator = validate(
     checkSchema(
@@ -141,15 +141,15 @@ export const registerValidator = validate(
             name: nameSchema(true),
             date_of_birth: dateOfBirthSchema(true),
             email: {
+                trim: true,
                 notEmpty: {
                     errorMessage: USER_MESSAGES.EMAIL_IS_REQUIRED
                 },
                 isEmail: {
                     errorMessage: USER_MESSAGES.EMAIL_IS_INVALID
                 },
-                trim: true,
-                custom: {
-                    options: async (value) => {
+                isEmailExited: {
+                    custom: async (value) => {
                         const exists = await usersServices.checkEmailExist(value)
                         if (exists) throw new Error(USER_MESSAGES.EMAIL_ALREADY_EXISTS)
                         return true
@@ -157,7 +157,7 @@ export const registerValidator = validate(
                 }
             },
             password: passwordSchema,
-            confirm_password: confirm_passwordSchema
+            confirm_password: confirm_password_schema
         },
         ['body']
     )
@@ -167,21 +167,21 @@ export const loginValidator = validate(
     checkSchema(
         {
             email: {
+                trim: true,
                 notEmpty: {
                     errorMessage: USER_MESSAGES.EMAIL_IS_REQUIRED
                 },
                 isEmail: {
                     errorMessage: USER_MESSAGES.EMAIL_IS_INVALID
                 },
-                custom: {
-                    options: async (value, { req }) => {
+                isEmailExited: {
+                    custom: async (value, { req }) => {
                         const user = await databaseService.users.findOne({ email: value })
                         if (user === null) throw new Error(USER_MESSAGES.USER_NOT_FOUND)
                         req.user = user
                         return true
                     }
-                },
-                trim: true
+                }
             },
             password: passwordSchema
         },
@@ -320,8 +320,8 @@ export const forgotPasswordValidator = validate(
                 isEmail: {
                     errorMessage: USER_MESSAGES.EMAIL_IS_INVALID
                 },
-                custom: {
-                    options: async (value: string, { req }) => {
+                isEmailExited: {
+                    custom: async (value: string, { req }) => {
                         const user = await databaseService.users.findOne({ email: value })
                         if (user === null)
                             throw new ErrorWithStatus({
@@ -346,8 +346,8 @@ export const verifyForgotPasswordTokenValidator = validate(
                 notEmpty: {
                     errorMessage: USER_MESSAGES.FORGOT_PASSWORD_TOKEN_IS_REQUIRED
                 },
-                custom: {
-                    options: async (token: string, { req }) => {
+                isValidForgotPasswordToken: {
+                    custom: async (token: string, { req }) => {
                         try {
                             const [decoded_forgot_password_token, user] = await Promise.all([
                                 verifyToken({
@@ -388,7 +388,7 @@ export const resetPasswordValidator = validate(
     checkSchema(
         {
             password: passwordSchema,
-            confirm_password: confirm_passwordSchema
+            confirm_password: confirm_password_schema
         },
         ['body']
     )
@@ -564,7 +564,7 @@ export const changePasswordValidator = validate(
                 }
             },
             password: passwordSchema,
-            confirm_password: confirm_passwordSchema
+            confirm_password: confirm_password_schema
         },
         ['body']
     )
