@@ -33,7 +33,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         if (error instanceof JsonWebTokenError) {
             return next(
                 new ErrorWithStatus({
-                    message: _.capitalize(error.message),
+                    message: AUTH_MESSAGES.INVALID_ACCESS_TOKEN,
                     status: HTTP_STATUS.UNAUTHORIZED
                 })
             )
@@ -83,10 +83,23 @@ export const authenticateRefreshToken = async (req: Request, res: Response, next
 import { UserVerifyStatus } from '~/constants/enum'
 import { USER_MESSAGES } from '~/constants/messages/user'
 import _ from 'lodash'
+import databaseService from '~/services/database.services'
+import { ObjectId } from 'mongodb'
 
-export const requireVerifiedUser = (req: Request, res: Response, next: NextFunction) => {
-    const { verify } = req.decoded_authorization || {}
-    if (verify !== UserVerifyStatus.Verified) {
+export const requireVerifiedUser = async (req: Request, res: Response, next: NextFunction) => {
+    const { user_id } = req.decoded_authorization || {}
+    const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+
+    if (!user) {
+        return next(
+            new ErrorWithStatus({
+                message: USER_MESSAGES.USER_NOT_FOUND,
+                status: HTTP_STATUS.NOT_FOUND
+            })
+        )
+    }
+
+    if (user?.verify !== UserVerifyStatus.Verified) {
         return next(
             new ErrorWithStatus({
                 message: USER_MESSAGES.USER_NOT_VERIFIED,
@@ -95,4 +108,37 @@ export const requireVerifiedUser = (req: Request, res: Response, next: NextFunct
         )
     }
     next()
+}
+
+/**
+ * Middleware verify access token
+ * Gắn decoded_authorization vào req nếu hợp lệ
+ */
+export const authOptional = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const authHeader = req.headers.authorization || ''
+        const token = authHeader.split(' ')[1]
+
+        if (!token) {
+            return (req.decoded_authorization = undefined)
+        }
+
+        const decoded = await verifyToken({
+            token,
+            secretOrPublicKey: envConfig.JWT_SECRET_ACCESS_TOKEN as string
+        })
+
+        req.decoded_authorization = decoded
+        next()
+    } catch (error) {
+        if (error instanceof JsonWebTokenError) {
+            return next(
+                new ErrorWithStatus({
+                    message: AUTH_MESSAGES.INVALID_ACCESS_TOKEN,
+                    status: HTTP_STATUS.UNAUTHORIZED
+                })
+            )
+        }
+        next(error)
+    }
 }

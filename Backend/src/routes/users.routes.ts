@@ -7,16 +7,14 @@ import {
     unFollowUserController,
     changePasswordController
 } from '~/controllers/users.controllers'
-import { filterReqBodyMiddleWare } from '~/middlewares/common.middlewares'
 import {
     changePasswordValidator,
     followValidator,
     unFollowValidator,
     updateUserValidator
 } from '~/validations/user.validations'
-import { UpdateUserRequestBody } from '~/models/requests/user.requests'
 import { wrapRequestHandler } from '~/utils/handlers'
-import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
+import { authenticate, authOptional, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 const userRouter = Router()
 
 /**
@@ -50,16 +48,6 @@ userRouter.patch(
     authenticate,
     requireVerifiedUser,
     updateUserValidator,
-    filterReqBodyMiddleWare<UpdateUserRequestBody>([
-        'name',
-        'date_of_birth',
-        'bio',
-        'location',
-        'website',
-        'username',
-        'avatar',
-        'cover_photo'
-    ]),
     wrapRequestHandler(updateUserController)
 )
 
@@ -69,7 +57,7 @@ userRouter.patch(
  * path: /:username
  */
 
-userRouter.get('/:username', wrapRequestHandler(getUserController))
+userRouter.get('/:username', authOptional, wrapRequestHandler(getUserController))
 
 /**
  * Description . follow someone

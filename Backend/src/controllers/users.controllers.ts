@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
+import { ParamsDictionary } from 'express-serve-static-core'
 import usersServices from '~/services/users.services'
 import {
     ChangePasswordRequestBody,
@@ -11,70 +11,68 @@ import {
 } from '~/models/requests/user.requests'
 
 import { USER_MESSAGES } from '~/constants/messages/user'
+import { ErrorWithStatus } from '~/models/Errors'
 
-export const getMeProfileController = async (req: Request, res: Response, next: NextFunction) => {
+export const getMeProfileController = async (req: Request, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
     const user = await usersServices.getUserById(user_id)
     if (!user) {
-        throw new Error(USER_MESSAGES.USER_NOT_FOUND)
+        throw new ErrorWithStatus({ message: USER_MESSAGES.USER_NOT_FOUND, status: 404 })
     }
     res.json({
         message: USER_MESSAGES.GET_USER_SUCCESS,
-        result: user
+        data: user
     })
 }
 
-export const getUserController = async (req: Request<GetProfileReqParams>, res: Response, next: NextFunction) => {
+export const getUserController = async (req: Request<GetProfileReqParams>, res: Response) => {
     const { username } = req.params
     const user = await usersServices.getUserByUserName(username)
     if (!user) {
-        throw new Error(USER_MESSAGES.USER_NOT_FOUND)
+        throw new ErrorWithStatus({ message: USER_MESSAGES.USER_NOT_FOUND, status: 404 })
     }
     res.json({
         message: USER_MESSAGES.GET_USER_SUCCESS,
-        result: user
+        data: user
     })
 }
 
-export const updateUserController = async (
-    req: Request<ParamsDictionary, any, UpdateUserRequestBody>,
-    res: Response,
-    next: NextFunction
-) => {
+export const updateUserController = async (req: Request<ParamsDictionary, UpdateUserRequestBody>, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
     const body = req.body
     const user = await usersServices.updateUserById(user_id, body)
 
     res.json({
         message: USER_MESSAGES.UPDATE_USER_SUCCESS,
-        result: user
+        data: user
     })
 }
 
 export const followUserController = async (req: Request<ParamsDictionary, followUserReqBody>, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
-    const { user_id: followed_user_id } = req.body
-    const result = await usersServices.followUser(user_id, followed_user_id)
-    res.json(result)
+    const { user_id: following_id } = req.body
+    await usersServices.followUser(user_id, following_id)
+    res.json({
+        message: USER_MESSAGES.FOLLOW_USER_SUCCESS
+    })
 }
-export const unFollowUserController = async (
-    req: Request<unFollowUserReqParams>,
-    res: Response,
-    next: NextFunction
-) => {
+export const unFollowUserController = async (req: Request<unFollowUserReqParams>, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
     const { user_id: followed_user_id } = req.params
-    const result = await usersServices.unfollowUser(user_id, followed_user_id)
-    res.json(result)
+    await usersServices.unfollowUser(user_id, followed_user_id)
+    res.json({
+        message: USER_MESSAGES.UNFOLLOW_USER_SUCCESS
+    })
 }
 
 export const changePasswordController = async (
-    req: Request<ParamsDictionary, any, ChangePasswordRequestBody>,
-    res: Response,
-    next: NextFunction
+    req: Request<ParamsDictionary, ChangePasswordRequestBody>,
+    res: Response
 ) => {
     const { user_id } = req.decoded_authorization as TokenPayload
     const { password } = req.body
-    const result = await usersServices.changePassword(user_id, password)
-    res.json(result)
+    await usersServices.changePassword(user_id, password)
+    res.json({
+        message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESS
+    })
 }

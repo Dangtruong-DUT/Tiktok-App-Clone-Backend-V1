@@ -36,10 +36,7 @@ export const updateUserValidator = validate(
                 custom: {
                     options: async (value: string, { req }) => {
                         if (!REGEX_USERNAME.test(value)) {
-                            throw new ErrorWithStatus({
-                                message: USER_MESSAGES.USERNAME_INVALID,
-                                status: HTTP_STATUS.UNPROCESSABLE_ENTITY
-                            })
+                            throw new Error(USER_MESSAGES.USERNAME_INVALID)
                         }
 
                         const decoded_authorization = (req as Request).decoded_authorization
@@ -47,10 +44,7 @@ export const updateUserValidator = validate(
 
                         const user = await databaseService.users.findOne({ username: value })
                         if (user && user._id.toString() !== user_id) {
-                            throw new ErrorWithStatus({
-                                message: USER_MESSAGES.USERNAME_ALREADY_EXISTS,
-                                status: HTTP_STATUS.CONFLICT
-                            })
+                            throw new Error(USER_MESSAGES.USERNAME_ALREADY_EXISTS)
                         }
                         return true
                     }
@@ -109,15 +103,29 @@ export const changePasswordValidator = validate(
                         }
                         const isMatch = hashPassword(value) === user.password
                         if (!isMatch) {
-                            throw new ErrorWithStatus({
-                                message: USER_MESSAGES.CURRENT_PASSWORD_IS_INCORRECT,
-                                status: HTTP_STATUS.UNAUTHORIZED
-                            })
+                            throw new Error(USER_MESSAGES.CURRENT_PASSWORD_IS_INCORRECT)
                         }
                     }
                 }
             },
-            password: passwordSchema,
+            password: {
+                ...passwordSchema,
+                custom: {
+                    options: async (value: string, { req }) => {
+                        const decoded_authorization = (req as Request).decoded_authorization
+                        const { user_id } = decoded_authorization as TokenPayload
+                        const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+                        if (!user) {
+                            throw new Error(USER_MESSAGES.USER_NOT_FOUND)
+                        }
+                        const isMatch = hashPassword(value) === user.password
+                        if (isMatch) {
+                            throw new Error(USER_MESSAGES.PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT)
+                        }
+                        return true
+                    }
+                }
+            },
             confirm_password: confirm_password_schema
         },
         ['body']

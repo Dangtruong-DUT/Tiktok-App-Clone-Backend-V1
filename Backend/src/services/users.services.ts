@@ -293,24 +293,21 @@ class UserService {
         return updateResult
     }
     async followUser(user_id: string, followed_user_id: string) {
-        const followerCount = await databaseService.followers.countDocuments({
-            user_id: new ObjectId(user_id),
-            followed_user_id: new ObjectId(followed_user_id)
-        })
-        if (followerCount > 0) {
-            return {
-                message: USER_MESSAGES.FOLLOW_USER_ALREADY_FOLLOWED
-            }
-        }
-        const result = await databaseService.followers.insertOne(
-            new Follower({
+        await databaseService.followers.updateOne(
+            {
                 user_id: new ObjectId(user_id),
                 followed_user_id: new ObjectId(followed_user_id)
-            })
+            },
+            {
+                $set: {
+                    user_id: new ObjectId(user_id),
+                    followed_user_id: new ObjectId(followed_user_id)
+                }
+            },
+            {
+                upsert: true
+            }
         )
-        return {
-            message: USER_MESSAGES.FOLLOW_USER_SUCCESS
-        }
     }
 
     async unfollowUser(user_id: string, followed_user_id: string) {
@@ -318,9 +315,6 @@ class UserService {
             user_id: new ObjectId(user_id),
             followed_user_id: new ObjectId(followed_user_id)
         })
-        return {
-            message: USER_MESSAGES.UNFOLLOW_USER_SUCCESS
-        }
     }
     async changePassword(user_id: string, password: string) {
         await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
@@ -331,9 +325,6 @@ class UserService {
                 }
             }
         ])
-        return {
-            message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESS
-        }
     }
     async checkEmailExist(email: string) {
         const user = await databaseService.users.findOne({ email })
