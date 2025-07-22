@@ -6,10 +6,12 @@ import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import { StringValue } from 'ms'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
 import { ObjectId } from 'mongodb'
-import { USER_MESSAGES } from '~/constants/messages'
 import User from '~/models/schemas/User.schema'
 import generateTimeBasedUsername from '~/utils/GenerateUserName'
 import Follower from '~/models/schemas/Follower.schemas'
+import { USER_MESSAGES } from '~/constants/messages/user'
+import { envConfig } from '~/config'
+import _ from 'lodash'
 
 class UserService {
     private signAccessToken({ verify, userId }: { userId: string; verify: UserVerifyStatus }) {
@@ -19,9 +21,9 @@ class UserService {
                 token_type: TokenType.AccessToken,
                 verify
             },
-            privateKey: process.env.JWT_SECRET_ACCESS_TOKEN as string,
+            privateKey: envConfig.JWT_SECRET_ACCESS_TOKEN as string,
             options: {
-                expiresIn: process.env.ACCESS_TOKEN_EXPIRE_IN as StringValue
+                expiresIn: envConfig.ACCESS_TOKEN_EXPIRE_IN as StringValue
             }
         })
     }
@@ -32,9 +34,9 @@ class UserService {
                 token_type: TokenType.RefreshToken,
                 verify
             },
-            privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string,
+            privateKey: envConfig.JWT_SECRET_REFRESH_TOKEN as string,
             options: {
-                expiresIn: process.env.REFRESH_TOKEN_EXPIRE_IN as StringValue
+                expiresIn: envConfig.REFRESH_TOKEN_EXPIRE_IN as StringValue
             }
         })
     }
@@ -48,9 +50,9 @@ class UserService {
                 user_id: userId,
                 token_type: TokenType.EmailVerifyToken
             },
-            privateKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string,
+            privateKey: envConfig.JWT_SECRET_EMAIL_VERIFY_TOKEN as string,
             options: {
-                expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPIRE_IN as StringValue
+                expiresIn: envConfig.EMAIL_VERIFY_TOKEN_EXPIRE_IN as StringValue
             }
         })
     }
@@ -61,9 +63,9 @@ class UserService {
                 user_id: userId,
                 token_type: TokenType.ForgotPasswordToken
             },
-            privateKey: process.env.JWT_SECRET_FORGOT_PASSWORD as string,
+            privateKey: envConfig.JWT_SECRET_FORGOT_PASSWORD as string,
             options: {
-                expiresIn: process.env.FORGOT_PASSWORD_TOKEN_EXPIRE_IN as StringValue
+                expiresIn: envConfig.FORGOT_PASSWORD_TOKEN_EXPIRE_IN as StringValue
             }
         })
     }
@@ -72,7 +74,7 @@ class UserService {
         const user_id = new ObjectId()
         const username = generateTimeBasedUsername()
         const email_verify_token = await this.signEmailVerifyToken(user_id.toString())
-        const result = await databaseService.users.insertOne(
+        await databaseService.users.insertOne(
             new User({
                 ...payload,
                 _id: user_id,
@@ -82,34 +84,59 @@ class UserService {
                 username
             })
         )
+        const user = await databaseService.users.findOne(
+            { _id: user_id },
+            {
+                projection: {
+                    password: 0,
+                    email_verify_token: 0,
+                    forgot_password_token: 0
+                }
+            }
+        )
 
-        const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
+        const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
             verify: UserVerifyStatus.Unverified,
             userId: user_id.toString()
         })
         await databaseService.refreshToken.insertOne(
-            new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken })
+            new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
         )
 
         // sent email width email_verify_token to user
         return {
-            accessToken,
-            refreshToken
+            access_token,
+            refresh_token,
+            user
         }
     }
 
     async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
-        const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({ userId: user_id, verify })
-        await databaseService.refreshToken.insertOne(
-            new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken })
-        )
+        const [[access_token, refresh_token], user] = await Promise.all([
+            this.signAccessAndRefreshToken({ userId: user_id, verify }),
+            databaseService.users.findOne(
+                { _id: new ObjectId(user_id) },
+                {
+                    projection: {
+                        password: 0,
+                        email_verify_token: 0,
+                        forgot_password_token: 0
+                    }
+                }
+            )
+        ])
 
+        await databaseService.refreshToken.insertOne(
+            new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
+        )
         return {
-            accessToken,
-            refreshToken
+            access_token,
+            refresh_token,
+            user
         }
     }
-    async logout(refresh_token: string) {
+
+    async logout(refresh_token: string): Promise<boolean> {
         const deleteResult = await databaseService.refreshToken.deleteOne({ token: refresh_token })
         return deleteResult.deletedCount > 0
     }
@@ -123,20 +150,24 @@ class UserService {
         user_id: string
         verify: UserVerifyStatus
     }) {
-        const [accessToken, newRefreshToken] = await this.signAccessAndRefreshToken({
+        const [access_token, new_refresh_token] = await this.signAccessAndRefreshToken({
             userId: user_id,
             verify
         })
-        await databaseService.refreshToken.deleteOne({ token: refresh_token })
-        await databaseService.refreshToken.insertOne(
-            new RefreshToken({ user_id: new ObjectId(user_id), token: newRefreshToken })
-        )
+
+        await Promise.all([
+            databaseService.refreshToken.deleteOne({ token: refresh_token }),
+            databaseService.refreshToken.insertOne(
+                new RefreshToken({ user_id: new ObjectId(user_id), token: new_refresh_token })
+            )
+        ])
+
         return {
-            accessToken,
-            refreshToken: newRefreshToken
+            access_token,
+            refresh_token: new_refresh_token
         }
     }
-    async logoutAll(user_id: string) {
+    async logoutAllDevices(user_id: string): Promise<boolean> {
         const deleteResult = await databaseService.refreshToken.deleteMany({ user_id: new ObjectId(user_id) })
         return deleteResult.deletedCount > 0
     }
@@ -181,9 +212,6 @@ class UserService {
                 }
             }
         ])
-        return {
-            message: USER_MESSAGES.RESEND_VERIFY_EMAIL_SUCCESS
-        }
     }
 
     async forgotPassword(user_id: string) {
@@ -197,9 +225,6 @@ class UserService {
             }
         ])
         //sent email with link to the user: https://taplamIT.tech/forgot-password?token=token use amazon sms
-        return {
-            message: USER_MESSAGES.FORGOT_PASSWORD_REQUEST_SUCCESS
-        }
     }
     async resetPassword(user_id: string, password: string) {
         await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
@@ -211,9 +236,6 @@ class UserService {
                 }
             }
         ])
-        return {
-            message: USER_MESSAGES.RESET_PASSWORD_SUCCESS
-        }
     }
 
     async getUserById(user_id: string) {

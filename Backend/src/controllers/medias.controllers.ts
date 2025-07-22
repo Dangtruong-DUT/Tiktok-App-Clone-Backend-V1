@@ -2,16 +2,16 @@ import { NextFunction, Request, Response } from 'express'
 import path from 'path'
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import HTTP_STATUS from '~/constants/httpStatus'
-import { FILE_MESSAGES } from '~/constants/messages'
 import { getImageReqParams, getVideoReqParam, getVideoHLSReqParam } from '~/models/requests/user.requests'
 import MediasService from '~/services/medias.services'
 import fs from 'fs'
+import { FILE_MESSAGES } from '~/constants/messages/file'
 
 export const uploadImagesController = async (req: Request, res: Response, next: NextFunction) => {
     const url = await MediasService.UploadImages(req)
     res.json({
         message: FILE_MESSAGES.UPLOAD_SUCCESS,
-        result: url
+        data: url
     })
 }
 
@@ -19,7 +19,7 @@ export const uploadVideosController = async (req: Request, res: Response, next: 
     const url = await MediasService.UploadVideos(req)
     res.json({
         message: FILE_MESSAGES.UPLOAD_SUCCESS,
-        result: url
+        data: url
     })
 }
 
@@ -33,7 +33,7 @@ export const uploadHLSVideosController = async (req: Request, res: Response, nex
     const url = await MediasService.UploadHLSVideos(req)
     res.json({
         message: FILE_MESSAGES.UPLOAD_SUCCESS,
-        result: url
+        data: url
     })
 }
 
@@ -139,9 +139,9 @@ export const checkEncodingProgressController = async (
     next: NextFunction
 ) => {
     const { id } = req.params
-    const result = await MediasService.CheckEncodingProgress(id)
+    const data = await MediasService.CheckEncodingProgress(id)
     res.json({
         message: FILE_MESSAGES.GET_VIDEO_HLS_STATUS_SUCCESS,
-        result
+        data
     })
 }

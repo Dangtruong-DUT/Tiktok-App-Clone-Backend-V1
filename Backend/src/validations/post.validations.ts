@@ -3,26 +3,26 @@ import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
 import { Audience, MediaType, PosterType } from '~/constants/enum'
 import HTTP_STATUS from '~/constants/httpStatus'
-import { TIKTOK_POST_MESSAGE } from '~/constants/messages'
+import { POST_MESSAGES } from '~/constants/messages/post'
+import { validate } from '~/middlewares/validation.middlewares'
 import { ErrorWithStatus } from '~/models/Errors'
 import databaseService from '~/services/database.services'
 import tikTokPostService from '~/services/TiktokPost.services'
 import usersServices from '~/services/users.services'
 import { numberEnumToArray } from '~/utils/common'
-import { validate } from '~/utils/validation'
 
 const validatePostId: ParamSchema = {
     notEmpty: {
-        errorMessage: TIKTOK_POST_MESSAGE.POST_ID_IS_REQUIRED
+        errorMessage: POST_MESSAGES.POST_ID_IS_REQUIRED
     },
     isString: {
-        errorMessage: TIKTOK_POST_MESSAGE.POSt_ID_MUST_BE_STRING
+        errorMessage: POST_MESSAGES.POST_ID_MUST_BE_STRING
     },
     custom: {
         options: async (value: string) => {
             if (!ObjectId.isValid(value)) {
                 throw new ErrorWithStatus({
-                    message: TIKTOK_POST_MESSAGE.INVALID_POST_ID,
+                    message: POST_MESSAGES.INVALID_POST_ID,
                     status: HTTP_STATUS.NOT_FOUND
                 })
             }
@@ -30,7 +30,7 @@ const validatePostId: ParamSchema = {
             const post = await tikTokPostService.getPostById(value)
             if (!post) {
                 throw new ErrorWithStatus({
-                    message: TIKTOK_POST_MESSAGE.POST_NOT_FOUND,
+                    message: POST_MESSAGES.POST_NOT_FOUND,
                     status: HTTP_STATUS.NOT_FOUND
                 })
             }
@@ -46,20 +46,20 @@ export const createTiktokPostValidator = validate(
             type: {
                 isIn: {
                     options: [numberEnumToArray(PosterType)],
-                    errorMessage: TIKTOK_POST_MESSAGE.INVALID_POST_TYPE
+                    errorMessage: POST_MESSAGES.INVALID_POST_TYPE
                 }
             },
             audience: {
                 isIn: {
                     options: [numberEnumToArray(Audience)],
-                    errorMessage: TIKTOK_POST_MESSAGE.INVALID_AUDIENCE_TYPE
+                    errorMessage: POST_MESSAGES.INVALID_AUDIENCE_TYPE
                 }
             },
             content: {
                 isString: true,
                 isLength: {
                     options: { max: 500 },
-                    errorMessage: TIKTOK_POST_MESSAGE.CONTENT_MAX_LENGTH
+                    errorMessage: POST_MESSAGES.CONTENT_MAX_LENGTH
                 },
                 custom: {
                     options: (value: string, { req }) => {
@@ -73,7 +73,7 @@ export const createTiktokPostValidator = validate(
                             isEmpty(medias) &&
                             isEmpty(mentions)
                         ) {
-                            throw new Error(TIKTOK_POST_MESSAGE.CONTENT_REQUIRED)
+                            throw new Error(POST_MESSAGES.CONTENT_REQUIRED)
                         }
                         return true
                     }
@@ -89,12 +89,12 @@ export const createTiktokPostValidator = validate(
                             !ObjectId.isValid(value) &&
                             [PosterType.Comment, PosterType.Reports, PosterType.quotePost].includes(type)
                         ) {
-                            throw new Error(TIKTOK_POST_MESSAGE.INVALID_PARENT_ID)
+                            throw new Error(POST_MESSAGES.INVALID_PARENT_ID)
                         }
 
                         // If parent_id is provided and type is posts, then it must be null
                         if (value != null && type === PosterType.post) {
-                            throw new Error(TIKTOK_POST_MESSAGE.PARENT_ID_MUST_BE_NULL)
+                            throw new Error(POST_MESSAGES.PARENT_ID_MUST_BE_NULL)
                         }
                         return true
                     }
@@ -103,11 +103,11 @@ export const createTiktokPostValidator = validate(
             },
             hashtags: {
                 isArray: true,
-                errorMessage: TIKTOK_POST_MESSAGE.HASHTAGS_MUST_BE_ARRAY,
+                errorMessage: POST_MESSAGES.HASHTAGS_MUST_BE_ARRAY,
                 custom: {
                     options: (value: string[]) => {
                         if (!value.every((item) => typeof item === 'string')) {
-                            throw new Error(TIKTOK_POST_MESSAGE.HASHTAG_MUST_BE_STRING)
+                            throw new Error(POST_MESSAGES.HASHTAG_MUST_BE_STRING)
                         }
                         return true
                     }
@@ -115,7 +115,7 @@ export const createTiktokPostValidator = validate(
             },
             mentions: {
                 isArray: true,
-                errorMessage: TIKTOK_POST_MESSAGE.MENTIONS_MUST_BE_ARRAY,
+                errorMessage: POST_MESSAGES.MENTIONS_MUST_BE_ARRAY,
                 custom: {
                     options: async (value: string[]) => {
                         const results = await Promise.all(
@@ -126,7 +126,7 @@ export const createTiktokPostValidator = validate(
                         )
                         if (!results.every(Boolean)) {
                             throw new ErrorWithStatus({
-                                message: TIKTOK_POST_MESSAGE.INVALID_MENTION,
+                                message: POST_MESSAGES.INVALID_MENTION,
                                 status: HTTP_STATUS.NOT_FOUND
                             })
                         }
@@ -138,19 +138,19 @@ export const createTiktokPostValidator = validate(
                 isInt: { options: { min: 0 } },
                 toInt: true,
                 optional: true,
-                errorMessage: TIKTOK_POST_MESSAGE.GUEST_VIEWS_MUST_BE_INTEGER
+                errorMessage: POST_MESSAGES.GUEST_VIEWS_MUST_BE_INTEGER
             },
             user_views: {
                 isInt: { options: { min: 0 } },
                 toInt: true,
                 optional: true,
-                errorMessage: TIKTOK_POST_MESSAGE.USER_VIEWS_MUST_BE_INTEGER
+                errorMessage: POST_MESSAGES.USER_VIEWS_MUST_BE_INTEGER
             },
             medias: {
                 isArray: true,
-                errorMessage: TIKTOK_POST_MESSAGE.MEDIA_FILES_MUST_BE_ARRAY,
+                errorMessage: POST_MESSAGES.MEDIA_FILES_MUST_BE_ARRAY,
                 notEmpty: {
-                    errorMessage: TIKTOK_POST_MESSAGE.MEDIA_FILES_REQUIRED
+                    errorMessage: POST_MESSAGES.MEDIA_FILES_REQUIRED
                 },
                 custom: {
                     options: (value) => {
@@ -159,7 +159,7 @@ export const createTiktokPostValidator = validate(
                                 return typeof item.url === 'string' && Object.values(MediaType).includes(item.type)
                             })
                         ) {
-                            throw new Error(TIKTOK_POST_MESSAGE.INVALID_MEDIA_TYPE)
+                            throw new Error(POST_MESSAGES.INVALID_MEDIA_TYPE)
                         }
                         return true
                     }
@@ -173,6 +173,7 @@ export const createTiktokPostValidator = validate(
 export const bookMarksTiktokPostValidator = validate(checkSchema({ post_id: validatePostId }, ['body']))
 
 export const likeTiktokPostValidator = validate(checkSchema({ post_id: validatePostId }, ['body']))
+
 export const unBookMarksTiktokValidator = validate(
     checkSchema(
         {
@@ -196,16 +197,16 @@ export const verifiedLikedIdValidator = validate(
         {
             _id: {
                 notEmpty: {
-                    errorMessage: TIKTOK_POST_MESSAGE.LIKED_ID_IS_REQUIRED
+                    errorMessage: POST_MESSAGES.LIKED_ID_IS_REQUIRED
                 },
                 isString: {
-                    errorMessage: TIKTOK_POST_MESSAGE.LIKED_ID_MUST_BE_STRING
+                    errorMessage: POST_MESSAGES.LIKED_ID_MUST_BE_STRING
                 },
                 custom: {
                     options: async (value: string) => {
                         if (!ObjectId.isValid(value)) {
                             throw new ErrorWithStatus({
-                                message: TIKTOK_POST_MESSAGE.INVALID_ID,
+                                message: POST_MESSAGES.INVALID_ID,
                                 status: HTTP_STATUS.NOT_FOUND
                             })
                         }
@@ -215,7 +216,7 @@ export const verifiedLikedIdValidator = validate(
                         })
                         if (!document) {
                             throw new ErrorWithStatus({
-                                message: TIKTOK_POST_MESSAGE.THE_POST_HAS_NOT_BEEN_LIKED_OR_UNLIKED_PREVIOUSLY,
+                                message: POST_MESSAGES.THE_POST_HAS_NOT_BEEN_LIKED_OR_UNLIKED_PREVIOUSLY,
                                 status: HTTP_STATUS.NOT_FOUND
                             })
                         }
@@ -233,16 +234,16 @@ export const verifiedBookMarksValidator = validate(
         {
             bookmark_id: {
                 notEmpty: {
-                    errorMessage: TIKTOK_POST_MESSAGE.BOOKMARKS_ID_IS_REQUIRED
+                    errorMessage: POST_MESSAGES.BOOKMARKS_ID_IS_REQUIRED
                 },
                 isString: {
-                    errorMessage: TIKTOK_POST_MESSAGE.BOOKMARKS_ID_MUST_BE_A_STRING
+                    errorMessage: POST_MESSAGES.BOOKMARKS_ID_MUST_BE_A_STRING
                 },
                 custom: {
                     options: async (value: string) => {
                         if (!ObjectId.isValid(value)) {
                             throw new ErrorWithStatus({
-                                message: TIKTOK_POST_MESSAGE.INVALID_ID,
+                                message: POST_MESSAGES.INVALID_ID,
                                 status: HTTP_STATUS.NOT_FOUND
                             })
                         }
@@ -252,7 +253,7 @@ export const verifiedBookMarksValidator = validate(
                         })
                         if (!document) {
                             throw new ErrorWithStatus({
-                                message: TIKTOK_POST_MESSAGE.THE_POST_HAS_NOT_BEEN_BOOKMARKS_OR_UNBOOKMARK_PREVIOUSLY,
+                                message: POST_MESSAGES.THE_POST_HAS_NOT_BEEN_BOOKMARKS_OR_UNBOOKMARK_PREVIOUSLY,
                                 status: HTTP_STATUS.NOT_FOUND
                             })
                         }

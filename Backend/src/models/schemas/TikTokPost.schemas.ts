@@ -8,7 +8,7 @@ interface TikTokPostType {
     type: PosterType
     audience: Audience
     content: string
-    parent_id: string | null
+    parent_id: string | null // null if this is a root post
     hashtags: ObjectId[]
     mentions: string[]
     guest_views?: number

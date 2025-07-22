@@ -4,13 +4,13 @@ import {
     unLikesTiktokPostByIdController,
     unLikesTiktokPostController
 } from '~/controllers/likesTiktokPost.controllers copy'
+import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
+import { wrapRequestHandler } from '~/utils/handlers'
 import {
     likeTiktokPostValidator,
     unLikeTiktokPostValidator,
     verifiedLikedIdValidator
-} from '~/middlewares/TiktokPost.middlewares'
-import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/user.middlewares'
-import { wrapRequestHandler } from '~/utils/handlers'
+} from '~/validations/post.validations'
 
 const likesRouter = Router()
 /**
@@ -25,8 +25,8 @@ const likesRouter = Router()
 
 likesRouter.post(
     '/',
-    accessTokenValidator,
-    verifiedUserValidator,
+    authenticate,
+    requireVerifiedUser,
     likeTiktokPostValidator,
     wrapRequestHandler(likesTiktokPostController)
 )
@@ -43,8 +43,8 @@ likesRouter.post(
 
 likesRouter.delete(
     '/post/:post_id',
-    accessTokenValidator,
-    verifiedUserValidator,
+    authenticate,
+    requireVerifiedUser,
     unLikeTiktokPostValidator,
     wrapRequestHandler(unLikesTiktokPostController)
 )
@@ -61,8 +61,8 @@ likesRouter.delete(
 
 likesRouter.delete(
     '/:_id',
-    accessTokenValidator,
-    verifiedUserValidator,
+    authenticate,
+    requireVerifiedUser,
     verifiedLikedIdValidator,
     wrapRequestHandler(unLikesTiktokPostByIdController)
 )

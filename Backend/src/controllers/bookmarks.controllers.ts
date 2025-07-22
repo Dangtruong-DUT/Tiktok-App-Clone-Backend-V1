@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express'
-import { TIKTOK_POST_MESSAGE } from '~/constants/messages'
 import bookMarkPostService from '~/services/bookmarks.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { TokenPayload } from '~/models/requests/user.requests'
@@ -8,6 +7,7 @@ import {
     UnBookMarkByIDReqParams,
     UnBookMarkReqParams
 } from '~/models/requests/bookmarks.requests'
+import { POST_MESSAGES } from '~/constants/messages/post'
 
 export const bookMarksTiktokPostController = async (
     req: Request<ParamsDictionary, any, TiktokBookMarkReqBody>,
@@ -18,7 +18,7 @@ export const bookMarksTiktokPostController = async (
     const { post_id } = req.body
     const result = await bookMarkPostService.bookMarkPost({ post_id, user_id })
     res.json({
-        message: TIKTOK_POST_MESSAGE.BOOKMARKS_SUCCESS,
+        message: POST_MESSAGES.BOOKMARKS_SUCCESS,
         result
     })
 }
@@ -32,7 +32,7 @@ export const unBookMarksTiktokPostController = async (
     const { post_id } = req.params
     await bookMarkPostService.unBookMarkPost({ post_id, user_id })
     res.json({
-        message: TIKTOK_POST_MESSAGE.UNBOOKMARKS_SUCCESS
+        message: POST_MESSAGES.UNBOOKMARKS_SUCCESS
     })
 }
 
@@ -44,6 +44,6 @@ export const unBookMarksTiktokPostByBookmarkIdController = async (
     const { bookmark_id } = req.params
     await bookMarkPostService.unBookMarkPostByBookmarkId(bookmark_id)
     res.json({
-        message: TIKTOK_POST_MESSAGE.UNBOOKMARKS_SUCCESS
+        message: POST_MESSAGES.UNBOOKMARKS_SUCCESS
     })
 }

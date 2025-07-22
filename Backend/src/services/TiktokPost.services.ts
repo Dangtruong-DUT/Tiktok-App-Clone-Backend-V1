@@ -3,7 +3,6 @@ import databaseService from './database.services'
 import TikTokPost from '~/models/schemas/TikTokPost.schemas'
 import { ObjectId, WithId } from 'mongodb'
 import Hashtag from '~/models/schemas/Hashtag.schemas'
-import Bookmarks from '~/models/schemas/Bookmarks.schemas'
 
 class TikTokenService {
     async checkAndCreateHashtags(hashtags: string[]) {

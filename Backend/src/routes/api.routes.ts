@@ -7,9 +7,11 @@ import express from 'express'
 import { UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import likesRouter from './likes.routes'
 import bookmarksRouter from './bookmarks.routes'
+import authRouter from '~/routes/auth.routes'
 const apiRouter = Router()
 
 apiRouter.use('/users', userRouter)
+apiRouter.use('/auth', authRouter)
 apiRouter.use('/medias', mediasRouter)
 apiRouter.use('/static', staticRouter)
 apiRouter.use('/posts', tiktokPostRouter)

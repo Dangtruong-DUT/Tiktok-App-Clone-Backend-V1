@@ -38,7 +38,7 @@ const defaultErrorHandler = (error: any, req: Request, res: Response, next: Next
 
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             message: error.message,
-            errorInfo: errorDetails
+            errors: errorDetails
         })
     }
 }

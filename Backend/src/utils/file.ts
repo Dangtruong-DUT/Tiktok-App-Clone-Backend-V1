@@ -2,11 +2,11 @@ import fs from 'fs'
 import { Request } from 'express'
 import formidable, { File } from 'formidable'
 import path from 'path'
-import { FILE_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_DIR, UPLOAD_VIDEO_TEMP_DIR } from '~/constants/dir'
 import { nanoid } from 'nanoid'
+import { FILE_MESSAGES } from '~/constants/messages/file'
 
 /**
  * Ensures the temporary directories for uploaded images and videos are created if they don't exist.
@@ -27,15 +27,16 @@ export const initFolder = () => {
     }
 }
 
-export const handleUploadImages = (req: Request) => {
+export const handleUploadSingleImage = (req: Request) => {
     const form = formidable({
         uploadDir: UPLOAD_IMAGE_TEMP_DIR,
         maxFiles: 1,
+        allowEmptyFiles: false,
         keepExtensions: true,
-        maxFileSize: 4000 * 1024,
-        maxTotalFileSize: 4000 * 1024 * 10,
+        maxFileSize: 40 * 1024, // 40MB
+        maxTotalFileSize: 40 * 1024, // 40MB
         filter: ({ name, originalFilename, mimetype }) => {
-            const valid = name === 'images' && Boolean(mimetype?.includes('image/'))
+            const valid = name == 'file' && Boolean(mimetype?.includes('image'))
             if (!valid) {
                 form.emit(
                     'error' as any,
@@ -54,7 +55,7 @@ export const handleUploadImages = (req: Request) => {
             if (err) {
                 reject(err)
             }
-            if (!files.image) {
+            if (!files.file) {
                 reject(
                     new ErrorWithStatus({
                         message: FILE_MESSAGES.UPLOAD_FILE_MUST_BE_NON_EMPTY,
@@ -62,7 +63,8 @@ export const handleUploadImages = (req: Request) => {
                     })
                 )
             }
-            resolve(files.image as File[])
+            console.log(files)
+            resolve(files.file as File[])
         })
     })
 }

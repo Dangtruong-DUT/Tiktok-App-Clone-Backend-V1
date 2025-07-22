@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
-import { TIKTOK_POST_MESSAGE } from '~/constants/messages'
-import bookMarkPostService from '~/services/bookmarks.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { TokenPayload } from '~/models/requests/user.requests'
 import { TiktokLikeReqBody, UnLikeByIDReqParams, UnLikeReqParams } from '~/models/requests/likes.requests'
 import likePostService from '~/services/likes.services'
+import { POST_MESSAGES } from '~/constants/messages/post'
 
 export const likesTiktokPostController = async (
     req: Request<ParamsDictionary, any, TiktokLikeReqBody>,
@@ -15,7 +14,7 @@ export const likesTiktokPostController = async (
     const { post_id } = req.body
     const result = await likePostService.LikePost({ post_id, user_id })
     res.json({
-        message: TIKTOK_POST_MESSAGE.LIKE_POST_SUCCESS,
+        message: POST_MESSAGES.LIKE_POST_SUCCESS,
         result
     })
 }
@@ -25,7 +24,7 @@ export const unLikesTiktokPostController = async (req: Request<UnLikeReqParams>,
     const { post_id } = req.params
     await likePostService.unLikePost({ post_id, user_id })
     res.json({
-        message: TIKTOK_POST_MESSAGE.UNLIKE_POST_SUCCESS
+        message: POST_MESSAGES.UNLIKE_POST_SUCCESS
     })
 }
 
@@ -37,6 +36,6 @@ export const unLikesTiktokPostByIdController = async (
     const { _id } = req.params
     await likePostService.unLikePostById(_id)
     res.json({
-        message: TIKTOK_POST_MESSAGE.UNLIKE_POST_SUCCESS
+        message: POST_MESSAGES.UNLIKE_POST_SUCCESS
     })
 }

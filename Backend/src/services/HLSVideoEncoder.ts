@@ -4,7 +4,7 @@ import path from 'path'
 import databaseService from './database.services'
 import VideoStatus from '~/models/schemas/VideoStatus.schemas'
 import { EncodingStatus } from '~/constants/enum'
-import { FILE_MESSAGES } from '~/constants/messages'
+import { FILE_MESSAGES } from '~/constants/messages/file'
 
 class HLSVideoEncoder {
     private videoPaths: string[]
@@ -46,6 +46,7 @@ class HLSVideoEncoder {
                 { $set: { status: EncodingStatus.Completed }, $currentDate: { updated_at: true } }
             )
         } catch (error) {
+            console.error(`Error encoding video ${idVideo}:`, error)
             await databaseService.videoStatus
                 .updateOne(
                     { name: idVideo },

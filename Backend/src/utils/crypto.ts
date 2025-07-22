@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { envConfig } from '~/config'
 
 /**
  * Returns a SHA256 hash using SHA-3 for the given `content`.
@@ -21,5 +22,5 @@ export function sha256(content: string) {
  */
 
 export function hashPassword(password: string) {
-    return sha256(password + process.env.PASSWORD_SECRET)
+    return sha256(password + envConfig.PASSWORD_SECRET)
 }

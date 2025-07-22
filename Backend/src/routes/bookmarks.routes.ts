@@ -4,13 +4,14 @@ import {
     unBookMarksTiktokPostByBookmarkIdController,
     unBookMarksTiktokPostController
 } from '~/controllers/bookmarks.controllers'
+import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
+
+import { wrapRequestHandler } from '~/utils/handlers'
 import {
     bookMarksTiktokPostValidator,
     unBookMarksTiktokValidator,
     verifiedBookMarksValidator
-} from '~/middlewares/TiktokPost.middlewares'
-import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/user.middlewares'
-import { wrapRequestHandler } from '~/utils/handlers'
+} from '~/validations/post.validations'
 
 const bookmarksRouter = Router()
 /**
@@ -25,8 +26,8 @@ const bookmarksRouter = Router()
 
 bookmarksRouter.post(
     '/',
-    accessTokenValidator,
-    verifiedUserValidator,
+    authenticate,
+    requireVerifiedUser,
     bookMarksTiktokPostValidator,
     wrapRequestHandler(bookMarksTiktokPostController)
 )
@@ -43,8 +44,8 @@ bookmarksRouter.post(
 
 bookmarksRouter.delete(
     '/post/:post_id',
-    accessTokenValidator,
-    verifiedUserValidator,
+    authenticate,
+    requireVerifiedUser,
     unBookMarksTiktokValidator,
     wrapRequestHandler(unBookMarksTiktokPostController)
 )
@@ -61,8 +62,8 @@ bookmarksRouter.delete(
 
 bookmarksRouter.delete(
     '/:bookmark_id',
-    accessTokenValidator,
-    verifiedUserValidator,
+    authenticate,
+    requireVerifiedUser,
     verifiedBookMarksValidator,
     wrapRequestHandler(unBookMarksTiktokPostByBookmarkIdController)
 )

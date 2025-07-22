@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { createTikTokPostController } from '~/controllers/TikTokPost.controllers'
-import { createTiktokPostValidator } from '~/middlewares/TiktokPost.middlewares'
-import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/user.middlewares'
+import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
+import { createTiktokPostValidator } from '~/validations/post.validations'
 
 const tiktokPostRouter = Router()
 
@@ -16,8 +16,8 @@ const tiktokPostRouter = Router()
 
 tiktokPostRouter.post(
     '/',
-    accessTokenValidator,
-    verifiedUserValidator,
+    authenticate,
+    requireVerifiedUser,
     createTiktokPostValidator,
     wrapRequestHandler(createTikTokPostController)
 )

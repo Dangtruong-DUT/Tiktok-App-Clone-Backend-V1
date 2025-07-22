@@ -1,180 +1,36 @@
 import { Router } from 'express'
 import {
-    verifyEmailController,
-    loginController,
-    logoutController,
-    registerController,
-    resendVerifyEmailController,
-    forgotPasswordController,
-    verifyForgotPasswordTokenController,
-    resetPasswordController,
     getUserController,
     updateUserController,
     getMeProfileController,
     followUserController,
     unFollowUserController,
-    changePasswordController,
-    logoutAllController,
-    refreshTokenController
+    changePasswordController
 } from '~/controllers/users.controllers'
 import { filterReqBodyMiddleWare } from '~/middlewares/common.middlewares'
 import {
-    accessTokenValidator,
     changePasswordValidator,
-    emailVerifyTokenValidator,
     followValidator,
-    forgotPasswordValidator,
-    loginValidator,
-    refreshTokenValidate,
-    registerValidator,
-    resetPasswordValidator,
     unFollowValidator,
-    updateUserValidator,
-    verifiedUserValidator,
-    verifyForgotPasswordTokenValidator
-} from '~/middlewares/user.middlewares'
+    updateUserValidator
+} from '~/validations/user.validations'
 import { UpdateUserRequestBody } from '~/models/requests/user.requests'
 import { wrapRequestHandler } from '~/utils/handlers'
+import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 const userRouter = Router()
 
 /**
- * Description. logs in a user
- * Path: /login
- * method: POST
- * body: {
- * email: string
- * password: string
- */
-
-userRouter.post('/login', loginValidator, wrapRequestHandler(loginController))
-
-/**
- * Description. registers a new user
- * Path: /register
- * method: POST
- * body: {
- * name: String
- * email: String,
- * password: String,
- * data_of_birth: ISO8601
- * confirm_password: String
- * }
- */
-
-userRouter.post('/register', registerValidator, wrapRequestHandler(registerController))
-
-/**
- *Description. logout a user
- * Path: /logout
- * Method: POST
- * header: <Authorization: Bearer <access_token>
- * body: {
- * refresh_token: String
- * }
- */
-
-userRouter.post('/logout', accessTokenValidator, refreshTokenValidate, wrapRequestHandler(logoutController))
-
-/**
- * Description. refresh token
- * Path: /refresh-token
- * method: POST
- * body: {
- * refresh_token: String
- * }
- */
-
-userRouter.post('/refresh-token', refreshTokenValidate, wrapRequestHandler(refreshTokenController))
-
-/**
- * Description: Logout from all devices
- * Path: /logout-all
- * Method: POST
- * Header: <Authorization: Bearer <access_token>>
- * Body: { }
- */
-
-userRouter.post('/logout-all', accessTokenValidator, wrapRequestHandler(logoutAllController))
-
-/**
- * Description. verify email when user client click on the link in email
- * Path: /verify-email
- * method: Post
- * Body:  {
- * email_verify_token: String
- * }
- */
-
-userRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(verifyEmailController))
-
-/**
- * Description. resend verify email when user client click on the link in email
- * Path: /verify-email
- * method: Post
- * Header: {Authorization: Bearer <access_token>}
- * Body:  {}
- */
-userRouter.post('/resend-verify-email', accessTokenValidator, wrapRequestHandler(resendVerifyEmailController))
-
-/**
- * Description .  submit verify email when user client click on the link forgot password
- * Path: /forgot-password
- * method: post
- * body:
- *
- * {
- * email: string
- * }
- */
-userRouter.post('/forgot-password', forgotPasswordValidator, wrapRequestHandler(forgotPasswordController))
-
-/**
- * Description . verify link in email when user client click on the link
- * Path: /verify-forgot-password
- * method: post
- * body:
- *
- * {
- * forgot-password-token: string
- * }
- */
-
-userRouter.post(
-    '/verify-forgot-password',
-    verifyForgotPasswordTokenValidator,
-    wrapRequestHandler(verifyForgotPasswordTokenController)
-)
-
-/**
- * Description . Reset password
- * Path: /reset-password
- * method: post
- * body: {
- * forgot-password-token: string,
- * password: string,
- * confirm_password: string
- * }
- */
-
-userRouter.post(
-    '/reset-password',
-    verifyForgotPasswordTokenValidator,
-    resetPasswordValidator,
-    wrapRequestHandler(resetPasswordController)
-)
-
-/**
- * Description . Get my profile
+ * Description. Get my profile
  * Path: /me
  * method: GET
  * header: {
  * Authorization: Bearer <access_token>
  * }
  * body: {}
- *
+ * Returns my profile
  */
 
-userRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeProfileController))
+userRouter.get('/me', authenticate, wrapRequestHandler(getMeProfileController))
 
 /**
  * Description . Update my profile
@@ -191,8 +47,8 @@ userRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeProfileContr
 
 userRouter.patch(
     '/me',
-    accessTokenValidator,
-    verifiedUserValidator,
+    authenticate,
+    requireVerifiedUser,
     updateUserValidator,
     filterReqBodyMiddleWare<UpdateUserRequestBody>([
         'name',
@@ -227,13 +83,7 @@ userRouter.get('/:username', wrapRequestHandler(getUserController))
  * }
  */
 
-userRouter.post(
-    '/follow',
-    accessTokenValidator,
-    verifiedUserValidator,
-    followValidator,
-    wrapRequestHandler(followUserController)
-)
+userRouter.post('/follow', authenticate, requireVerifiedUser, followValidator, wrapRequestHandler(followUserController))
 
 /**
  * Description . unfollow someone
@@ -246,8 +96,8 @@ userRouter.post(
 
 userRouter.delete(
     '/follow/:user_id',
-    accessTokenValidator,
-    verifiedUserValidator,
+    authenticate,
+    requireVerifiedUser,
     unFollowValidator,
     wrapRequestHandler(unFollowUserController)
 )
@@ -266,8 +116,8 @@ userRouter.delete(
 
 userRouter.put(
     '/change-password',
-    accessTokenValidator,
-    verifiedUserValidator,
+    authenticate,
+    requireVerifiedUser,
     changePasswordValidator,
     wrapRequestHandler(changePasswordController)
 )

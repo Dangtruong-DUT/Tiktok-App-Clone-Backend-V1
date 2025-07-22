@@ -5,7 +5,7 @@ import {
     uploadImagesController,
     uploadVideosController
 } from '~/controllers/medias.controllers'
-import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/user.middlewares'
+import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 const mediasRouter = Router()
 
@@ -16,17 +16,12 @@ const mediasRouter = Router()
  * headers: { authorization: bearer <access_token>}
  * body:  {
  *   form-data {
- *          images: file
+ *          file: file
  *   }
  * }
  *
  * */
-mediasRouter.post(
-    '/upload-image',
-    accessTokenValidator,
-    verifiedUserValidator,
-    wrapRequestHandler(uploadImagesController)
-)
+mediasRouter.post('/upload-image', authenticate, requireVerifiedUser, wrapRequestHandler(uploadImagesController))
 
 /**
  * Description. upload single video
@@ -40,12 +35,7 @@ mediasRouter.post(
  * }
  *
  * */
-mediasRouter.post(
-    '/upload-video',
-    accessTokenValidator,
-    verifiedUserValidator,
-    wrapRequestHandler(uploadVideosController)
-)
+mediasRouter.post('/upload-video', authenticate, requireVerifiedUser, wrapRequestHandler(uploadVideosController))
 
 /**
  * Description. upload single video
@@ -59,12 +49,7 @@ mediasRouter.post(
  * }
  *
  * */
-mediasRouter.post(
-    '/upload-video-hls',
-    accessTokenValidator,
-    verifiedUserValidator,
-    wrapRequestHandler(uploadHLSVideosController)
-)
+mediasRouter.post('/upload-video-hls', authenticate, requireVerifiedUser, wrapRequestHandler(uploadHLSVideosController))
 
 /**
  *
@@ -78,8 +63,8 @@ mediasRouter.post(
  * */
 mediasRouter.get(
     '/upload-hls-status/:id',
-    accessTokenValidator,
-    verifiedUserValidator,
+    authenticate,
+    requireVerifiedUser,
     wrapRequestHandler(checkEncodingProgressController)
 )
 
