@@ -26,6 +26,13 @@ export const loginController = async (req: Request<ParamsDictionary, LoginReques
         user_id: user_id.toString(),
         verify: userFromClient.verify
     })
+
+    if (!access_token || !refresh_token || !user) {
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            message: AUTH_MESSAGES.LOGIN_FAILED
+        })
+    }
+
     res.status(HTTP_STATUS.OK).json({
         message: AUTH_MESSAGES.LOGIN_SUCCESS,
         data: {
@@ -38,6 +45,13 @@ export const loginController = async (req: Request<ParamsDictionary, LoginReques
 
 export const registerController = async (req: Request<ParamsDictionary, RegisterRequestBody>, res: Response) => {
     const { access_token, refresh_token, user } = await usersServices.register(req.body)
+
+    if (!access_token || !refresh_token || !user) {
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            message: AUTH_MESSAGES.REGISTER_FAILED
+        })
+    }
+
     res.status(HTTP_STATUS.OK).json({
         message: AUTH_MESSAGES.REGISTER_SUCCESS,
         data: {

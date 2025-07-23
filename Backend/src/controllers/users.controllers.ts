@@ -27,7 +27,8 @@ export const getMeProfileController = async (req: Request, res: Response) => {
 
 export const getUserController = async (req: Request<GetProfileReqParams>, res: Response) => {
     const { username } = req.params
-    const user = await usersServices.getUserByUserName(username)
+    const user_id = req?.decoded_authorization?.user_id as string | undefined
+    const user = await usersServices.getUserByUserName(username, user_id)
     if (!user) {
         throw new ErrorWithStatus({ message: USER_MESSAGES.USER_NOT_FOUND, status: 404 })
     }

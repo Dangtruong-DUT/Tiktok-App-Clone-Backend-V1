@@ -110,19 +110,16 @@ export const requireVerifiedUser = async (req: Request, res: Response, next: Nex
     next()
 }
 
-/**
- * Middleware verify access token
- * Gắn decoded_authorization vào req nếu hợp lệ
- */
 export const authOptional = async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization || ''
+    const token = authHeader.split(' ')[1]
+
+    if (!token) {
+        req.decoded_authorization = undefined
+        return next()
+    }
+
     try {
-        const authHeader = req.headers.authorization || ''
-        const token = authHeader.split(' ')[1]
-
-        if (!token) {
-            return (req.decoded_authorization = undefined)
-        }
-
         const decoded = await verifyToken({
             token,
             secretOrPublicKey: envConfig.JWT_SECRET_ACCESS_TOKEN as string
