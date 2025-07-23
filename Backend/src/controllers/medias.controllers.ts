@@ -7,8 +7,8 @@ import MediasService from '~/services/medias.services'
 import fs from 'fs'
 import { FILE_MESSAGES } from '~/constants/messages/file'
 
-export const uploadImagesController = async (req: Request, res: Response, next: NextFunction) => {
-    const url = await MediasService.UploadImages(req)
+export const uploadImagesController = async (req: Request, res: Response) => {
+    const url = await MediasService.UploadSingleImage(req)
     res.json({
         message: FILE_MESSAGES.UPLOAD_SUCCESS,
         data: url

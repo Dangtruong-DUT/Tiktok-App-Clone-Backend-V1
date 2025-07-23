@@ -33,38 +33,39 @@ export const handleUploadSingleImage = (req: Request) => {
         maxFiles: 1,
         allowEmptyFiles: false,
         keepExtensions: true,
-        maxFileSize: 40 * 1024, // 40MB
-        maxTotalFileSize: 40 * 1024, // 40MB
-        filter: ({ name, originalFilename, mimetype }) => {
-            const valid = name == 'file' && Boolean(mimetype?.includes('image'))
+        maxFileSize: 40 * 1024 * 1024, // 40MB
+        maxTotalFileSize: 40 * 1024 * 1024, // 40MB
+        filter: ({ name, mimetype }) => {
+            const valid = name === 'file' && Boolean(mimetype?.includes('image'))
             if (!valid) {
                 form.emit(
                     'error' as any,
                     new ErrorWithStatus({
                         message: FILE_MESSAGES.UPLOAD_INVALID_FORMAT,
-                        status: HTTP_STATUS.BAD_REQUEST
+                        status: HTTP_STATUS.UNPROCESSABLE_ENTITY
                     }) as any
                 )
+                return false
             }
-            return valid
+            return true
         }
     })
 
-    return new Promise<File[]>((resolve, reject) => {
+    return new Promise<File>((resolve, reject) => {
         form.parse(req, (err, fields, files) => {
-            if (err) {
-                reject(err)
-            }
-            if (!files.file) {
-                reject(
+            if (err) return reject(err)
+
+            if (!files?.file || !Array.isArray(files.file) || !files.file[0]) {
+                return reject(
                     new ErrorWithStatus({
                         message: FILE_MESSAGES.UPLOAD_FILE_MUST_BE_NON_EMPTY,
-                        status: HTTP_STATUS.NOT_FOUND
+                        status: HTTP_STATUS.UNPROCESSABLE_ENTITY
                     })
                 )
             }
-            console.log(files)
-            resolve(files.file as File[])
+
+            const file = files.file[0] as File
+            resolve(file)
         })
     })
 }
@@ -122,10 +123,13 @@ export const handleUploadVideos = (req: Request) => {
     })
 }
 
-export const getFileNameWithoutExtension = (fullName: string) => {
-    return fullName.substring(0, fullName.lastIndexOf('.')) || fullName
+export const getFileNameWithoutExtension = (fullName: string): string => {
+    return fullName.substring(0, fullName.lastIndexOf('.'))
 }
 
-export const getExtensionFileName = (fileName: string) => {
-    return fileName.substring(fileName.lastIndexOf('.') + 1) || ''
+export const getExtensionFileName = (fileName: string): string => {
+    return fileName.substring(fileName.lastIndexOf('.') + 1)
+}
+export const getFileNameWithExtension = (fileName: string, ext: string): string => {
+    return `${getFileNameWithoutExtension(fileName)}.${ext}`
 }
