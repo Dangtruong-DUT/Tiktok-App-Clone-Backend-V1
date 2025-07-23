@@ -4,6 +4,7 @@ import {
     loginController,
     logoutAllDevicesController,
     logoutController,
+    oauthGoogleController,
     refreshTokenController,
     registerController,
     resendVerifyEmailController,
@@ -12,17 +13,27 @@ import {
     verifyForgotPasswordTokenController
 } from '~/controllers/auth.controllers'
 import { authenticate, authenticateRefreshToken } from '~/middlewares/auth.middlewares'
+import { OauthWithGoogleReqQuery } from '~/models/requests/auth.requests'
 import { wrapRequestHandler } from '~/utils/handlers'
 import {
     emailVerifyTokenValidator,
     forgotPasswordValidator,
     loginValidator,
+    oauthGoogleValidator,
     registerValidator,
     resetPasswordValidator,
     verifyForgotPasswordTokenValidator
 } from '~/validations/auth.validations'
 
 const authRouter = Router()
+
+/**
+ * Description. logs in a user
+ * Path: /login/google
+ * method: get
+ */
+
+authRouter.get('/login/google', oauthGoogleValidator, wrapRequestHandler(oauthGoogleController))
 
 /**
  * Description. logs in a user

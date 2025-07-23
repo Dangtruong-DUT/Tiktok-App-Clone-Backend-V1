@@ -1,8 +1,8 @@
-import { IdReqParam, PostIdParam } from './common.requests'
-
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface TiktokLikeReqBody extends PostIdParam {}
+export interface TiktokLikeReqBody {
+    post_id: string
+}
 
-export type UnLikeReqParams = PostIdParam & Record<string, string>
-
-export type UnLikeByIDReqParams = IdReqParam & Record<string, string>
+export type UnLikeReqParams = {
+    post_id: string
+}

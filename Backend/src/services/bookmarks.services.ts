@@ -33,12 +33,6 @@ class BookMarkPostService {
         })
         return result
     }
-    async unBookMarkPostByBookmarkId(bookmark_id: string) {
-        const result = await databaseService.bookmarks.deleteOne({
-            _id: new ObjectId(bookmark_id)
-        })
-        return result
-    }
 }
 const bookMarkPostService = new BookMarkPostService()
 export default bookMarkPostService

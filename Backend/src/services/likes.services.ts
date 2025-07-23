@@ -33,12 +33,6 @@ class LikePostService {
         })
         return result
     }
-    async unLikePostById(_id: string) {
-        const result = await databaseService.likes.deleteOne({
-            _id: new ObjectId(_id)
-        })
-        return result
-    }
 }
 const likePostService = new LikePostService()
 export default likePostService

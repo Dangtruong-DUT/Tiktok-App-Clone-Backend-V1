@@ -1,8 +1,7 @@
-import { IdReqParam, PostIdParam } from './common.requests'
+export interface TiktokBookMarkReqBody {
+    post_id: string
+}
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface TiktokBookMarkReqBody extends PostIdParam {}
-
-export type UnBookMarkReqParams = PostIdParam & Record<string, string>
-
-export type UnBookMarkByIDReqParams = IdReqParam & Record<string, string>
+export type UnBookMarkReqParams = {
+    post_id: string
+}

@@ -1,5 +1,5 @@
 import databaseService from './database.services'
-import { RegisterRequestBody, UpdateUserRequestBody } from '~/models/requests/user.requests'
+import { UpdateUserRequestBody } from '~/models/requests/user.requests'
 import { hashPassword } from '~/utils/crypto'
 import { UserVerifyStatus } from '~/constants/enum'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
@@ -7,6 +7,8 @@ import { ObjectId } from 'mongodb'
 import User from '~/models/schemas/User.schema'
 import generateTimeBasedUsername from '~/utils/GenerateUserName'
 import { signAccessAndRefreshToken, signEmailVerifyToken, signForgotPasswordToken } from '~/helpers/signToken'
+import { getOauthGoogleToken, getOauthGoogleUserInfo } from '~/helpers/oauth'
+import { RegisterRequestBody } from '~/models/requests/auth.requests'
 
 class UserService {
     private get safeUserProjection() {
@@ -78,6 +80,30 @@ class UserService {
         }
     }
 
+    async oauthGoogle(code: string) {
+        const { id_token, access_token } = await getOauthGoogleToken(code)
+        const userInfo = await getOauthGoogleUserInfo({ id_token, access_token })
+        const user = await databaseService.users.findOne(
+            { email: userInfo.email },
+            { projection: this.safeUserProjection }
+        )
+
+        if (user) {
+            return this.login({
+                user_id: user._id.toString(),
+                verify: user.verify
+            })
+        } else {
+            const generatedPassword = Math.random().toString(36).slice(-8)
+            return this.register({
+                email: userInfo.email,
+                password: generatedPassword,
+                confirm_password: generatedPassword,
+                name: userInfo.name,
+                date_of_birth: new Date().toISOString()
+            })
+        }
+    }
     async logout(refresh_token: string) {
         const result = await databaseService.refreshToken.deleteOne({ token: refresh_token })
         return result.deletedCount > 0

@@ -28,5 +28,6 @@ export const AUTH_MESSAGES = {
     USER_NOT_FOUND: 'User not found',
     USER_NOT_VERIFIED: 'User not verified',
     EMAIL_OR_PASSWORD_DOES_NOT_MATCH: 'Email or password does not match',
-    EMAIL_NOT_EXISTS: 'Email does not exist'
+    EMAIL_NOT_EXISTS: 'Email does not exist',
+    OAUTH_GOOGLE_SUCCESS: 'OAuth Google login success'
 } as const

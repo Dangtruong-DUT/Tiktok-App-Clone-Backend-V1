@@ -129,8 +129,8 @@ export const serveSegmentHLSController = async (req: Request<getVideoHLSReqParam
     })
 }
 
-export const checkEncodingProgressController = async (req: Request<getVideoHLSReqParam>, res: Response) => {
-    const { id } = req.params
+export const checkEncodingProgressController = async (req: Request, res: Response) => {
+    const { id } = req.params as unknown as getVideoHLSReqParam
     const data = await MediasService.CheckEncodingProgress(id)
     res.json({
         message: FILE_MESSAGES.GET_VIDEO_HLS_STATUS_SUCCESS,

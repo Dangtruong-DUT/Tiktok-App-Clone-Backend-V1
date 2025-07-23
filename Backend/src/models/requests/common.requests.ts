@@ -1,7 +1,8 @@
-export interface PostIdParam {
-    post_id: string
-}
+import { JwtPayload } from 'jsonwebtoken'
+import { TokenType, UserVerifyStatus } from '~/constants/enum'
 
-export interface IdReqParam {
-    _id: string
+export interface TokenPayload extends JwtPayload {
+    user_id: string
+    token_Type: TokenType
+    verify: UserVerifyStatus
 }

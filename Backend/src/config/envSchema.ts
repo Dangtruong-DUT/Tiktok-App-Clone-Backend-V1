@@ -25,5 +25,9 @@ export const envSchema = z.object({
     EMAIL_VERIFY_TOKEN_EXPIRE_IN: z.string().regex(/^\d+[smhd]$/, 'Must be duration string like 24h, 15m'),
     FORGOT_PASSWORD_TOKEN_EXPIRE_IN: z.string().regex(/^\d+[smhd]$/, 'Must be duration string like 24h, 15m'),
     ACCESS_TOKEN_EXPIRE_IN: z.string().regex(/^\d+[smhd]$/, 'Must be duration string like 15m'),
-    REFRESH_TOKEN_EXPIRE_IN: z.string().regex(/^\d+[smhd]$/, 'Must be duration string like 30d')
+    REFRESH_TOKEN_EXPIRE_IN: z.string().regex(/^\d+[smhd]$/, 'Must be duration string like 30d'),
+    GOOGLE_REDIRECT_CLIENT_URL: z.string().url(),
+    GOOGLE_CLIENT_ID: z.string().min(1),
+    GOOGLE_CLIENT_SECRET: z.string().min(1),
+    GOOGLE_REDIRECT_URI: z.string().url()
 })

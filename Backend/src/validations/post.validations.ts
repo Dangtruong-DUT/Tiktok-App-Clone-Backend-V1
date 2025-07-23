@@ -6,7 +6,6 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import { POST_MESSAGES } from '~/constants/messages/post'
 import { validate } from '~/middlewares/validation.middlewares'
 import { ErrorWithStatus } from '~/models/Errors'
-import databaseService from '~/services/database.services'
 import tikTokPostService from '~/services/TiktokPost.services'
 import usersServices from '~/services/users.services'
 import { numberEnumToArray } from '~/utils/common'
@@ -187,81 +186,6 @@ export const unLikeTiktokPostValidator = validate(
     checkSchema(
         {
             post_id: validatePostId
-        },
-        ['params']
-    )
-)
-
-export const verifiedLikedIdValidator = validate(
-    checkSchema(
-        {
-            _id: {
-                notEmpty: {
-                    errorMessage: POST_MESSAGES.LIKED_ID_IS_REQUIRED
-                },
-                isString: {
-                    errorMessage: POST_MESSAGES.LIKED_ID_MUST_BE_STRING
-                },
-                custom: {
-                    options: async (value: string) => {
-                        if (!ObjectId.isValid(value)) {
-                            throw new ErrorWithStatus({
-                                message: POST_MESSAGES.INVALID_ID,
-                                status: HTTP_STATUS.NOT_FOUND
-                            })
-                        }
-
-                        const document = await databaseService.likes.findOne({
-                            _id: new ObjectId(value)
-                        })
-                        if (!document) {
-                            throw new ErrorWithStatus({
-                                message: POST_MESSAGES.THE_POST_HAS_NOT_BEEN_LIKED_OR_UNLIKED_PREVIOUSLY,
-                                status: HTTP_STATUS.NOT_FOUND
-                            })
-                        }
-                        return true
-                    }
-                },
-                trim: true
-            }
-        },
-        ['params']
-    )
-)
-export const verifiedBookMarksValidator = validate(
-    checkSchema(
-        {
-            bookmark_id: {
-                notEmpty: {
-                    errorMessage: POST_MESSAGES.BOOKMARKS_ID_IS_REQUIRED
-                },
-                isString: {
-                    errorMessage: POST_MESSAGES.BOOKMARKS_ID_MUST_BE_A_STRING
-                },
-                custom: {
-                    options: async (value: string) => {
-                        if (!ObjectId.isValid(value)) {
-                            throw new ErrorWithStatus({
-                                message: POST_MESSAGES.INVALID_ID,
-                                status: HTTP_STATUS.NOT_FOUND
-                            })
-                        }
-
-                        const document = await databaseService.bookmarks.findOne({
-                            _id: new ObjectId(value)
-                        })
-                        if (!document) {
-                            throw new ErrorWithStatus({
-                                message: POST_MESSAGES.THE_POST_HAS_NOT_BEEN_BOOKMARKS_OR_UNBOOKMARK_PREVIOUSLY,
-                                status: HTTP_STATUS.NOT_FOUND
-                            })
-                        }
-                        return true
-                    }
-                },
-                trim: true
-            }
         },
         ['params']
     )

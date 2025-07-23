@@ -5,13 +5,13 @@ import {
     ChangePasswordRequestBody,
     followUserReqBody,
     GetProfileReqParams,
-    TokenPayload,
     unFollowUserReqParams,
     UpdateUserRequestBody
 } from '~/models/requests/user.requests'
 
 import { USER_MESSAGES } from '~/constants/messages/user'
 import { ErrorWithStatus } from '~/models/Errors'
+import { TokenPayload } from '~/models/requests/common.requests'
 
 export const getMeProfileController = async (req: Request, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload

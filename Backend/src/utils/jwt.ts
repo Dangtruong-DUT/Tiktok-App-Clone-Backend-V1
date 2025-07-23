@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { envConfig } from '~/config'
-import { TokenPayload } from '~/models/requests/user.requests'
+import { TokenPayload } from '~/models/requests/common.requests'
 
 /**
  * Generates a JSON Web Token (JWT) asynchronously using the provided payload, secret key, and signing options.

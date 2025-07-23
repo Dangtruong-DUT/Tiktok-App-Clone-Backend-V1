@@ -6,18 +6,20 @@ import {
     ForgotPasswordRequestBody,
     LoginRequestBody,
     LogoutRequestBody,
+    OauthWithGoogleReqQuery,
     RefreshTokenReqBody,
     RegisterRequestBody,
     ResetPasswordRequestBody,
-    TokenPayload,
     VerifyEmailRequestBody,
     VerifyForgotPasswordTokenRequestBody
-} from '~/models/requests/user.requests'
+} from '~/models/requests/auth.requests'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { ObjectId } from 'mongodb'
 import usersServices from '~/services/users.services'
 import { Request, Response } from 'express'
 import { AUTH_MESSAGES } from '~/constants/messages/auth'
+import { envConfig } from '~/config'
+import { TokenPayload } from '~/models/requests/common.requests'
 
 export const loginController = async (req: Request<ParamsDictionary, LoginRequestBody>, res: Response) => {
     const userFromClient = req.user as User
@@ -41,6 +43,13 @@ export const loginController = async (req: Request<ParamsDictionary, LoginReques
             user
         }
     })
+}
+
+export const oauthGoogleController = async (req: Request, res: Response) => {
+    const { code } = req.query as unknown as OauthWithGoogleReqQuery
+    const { access_token, refresh_token } = await usersServices.oauthGoogle(code)
+    const redirectUrl = `${envConfig.GOOGLE_REDIRECT_CLIENT_URL}?access_token=${access_token}&refresh_token=${refresh_token}`
+    return res.redirect(redirectUrl)
 }
 
 export const registerController = async (req: Request<ParamsDictionary, RegisterRequestBody>, res: Response) => {

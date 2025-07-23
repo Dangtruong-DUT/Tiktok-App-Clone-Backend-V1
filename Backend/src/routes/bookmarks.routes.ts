@@ -1,17 +1,9 @@
 import { Router } from 'express'
-import {
-    bookMarksTiktokPostController,
-    unBookMarksTiktokPostByBookmarkIdController,
-    unBookMarksTiktokPostController
-} from '~/controllers/bookmarks.controllers'
+import { bookMarksTiktokPostController, unBookMarksTiktokPostController } from '~/controllers/bookmarks.controllers'
 import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 
 import { wrapRequestHandler } from '~/utils/handlers'
-import {
-    bookMarksTiktokPostValidator,
-    unBookMarksTiktokValidator,
-    verifiedBookMarksValidator
-} from '~/validations/post.validations'
+import { bookMarksTiktokPostValidator, unBookMarksTiktokValidator } from '~/validations/post.validations'
 
 const bookmarksRouter = Router()
 /**
@@ -50,21 +42,4 @@ bookmarksRouter.delete(
     wrapRequestHandler(unBookMarksTiktokPostController)
 )
 
-/**
- * Description. unBookmarks post
- * Path: /:bookmark_id
- * method: delete
- * body:{
- * post_id: string
- * }
- *
- */
-
-bookmarksRouter.delete(
-    '/:bookmark_id',
-    authenticate,
-    requireVerifiedUser,
-    verifiedBookMarksValidator,
-    wrapRequestHandler(unBookMarksTiktokPostByBookmarkIdController)
-)
 export default bookmarksRouter
