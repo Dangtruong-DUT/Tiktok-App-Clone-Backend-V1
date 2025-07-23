@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { getFileNameWithoutExtension, handleUploadSingleImage, handleUploadVideos } from '~/utils/file'
+import { getFileNameWithoutExtension, handleUploadImages, handleUploadVideos } from '~/utils/file'
 import sharp from 'sharp'
 import { UPLOAD_IMAGE_DIR } from '~/constants/dir'
 import path from 'path'
@@ -11,18 +11,23 @@ import databaseService from './database.services'
 import { envConfig, isProduction } from '~/config'
 
 class MediasService {
-    async UploadSingleImage(req: Request) {
-        const file = await handleUploadSingleImage(req)
-        const newFileName = getFileNameWithoutExtension(file.newFilename)
-        const newPath = path.resolve(UPLOAD_IMAGE_DIR, `${newFileName}.jpg`)
-        await sharp(file.filepath).jpeg().toFile(newPath)
-        fs.unlinkSync(file.filepath)
-        return {
-            url: isProduction
-                ? `${process.env.HOST}/api/static/image/${newFileName}.jpg`
-                : `http://localhost:${process.env.PORT}/api/static/image/${newFileName}.jpg`,
-            type: MediaType.Image
-        }
+    async UploadImages(req: Request) {
+        const files = await handleUploadImages(req)
+        const urls = await Promise.all(
+            files.map(async (file) => {
+                const newFileName = getFileNameWithoutExtension(file.newFilename)
+                const newPath = path.resolve(UPLOAD_IMAGE_DIR, `${newFileName}.jpg`)
+                await sharp(file.filepath).jpeg().toFile(newPath)
+                fs.unlinkSync(file.filepath)
+                return {
+                    url: isProduction
+                        ? `${process.env.HOST}/api/static/image/${newFileName}.jpg`
+                        : `http://localhost:${process.env.PORT}/api/static/image/${newFileName}.jpg`,
+                    type: MediaType.Image
+                }
+            })
+        )
+        return urls
     }
     async UploadVideos(req: Request) {
         const files = await handleUploadVideos(req)

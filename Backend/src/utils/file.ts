@@ -27,14 +27,14 @@ export const initFolder = () => {
     }
 }
 
-export const handleUploadSingleImage = (req: Request) => {
+export const handleUploadImages = (req: Request) => {
     const form = formidable({
         uploadDir: UPLOAD_IMAGE_TEMP_DIR,
-        maxFiles: 1,
+        maxFiles: 6,
         allowEmptyFiles: false,
         keepExtensions: true,
         maxFileSize: 40 * 1024 * 1024, // 40MB
-        maxTotalFileSize: 40 * 1024 * 1024, // 40MB
+        maxTotalFileSize: 6 * 40 * 1024 * 1024, // 240MB
         filter: ({ name, mimetype }) => {
             const valid = name === 'file' && Boolean(mimetype?.includes('image'))
             if (!valid) {
@@ -51,11 +51,11 @@ export const handleUploadSingleImage = (req: Request) => {
         }
     })
 
-    return new Promise<File>((resolve, reject) => {
+    return new Promise<File[]>((resolve, reject) => {
         form.parse(req, (err, fields, files) => {
             if (err) return reject(err)
 
-            if (!files?.file || !Array.isArray(files.file) || !files.file[0]) {
+            if (!files?.file || !Array.isArray(files.file) || files.file.length === 0) {
                 return reject(
                     new ErrorWithStatus({
                         message: FILE_MESSAGES.UPLOAD_FILE_MUST_BE_NON_EMPTY,
@@ -64,31 +64,24 @@ export const handleUploadSingleImage = (req: Request) => {
                 )
             }
 
-            const file = files.file[0] as File
-            resolve(file)
+            resolve(files.file as File[])
         })
     })
 }
 
 export const handleUploadVideos = (req: Request) => {
-    const idName = nanoid()
-    const folderPath = path.resolve(UPLOAD_VIDEO_DIR, idName)
-    fs.mkdirSync(folderPath)
     const form = formidable({
-        uploadDir: folderPath,
+        uploadDir: UPLOAD_VIDEO_TEMP_DIR,
         maxFiles: 1,
         maxFileSize: 50 * 1024 * 1024, // 50MB
-        filename: () => {
-            return idName
-        },
         filter: ({ name, mimetype }) => {
-            const valid = name === 'video' && Boolean(mimetype?.startsWith('video/'))
+            const valid = name === 'file' && Boolean(mimetype?.startsWith('video/'))
             if (!valid) {
                 form.emit(
                     'error' as any,
                     new ErrorWithStatus({
                         message: FILE_MESSAGES.UPLOAD_INVALID_FORMAT,
-                        status: HTTP_STATUS.BAD_REQUEST
+                        status: HTTP_STATUS.UNPROCESSABLE_ENTITY
                     }) as any
                 )
             }
@@ -101,24 +94,33 @@ export const handleUploadVideos = (req: Request) => {
             if (err) {
                 reject(err)
             }
-            if (!files.video) {
-                reject(
+            if (!files?.file || !Array.isArray(files.file) || files.file.length === 0) {
+                return reject(
                     new ErrorWithStatus({
                         message: FILE_MESSAGES.UPLOAD_FILE_MUST_BE_NON_EMPTY,
-                        status: HTTP_STATUS.NOT_FOUND
+                        status: HTTP_STATUS.UNPROCESSABLE_ENTITY
                     })
                 )
             }
-            const videos = files.video as File[]
+            const videos = files.file as File[]
+
             videos.forEach((video) => {
                 const ext = getExtensionFileName(video.originalFilename as string)
-                const basePath = path.basename(video.filepath)
-                const newPath = path.join(folderPath, basePath + '.' + ext)
+                const videoName = nanoid()
+                const uniqueFolder = path.resolve(UPLOAD_VIDEO_DIR, videoName)
+                fs.mkdirSync(uniqueFolder)
+
+                const newName = videoName + '.' + ext
+                const newPath = path.join(uniqueFolder, newName)
+
                 fs.renameSync(video.filepath, newPath)
-                video.newFilename = video.newFilename + '.' + ext
-                video.filepath = video.filepath + '.' + ext
+
+                // Cập nhật lại metadata
+                video.newFilename = newName
+                video.filepath = newPath
             })
-            resolve(files.video as File[])
+
+            resolve(videos)
         })
     })
 }

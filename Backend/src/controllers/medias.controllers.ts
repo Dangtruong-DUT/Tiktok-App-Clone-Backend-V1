@@ -8,14 +8,14 @@ import fs from 'fs'
 import { FILE_MESSAGES } from '~/constants/messages/file'
 
 export const uploadImagesController = async (req: Request, res: Response) => {
-    const url = await MediasService.UploadSingleImage(req)
+    const url = await MediasService.UploadImages(req)
     res.json({
         message: FILE_MESSAGES.UPLOAD_SUCCESS,
         data: url
     })
 }
 
-export const uploadVideosController = async (req: Request, res: Response, next: NextFunction) => {
+export const uploadVideosController = async (req: Request, res: Response) => {
     const url = await MediasService.UploadVideos(req)
     res.json({
         message: FILE_MESSAGES.UPLOAD_SUCCESS,
@@ -29,7 +29,7 @@ export const uploadVideosController = async (req: Request, res: Response, next: 
  * 2. Encode: Provides an endpoint to check encoding progress.
  */
 
-export const uploadHLSVideosController = async (req: Request, res: Response, next: NextFunction) => {
+export const uploadHLSVideosController = async (req: Request, res: Response) => {
     const url = await MediasService.UploadHLSVideos(req)
     res.json({
         message: FILE_MESSAGES.UPLOAD_SUCCESS,
@@ -37,7 +37,7 @@ export const uploadHLSVideosController = async (req: Request, res: Response, nex
     })
 }
 
-export const serveImageController = async (req: Request<getImageReqParams>, res: Response, next: NextFunction) => {
+export const serveImageController = async (req: Request<getImageReqParams>, res: Response) => {
     const { name } = req.params
     return res.sendFile(path.resolve(UPLOAD_IMAGE_DIR, name), (error) => {
         if (error) {
@@ -46,11 +46,11 @@ export const serveImageController = async (req: Request<getImageReqParams>, res:
     })
 }
 
-export const serveVideoController = async (req: Request<getVideoReqParam>, res: Response, next: NextFunction) => {
+export const serveVideoController = async (req: Request<getVideoReqParam>, res: Response) => {
     const { name } = req.params
-    const id = path.basename(name, path.extname(name))
+    const idFolderVideo = path.basename(name, path.extname(name))
 
-    const folderPath = path.resolve(UPLOAD_VIDEO_DIR, id)
+    const folderPath = path.resolve(UPLOAD_VIDEO_DIR, idFolderVideo)
     const videoPath = path.resolve(folderPath, name)
 
     return res.sendFile(videoPath, (error) => {
@@ -108,7 +108,7 @@ export const serveVideoStreamController = async (req: Request<getVideoReqParam>,
     videoStream.pipe(res)
 }
 
-export const serveM3u8HLSController = async (req: Request<getVideoHLSReqParam>, res: Response, next: NextFunction) => {
+export const serveM3u8HLSController = async (req: Request<getVideoHLSReqParam>, res: Response) => {
     const { id } = req.params
     const folderPath = path.resolve(UPLOAD_VIDEO_DIR, id)
     res.sendFile(path.resolve(folderPath, 'master.m3u8'), (error) => {
@@ -118,11 +118,7 @@ export const serveM3u8HLSController = async (req: Request<getVideoHLSReqParam>, 
     })
 }
 
-export const serveSegmentHLSController = async (
-    req: Request<getVideoHLSReqParam>,
-    res: Response,
-    next: NextFunction
-) => {
+export const serveSegmentHLSController = async (req: Request<getVideoHLSReqParam>, res: Response) => {
     const { id, v, segment } = req.params
 
     const filePath = path.resolve(UPLOAD_VIDEO_DIR, id, v, segment)
@@ -133,11 +129,7 @@ export const serveSegmentHLSController = async (
     })
 }
 
-export const checkEncodingProgressController = async (
-    req: Request<getVideoHLSReqParam>,
-    res: Response,
-    next: NextFunction
-) => {
+export const checkEncodingProgressController = async (req: Request<getVideoHLSReqParam>, res: Response) => {
     const { id } = req.params
     const data = await MediasService.CheckEncodingProgress(id)
     res.json({
