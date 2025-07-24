@@ -109,33 +109,3 @@ export const requireVerifiedUser = async (req: Request, res: Response, next: Nex
     }
     next()
 }
-
-export const authOptional = async (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.headers.authorization || ''
-    const token = authHeader.split(' ')[1]
-
-    if (!token) {
-        req.decoded_authorization = undefined
-        return next()
-    }
-
-    try {
-        const decoded = await verifyToken({
-            token,
-            secretOrPublicKey: envConfig.JWT_SECRET_ACCESS_TOKEN as string
-        })
-
-        req.decoded_authorization = decoded
-        next()
-    } catch (error) {
-        if (error instanceof JsonWebTokenError) {
-            return next(
-                new ErrorWithStatus({
-                    message: AUTH_MESSAGES.INVALID_ACCESS_TOKEN,
-                    status: HTTP_STATUS.UNAUTHORIZED
-                })
-            )
-        }
-        next(error)
-    }
-}

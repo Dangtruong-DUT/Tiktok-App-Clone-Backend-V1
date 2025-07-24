@@ -14,7 +14,8 @@ import {
     updateUserValidator
 } from '~/validations/user.validations'
 import { wrapRequestHandler } from '~/utils/handlers'
-import { authenticate, authOptional, requireVerifiedUser } from '~/middlewares/auth.middlewares'
+import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
+import { isUserLoginValidator } from '~/middlewares/user.middlewares'
 const userRouter = Router()
 
 /**
@@ -57,7 +58,7 @@ userRouter.patch(
  * path: /:username
  */
 
-userRouter.get('/:username', authOptional, wrapRequestHandler(getUserController))
+userRouter.get('/:username', isUserLoginValidator(authenticate), wrapRequestHandler(getUserController))
 
 /**
  * Description . follow someone

@@ -2,11 +2,13 @@ import { Router } from 'express'
 import {
     bookMarksTiktokPostController,
     createTikTokPostController,
+    getPostDetailController,
     likesTiktokPostController,
     unBookMarksTiktokPostController,
     unLikesTiktokPostController
 } from '~/controllers/TikTokPost.controllers'
 import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
+import { isUserLoginValidator } from '~/middlewares/user.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 import {
     bookMarksTiktokPostValidator,
@@ -33,6 +35,14 @@ tiktokPostRouter.post(
     createTiktokPostValidator,
     wrapRequestHandler(createTikTokPostController)
 )
+
+/**
+ * Description. Get post detail
+ * Path: /:post_id
+ * method: GET
+ * */
+
+tiktokPostRouter.get('/:post_id', isUserLoginValidator(authenticate), wrapRequestHandler(getPostDetailController))
 
 /**
  * Description. Like post

@@ -80,6 +80,14 @@ export const createTiktokPostValidator = validate(
                 trim: true
             },
             parent_id: {
+                trim: true,
+                optional: true,
+                notEmpty: {
+                    errorMessage: POST_MESSAGES.INVALID_PARENT_ID
+                },
+                isString: {
+                    errorMessage: POST_MESSAGES.INVALID_PARENT_ID
+                },
                 custom: {
                     options: (value: string, { req }) => {
                         const type = req.body.type
@@ -97,11 +105,11 @@ export const createTiktokPostValidator = validate(
                         }
                         return true
                     }
-                },
-                trim: true
+                }
             },
             hashtags: {
                 isArray: true,
+                optional: true,
                 errorMessage: POST_MESSAGES.HASHTAGS_MUST_BE_ARRAY,
                 custom: {
                     options: (value: string[]) => {
@@ -124,35 +132,23 @@ export const createTiktokPostValidator = validate(
                             })
                         )
                         if (!results.every(Boolean)) {
-                            throw new ErrorWithStatus({
-                                message: POST_MESSAGES.INVALID_MENTION,
-                                status: HTTP_STATUS.NOT_FOUND
-                            })
+                            throw new Error(POST_MESSAGES.INVALID_MENTION)
                         }
                         return true
                     }
                 }
             },
-            guest_views: {
-                isInt: { options: { min: 0 } },
-                toInt: true,
-                optional: true,
-                errorMessage: POST_MESSAGES.GUEST_VIEWS_MUST_BE_INTEGER
-            },
-            user_views: {
-                isInt: { options: { min: 0 } },
-                toInt: true,
-                optional: true,
-                errorMessage: POST_MESSAGES.USER_VIEWS_MUST_BE_INTEGER
-            },
             medias: {
                 isArray: true,
                 errorMessage: POST_MESSAGES.MEDIA_FILES_MUST_BE_ARRAY,
-                notEmpty: {
-                    errorMessage: POST_MESSAGES.MEDIA_FILES_REQUIRED
-                },
                 custom: {
-                    options: (value) => {
+                    options: (value, { req }) => {
+                        if (
+                            (req.body.type === PosterType.post || req.body.type === PosterType.quotePost) &&
+                            isEmpty(value)
+                        ) {
+                            throw new Error(POST_MESSAGES.MEDIA_FILES_REQUIRED)
+                        }
                         if (
                             !value.every((item: any) => {
                                 return typeof item.url === 'string' && Object.values(MediaType).includes(item.type)

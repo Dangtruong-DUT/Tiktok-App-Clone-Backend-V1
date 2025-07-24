@@ -48,7 +48,7 @@ export default class TikTokPost {
         medias
     }: TikTokPostType) {
         const date = new Date()
-        this._id = _id
+        this._id = _id || new ObjectId()
         this.user_id = user_id
         this.type = type
         this.audience = audience

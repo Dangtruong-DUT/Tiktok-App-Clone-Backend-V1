@@ -2,30 +2,59 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { POST_MESSAGES } from '~/constants/messages/post'
 import { TokenPayload } from '~/models/requests/common.requests'
-import { TikTokPostBodyReq } from '~/models/requests/TiktokPost.requests'
+import { CreateTikTokPostBodyReq } from '~/models/requests/TiktokPost.requests'
 import { TiktokLikeReqBody, UnLikeReqParams } from '~/models/requests/likes.requests'
 import likePostService from '~/services/likes.services'
 import tikTokPostService from '~/services/TiktokPost.services'
 import { TiktokBookMarkReqBody, UnBookMarkReqParams } from '~/models/requests/bookmarks.requests'
 import bookMarkPostService from '~/services/bookmarks.services'
+import HTTP_STATUS from '~/constants/httpStatus'
+import { ErrorWithStatus } from '~/models/Errors'
 
-export const createTikTokPostController = async (req: Request<ParamsDictionary, TikTokPostBodyReq>, res: Response) => {
+export const createTikTokPostController = async (
+    req: Request<ParamsDictionary, CreateTikTokPostBodyReq>,
+    res: Response
+) => {
     const payload = req.body
     const { user_id } = req.decoded_authorization as TokenPayload
-    const result = await tikTokPostService.createPost({ payload, user_id })
+    const data = await tikTokPostService.createPost({ payload, user_id })
+    if (!data) {
+        throw new ErrorWithStatus({
+            message: POST_MESSAGES.POST_FAILED,
+            status: HTTP_STATUS.INTERNAL_SERVER_ERROR
+        })
+    }
+
     res.json({
         message: POST_MESSAGES.POST_SUCCESS,
-        result
+        data
+    })
+}
+
+export const getPostDetailController = async (req: Request<ParamsDictionary>, res: Response) => {
+    const { post_id } = req.params
+    const user_id = req.decoded_authorization?.user_id
+    const data = await tikTokPostService.getPostDetail({ post_id, user_id })
+
+    if (!data) {
+        throw new ErrorWithStatus({
+            message: POST_MESSAGES.GET_POST_DETAIL_FAILED,
+            status: HTTP_STATUS.NOT_FOUND
+        })
+    }
+    return res.json({
+        message: POST_MESSAGES.GET_POST_DETAIL_SUCCESS,
+        data
     })
 }
 
 export const likesTiktokPostController = async (req: Request<ParamsDictionary, TiktokLikeReqBody>, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
     const { post_id } = req.body
-    const result = await likePostService.LikePost({ post_id, user_id })
+    const data = await likePostService.LikePost({ post_id, user_id })
     res.json({
         message: POST_MESSAGES.LIKE_POST_SUCCESS,
-        result
+        data
     })
 }
 
@@ -44,10 +73,10 @@ export const bookMarksTiktokPostController = async (
 ) => {
     const { user_id } = req.decoded_authorization as TokenPayload
     const { post_id } = req.body
-    const result = await bookMarkPostService.bookMarkPost({ post_id, user_id })
+    const data = await bookMarkPostService.bookMarkPost({ post_id, user_id })
     res.json({
         message: POST_MESSAGES.BOOKMARKS_SUCCESS,
-        result
+        data
     })
 }
 

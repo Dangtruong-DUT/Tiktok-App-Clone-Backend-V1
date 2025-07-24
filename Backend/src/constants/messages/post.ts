@@ -36,5 +36,8 @@ export const POST_MESSAGES = {
     BOOKMARKS_ID_IS_REQUIRED: 'Bookmark ID is required',
     BOOKMARKS_ID_MUST_BE_A_STRING: 'Bookmark ID must be a string',
     LIKED_ID_IS_REQUIRED: 'Liked ID is required',
-    LIKED_ID_MUST_BE_STRING: 'Liked ID must be a string'
+    LIKED_ID_MUST_BE_STRING: 'Liked ID must be a string',
+    GET_POST_DETAIL_SUCCESS: 'Get post detail successfully',
+    GET_POST_DETAIL_FAILED: 'Failed to get post detail',
+    POST_FAILED: 'Failed to create post'
 } as const
