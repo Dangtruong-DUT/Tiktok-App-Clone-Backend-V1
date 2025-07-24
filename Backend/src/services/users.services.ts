@@ -306,6 +306,15 @@ class UserService {
         const user = await databaseService.users.findOne({ email })
         return !!user
     }
+
+    async checkFriendshipStatus({ user_id, target_user_id }: { user_id: string; target_user_id: string }) {
+        const follower = await databaseService.followers.findOne({
+            user_id: new ObjectId(user_id),
+            followed_user_id: new ObjectId(target_user_id)
+        })
+
+        return !!follower
+    }
 }
 
 export default new UserService()

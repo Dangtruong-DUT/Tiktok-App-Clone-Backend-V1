@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { POST_MESSAGES } from '~/constants/messages/post'
 import { TokenPayload } from '~/models/requests/common.requests'
-import { CreateTikTokPostBodyReq } from '~/models/requests/TiktokPost.requests'
+import { CreateTikTokPostBodyReq, GetPostDetailParamsReq } from '~/models/requests/TiktokPost.requests'
 import { TiktokLikeReqBody, UnLikeReqParams } from '~/models/requests/likes.requests'
 import likePostService from '~/services/likes.services'
 import tikTokPostService from '~/services/TiktokPost.services'
@@ -31,7 +31,7 @@ export const createTikTokPostController = async (
     })
 }
 
-export const getPostDetailController = async (req: Request<ParamsDictionary>, res: Response) => {
+export const getPostDetailController = async (req: Request<GetPostDetailParamsReq>, res: Response) => {
     const { post_id } = req.params
     const user_id = req.decoded_authorization?.user_id
     const data = await tikTokPostService.getPostDetail({ post_id, user_id })

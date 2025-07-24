@@ -8,11 +8,13 @@ import {
     unLikesTiktokPostController
 } from '~/controllers/TikTokPost.controllers'
 import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
+import { audienceValidator } from '~/middlewares/post.middlewares'
 import { isUserLoginValidator } from '~/middlewares/user.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 import {
     bookMarksTiktokPostValidator,
     createTiktokPostValidator,
+    getPostDetailValidator,
     likeTiktokPostValidator,
     unBookMarksTiktokValidator,
     unLikeTiktokPostValidator
@@ -42,7 +44,13 @@ tiktokPostRouter.post(
  * method: GET
  * */
 
-tiktokPostRouter.get('/:post_id', isUserLoginValidator(authenticate), wrapRequestHandler(getPostDetailController))
+tiktokPostRouter.get(
+    '/:post_id',
+    isUserLoginValidator(authenticate),
+    getPostDetailValidator,
+    wrapRequestHandler(audienceValidator),
+    wrapRequestHandler(getPostDetailController)
+)
 
 /**
  * Description. Like post

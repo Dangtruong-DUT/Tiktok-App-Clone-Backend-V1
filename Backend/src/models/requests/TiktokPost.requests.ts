@@ -1,5 +1,6 @@
 import { Audience, PosterType } from '~/constants/enum'
 import { Media } from '../Common'
+import { ParamsDictionary } from 'express-serve-static-core'
 
 export interface CreateTikTokPostBodyReq {
     type: PosterType
@@ -9,4 +10,8 @@ export interface CreateTikTokPostBodyReq {
     hashtags: string[]
     mentions: string[]
     medias: Media[]
+}
+
+export interface GetPostDetailParamsReq extends ParamsDictionary {
+    post_id: string
 }

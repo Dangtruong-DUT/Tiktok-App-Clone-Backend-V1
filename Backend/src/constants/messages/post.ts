@@ -39,5 +39,6 @@ export const POST_MESSAGES = {
     LIKED_ID_MUST_BE_STRING: 'Liked ID must be a string',
     GET_POST_DETAIL_SUCCESS: 'Get post detail successfully',
     GET_POST_DETAIL_FAILED: 'Failed to get post detail',
-    POST_FAILED: 'Failed to create post'
+    POST_FAILED: 'Failed to create post',
+    YOU_DO_NOT_HAVE_PERMISSION_TO_VIEW_THIS_POST: 'You do not have permission to view this post'
 } as const

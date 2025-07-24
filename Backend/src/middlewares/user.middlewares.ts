@@ -4,7 +4,6 @@ export function isUserLoginValidator(
     authMiddleware: (req: Request, res: Response, next: NextFunction) => void | Promise<void>
 ) {
     return (req: Request, res: Response, next: NextFunction) => {
-        console.log(req.headers['authorization'])
         if (req.headers['authorization'] != undefined) {
             return authMiddleware(req, res, next)
         } else {

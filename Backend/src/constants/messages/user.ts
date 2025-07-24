@@ -27,5 +27,6 @@ export const USER_MESSAGES = {
     USERNAME_INVALID: 'Username must be 4-15 characters long and contain only letters, numbers, and underscores',
     COVER_PHOTO_MUST_BE_A_VALID_URL: 'Cover photo must be a valid URL',
     COVER_PHOTO_LENGTH_MUST_BE_FROM_0_TO_400: 'Cover photo must be from 0 to 400 characters',
-    PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT: 'New password must be different from current password'
+    PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT: 'New password must be different from current password',
+    REQUIRED_lOGIN: 'You must be logged in to perform this action'
 } as const

@@ -18,7 +18,7 @@ const validatePostId: ParamSchema = {
         errorMessage: POST_MESSAGES.POST_ID_MUST_BE_STRING
     },
     custom: {
-        options: async (value: string) => {
+        options: async (value: string, { req }) => {
             if (!ObjectId.isValid(value)) {
                 throw new ErrorWithStatus({
                     message: POST_MESSAGES.INVALID_POST_ID,
@@ -33,6 +33,8 @@ const validatePostId: ParamSchema = {
                     status: HTTP_STATUS.NOT_FOUND
                 })
             }
+            req.post = post
+
             return true
         }
     },
@@ -162,6 +164,15 @@ export const createTiktokPostValidator = validate(
             }
         },
         ['body']
+    )
+)
+
+export const getPostDetailValidator = validate(
+    checkSchema(
+        {
+            post_id: validatePostId
+        },
+        ['params']
     )
 )
 
