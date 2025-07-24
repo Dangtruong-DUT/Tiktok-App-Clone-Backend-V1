@@ -9,6 +9,7 @@ import generateTimeBasedUsername from '~/utils/GenerateUserName'
 import { signAccessAndRefreshToken, signEmailVerifyToken, signForgotPasswordToken } from '~/helpers/signToken'
 import { getOauthGoogleToken, getOauthGoogleUserInfo } from '~/helpers/oauth'
 import { RegisterRequestBody } from '~/models/requests/auth.requests'
+import Follower from '~/models/schemas/Follower.schemas'
 
 class UserService {
     private get safeUserProjection() {
@@ -273,10 +274,10 @@ class UserService {
                 followed_user_id: new ObjectId(followed_user_id)
             },
             {
-                $set: {
+                $setOnInsert: new Follower({
                     user_id: new ObjectId(user_id),
                     followed_user_id: new ObjectId(followed_user_id)
-                }
+                })
             },
             { upsert: true }
         )

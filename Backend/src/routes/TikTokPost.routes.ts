@@ -1,8 +1,16 @@
 import { Router } from 'express'
+import { bookMarksTiktokPostController, unBookMarksTiktokPostController } from '~/controllers/bookmarks.controllers'
+import { likesTiktokPostController, unLikesTiktokPostController } from '~/controllers/likesTiktokPost.controllers copy'
 import { createTikTokPostController } from '~/controllers/TikTokPost.controllers'
 import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
-import { createTiktokPostValidator } from '~/validations/post.validations'
+import {
+    bookMarksTiktokPostValidator,
+    createTiktokPostValidator,
+    likeTiktokPostValidator,
+    unBookMarksTiktokValidator,
+    unLikeTiktokPostValidator
+} from '~/validations/post.validations'
 
 const tiktokPostRouter = Router()
 
@@ -20,6 +28,78 @@ tiktokPostRouter.post(
     requireVerifiedUser,
     createTiktokPostValidator,
     wrapRequestHandler(createTikTokPostController)
+)
+
+/**
+ * Description. Like post
+ * Path: /
+ * method: POST
+ * body:{
+ * post_id: string
+ * }
+ *
+ */
+
+tiktokPostRouter.post(
+    '/likes',
+    authenticate,
+    requireVerifiedUser,
+    likeTiktokPostValidator,
+    wrapRequestHandler(likesTiktokPostController)
+)
+
+/**
+ * Description. unLike post
+ * Path: /post/:post_id
+ * method: delete
+ * body:{
+ * post_id: string
+ * }
+ *
+ */
+
+tiktokPostRouter.delete(
+    '/:post_id/likes',
+    authenticate,
+    requireVerifiedUser,
+    unLikeTiktokPostValidator,
+    wrapRequestHandler(unLikesTiktokPostController)
+)
+
+/**
+ * Description. bookmarks post
+ * Path: /
+ * method: POST
+ * body:{
+ * post_id: string
+ * }
+ *
+ */
+
+tiktokPostRouter.post(
+    '/bookmarks',
+    authenticate,
+    requireVerifiedUser,
+    bookMarksTiktokPostValidator,
+    wrapRequestHandler(bookMarksTiktokPostController)
+)
+
+/**
+ * Description. unBookmarks post
+ * Path: /post/:post_id
+ * method: delete
+ * body:{
+ * post_id: string
+ * }
+ *
+ */
+
+tiktokPostRouter.delete(
+    '/:post_id/bookmarks',
+    authenticate,
+    requireVerifiedUser,
+    unBookMarksTiktokValidator,
+    wrapRequestHandler(unBookMarksTiktokPostController)
 )
 
 export default tiktokPostRouter
