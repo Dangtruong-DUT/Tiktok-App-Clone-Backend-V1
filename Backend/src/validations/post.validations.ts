@@ -25,8 +25,8 @@ const validatePostId: ParamSchema = {
                     status: HTTP_STATUS.NOT_FOUND
                 })
             }
-
-            const post = await tikTokPostService.getPostById(value)
+            const user_id = req.decoded_authorization?.user_id
+            const post = await tikTokPostService.getPostDetail({ post_id: value, user_id: user_id })
             if (!post) {
                 throw new ErrorWithStatus({
                     message: POST_MESSAGES.POST_NOT_FOUND,

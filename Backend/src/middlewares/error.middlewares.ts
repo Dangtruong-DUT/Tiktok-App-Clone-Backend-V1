@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { ErrorWithStatus } from '~/models/Errors'
 
@@ -19,7 +19,7 @@ import { ErrorWithStatus } from '~/models/Errors'
  *   + Sends a 500 Internal Server Error response with the error message and additional error details.
  */
 
-const defaultErrorHandler = (error: any, req: Request, res: Response): void => {
+const defaultErrorHandler = (error: any, req: Request, res: Response, next: NextFunction): void => {
     const errorResponse = { ...error }
     const { status, ...errorDetails } = errorResponse
     if (error instanceof ErrorWithStatus) {

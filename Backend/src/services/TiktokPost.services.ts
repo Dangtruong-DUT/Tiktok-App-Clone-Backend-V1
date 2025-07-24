@@ -3,6 +3,9 @@ import databaseService from './database.services'
 import TikTokPost from '~/models/schemas/TikTokPost.schemas'
 import { ObjectId, WithId } from 'mongodb'
 import Hashtag from '~/models/schemas/Hashtag.schemas'
+import { ErrorWithStatus } from '~/models/Errors'
+import HTTP_STATUS from '~/constants/httpStatus'
+import { POST_MESSAGES } from '~/constants/messages/post'
 
 class TikTokenService {
     async checkAndCreateHashtags(hashtags: string[]) {
@@ -50,14 +53,133 @@ class TikTokenService {
         return post
     }
     async getPostById(post_id: string) {
-        const result = await databaseService.tiktokPost.findOne({ _id: new ObjectId(post_id) })
-        const bookmarks_count = await databaseService.bookmarks.countDocuments({ post_id: new ObjectId(post_id) })
-        const likes_count = await databaseService.likes.countDocuments({ post_id: new ObjectId(post_id) })
-        return {
-            ...result,
-            bookmarks_count,
-            likes_count
-        }
+        const [result] = await databaseService.tiktokPost
+            .aggregate<TikTokPost>([
+                {
+                    $match: {
+                        _id: new ObjectId(post_id)
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'hashtags',
+                        localField: 'hashtags',
+                        foreignField: '_id',
+                        as: 'hashtags'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'mentions',
+                        foreignField: '_id',
+                        as: 'mentions'
+                    }
+                },
+                {
+                    $addFields: {
+                        mentions: {
+                            $map: {
+                                input: '$mentions',
+                                as: 'mention',
+                                in: {
+                                    _id: '$$mention._id',
+                                    name: '$$mention.name',
+                                    ussername: '$$mention.username',
+                                    email: '$$mention.email'
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'likes',
+                        localField: '_id',
+                        foreignField: 'post_id',
+                        as: 'likes_count'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'bookmarks',
+                        localField: '_id',
+                        foreignField: 'post_id',
+                        as: 'bookmarks_count'
+                    }
+                },
+                {
+                    $addFields: {
+                        bookmarks_count: {
+                            $size: '$bookmarks_count'
+                        },
+                        likes_count: {
+                            $size: '$likes_count'
+                        }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'tiktok_post',
+                        localField: '_id',
+                        foreignField: 'parent_id',
+                        as: 'post_children'
+                    }
+                },
+                {
+                    $addFields: {
+                        repost_count: {
+                            $size: {
+                                $filter: {
+                                    input: '$post_children',
+                                    as: 'item',
+                                    cond: {
+                                        $eq: ['$$item.type', 1]
+                                    }
+                                }
+                            }
+                        },
+                        comment_count: {
+                            $size: {
+                                $filter: {
+                                    input: '$post_children',
+                                    as: 'item',
+                                    cond: {
+                                        $eq: ['$$item.type', 2]
+                                    }
+                                }
+                            }
+                        },
+                        quote_post_count: {
+                            $size: {
+                                $filter: {
+                                    input: '$post_children',
+                                    as: 'item',
+                                    cond: {
+                                        $eq: ['$$item.type', 3]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    $addFields: {
+                        views_count: {
+                            $add: ['$guest_views', '$user_views']
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        post_children: 0,
+                        guest_views: 0,
+                        user_views: 0
+                    }
+                }
+            ])
+            .toArray()
+        return result
     }
 
     async getPostDetail({ post_id, user_id }: { post_id: string; user_id?: string }) {
@@ -80,12 +202,50 @@ class TikTokenService {
 
         const post = await this.getPostById(post_id)
         if (!post) {
-            return null
+            throw new ErrorWithStatus({
+                message: POST_MESSAGES.POST_NOT_FOUND,
+                status: HTTP_STATUS.NOT_FOUND
+            })
         }
         return {
             ...post,
             is_liked,
             is_bookmarked
+        }
+    }
+
+    async increasePostViews({ post_id, user_id }: { post_id: string; user_id?: string }) {
+        const result = await databaseService.tiktokPost.findOneAndUpdate(
+            {
+                _id: new ObjectId(post_id)
+            },
+            {
+                $inc: user_id ? { user_views: 1 } : { guest_views: 1 },
+                $currentDate: {
+                    updated_at: true
+                }
+            },
+            {
+                returnDocument: 'after',
+                projection: {
+                    guest_views: 1,
+                    user_views: 1,
+                    updated_at: 1
+                }
+            }
+        )
+
+        if (!result) {
+            throw new ErrorWithStatus({
+                message: POST_MESSAGES.POST_NOT_FOUND,
+                status: HTTP_STATUS.NOT_FOUND
+            })
+        }
+
+        return {
+            guest_views: result.guest_views,
+            user_views: result.user_views,
+            updated_at: result.updated_at
         }
     }
 }

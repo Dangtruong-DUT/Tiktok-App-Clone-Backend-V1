@@ -32,19 +32,33 @@ export const createTikTokPostController = async (
 }
 
 export const getPostDetailController = async (req: Request<GetPostDetailParamsReq>, res: Response) => {
-    const { post_id } = req.params
-    const user_id = req.decoded_authorization?.user_id
-    const data = await tikTokPostService.getPostDetail({ post_id, user_id })
-
-    if (!data) {
+    const post = req.post
+    if (!post) {
         throw new ErrorWithStatus({
-            message: POST_MESSAGES.GET_POST_DETAIL_FAILED,
+            message: POST_MESSAGES.POST_NOT_FOUND,
             status: HTTP_STATUS.NOT_FOUND
         })
     }
+
+    const user_id = (req.decoded_authorization as TokenPayload)?.user_id
+    if (!post._id) {
+        throw new ErrorWithStatus({
+            message: POST_MESSAGES.POST_NOT_FOUND,
+            status: HTTP_STATUS.NOT_FOUND
+        })
+    }
+    const mutateData = await tikTokPostService.increasePostViews({ post_id: post._id.toString(), user_id })
+    const views_count = (mutateData.guest_views || 0) + (mutateData.user_views || 0)
+
+    const tiktokPost = {
+        ...post,
+        ...mutateData,
+        views_count
+    }
+
     return res.json({
         message: POST_MESSAGES.GET_POST_DETAIL_SUCCESS,
-        data
+        data: tiktokPost
     })
 }
 
