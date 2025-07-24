@@ -1,7 +1,11 @@
 import { Router } from 'express'
-import { bookMarksTiktokPostController, unBookMarksTiktokPostController } from '~/controllers/bookmarks.controllers'
-import { likesTiktokPostController, unLikesTiktokPostController } from '~/controllers/likesTiktokPost.controllers copy'
-import { createTikTokPostController } from '~/controllers/TikTokPost.controllers'
+import {
+    bookMarksTiktokPostController,
+    createTikTokPostController,
+    likesTiktokPostController,
+    unBookMarksTiktokPostController,
+    unLikesTiktokPostController
+} from '~/controllers/TikTokPost.controllers'
 import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 import {

@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages/user'
 import { ErrorWithStatus } from '~/models/Errors'
-import { TokenPayload } from '~/models/requests/user.requests'
+import { TokenPayload } from '~/models/requests/common.requests'
 import usersServices from '~/services/users.services'
 
 // This validator checks if the target user ID is valid and exists in the database and is not the same as the logged-in user

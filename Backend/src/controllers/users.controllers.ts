@@ -52,7 +52,7 @@ export const updateUserController = async (req: Request<ParamsDictionary, Update
 export const followUserController = async (req: Request<ParamsDictionary, followUserReqBody>, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
     const { user_id: following_id } = req.body
-    await usersServices.followUser(user_id, following_id)
+    await usersServices.followUser({ user_id, followed_user_id: following_id })
     res.json({
         message: USER_MESSAGES.FOLLOW_USER_SUCCESS
     })

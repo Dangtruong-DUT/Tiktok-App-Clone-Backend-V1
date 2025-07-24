@@ -267,14 +267,15 @@ class UserService {
         return result
     }
 
-    async followUser(user_id: string, followed_user_id: string) {
-        await databaseService.followers.updateOne(
+    async followUser({ user_id, followed_user_id }: { user_id: string; followed_user_id: string }) {
+        await databaseService.followers.findOneAndUpdate(
             {
                 user_id: new ObjectId(user_id),
                 followed_user_id: new ObjectId(followed_user_id)
             },
             {
                 $setOnInsert: new Follower({
+                    _id: new ObjectId(),
                     user_id: new ObjectId(user_id),
                     followed_user_id: new ObjectId(followed_user_id)
                 })
