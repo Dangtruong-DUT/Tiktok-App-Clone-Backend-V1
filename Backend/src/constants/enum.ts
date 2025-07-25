@@ -1,38 +1,38 @@
 export enum UserVerifyStatus {
-    Unverified,
-    Verified,
-    Banned
+    UNVERIFIED,
+    VERIFIED,
+    BANNED
 }
 
 export enum TokenType {
-    AccessToken,
-    RefreshToken,
-    ForgotPasswordToken,
-    EmailVerifyToken
+    ACCESS_TOKEN,
+    REFRESH_TOKEN,
+    FORGOT_PASSWORD_TOKEN,
+    EMAIL_VERIFY_TOKEN
 }
 
 export enum MediaType {
-    Image,
-    Video,
-    HLSVideo
+    IMAGE,
+    VIDEO,
+    HLS_VIDEO
 }
 
 export enum EncodingStatus {
-    Pending,
-    Processing,
-    Completed,
-    Failed
+    PENDING,
+    PROCESSING,
+    COMPLETED,
+    FAILED
 }
 
 export enum Audience {
-    public,
-    private,
-    friends
+    PUBLIC,
+    PRIVATE,
+    FRIENDS
 }
 
 export enum PosterType {
-    post,
-    Reports,
-    Comment,
-    quotePost
+    POST,
+    RE_POST,
+    COMMENT,
+    QUOTE_POST
 }

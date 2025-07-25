@@ -13,17 +13,17 @@ export function signTokenByType({
     type: TokenType
 }) {
     const secret = {
-        [TokenType.AccessToken]: envConfig.JWT_SECRET_ACCESS_TOKEN,
-        [TokenType.RefreshToken]: envConfig.JWT_SECRET_REFRESH_TOKEN,
-        [TokenType.EmailVerifyToken]: envConfig.JWT_SECRET_EMAIL_VERIFY_TOKEN,
-        [TokenType.ForgotPasswordToken]: envConfig.JWT_SECRET_FORGOT_PASSWORD
+        [TokenType.ACCESS_TOKEN]: envConfig.JWT_SECRET_ACCESS_TOKEN,
+        [TokenType.REFRESH_TOKEN]: envConfig.JWT_SECRET_REFRESH_TOKEN,
+        [TokenType.EMAIL_VERIFY_TOKEN]: envConfig.JWT_SECRET_EMAIL_VERIFY_TOKEN,
+        [TokenType.FORGOT_PASSWORD_TOKEN]: envConfig.JWT_SECRET_FORGOT_PASSWORD
     }[type] as string
 
     const expiresIn = {
-        [TokenType.AccessToken]: envConfig.ACCESS_TOKEN_EXPIRE_IN,
-        [TokenType.RefreshToken]: envConfig.REFRESH_TOKEN_EXPIRE_IN,
-        [TokenType.EmailVerifyToken]: envConfig.EMAIL_VERIFY_TOKEN_EXPIRE_IN,
-        [TokenType.ForgotPasswordToken]: envConfig.FORGOT_PASSWORD_TOKEN_EXPIRE_IN
+        [TokenType.ACCESS_TOKEN]: envConfig.ACCESS_TOKEN_EXPIRE_IN,
+        [TokenType.REFRESH_TOKEN]: envConfig.REFRESH_TOKEN_EXPIRE_IN,
+        [TokenType.EMAIL_VERIFY_TOKEN]: envConfig.EMAIL_VERIFY_TOKEN_EXPIRE_IN,
+        [TokenType.FORGOT_PASSWORD_TOKEN]: envConfig.FORGOT_PASSWORD_TOKEN_EXPIRE_IN
     }[type] as StringValue | number
 
     const payload: Record<string, string | number> = {
@@ -41,11 +41,11 @@ export function signTokenByType({
 }
 
 export function signAccessToken({ userId, verify }: { userId: string; verify: UserVerifyStatus }) {
-    return signTokenByType({ userId, verify, type: TokenType.AccessToken })
+    return signTokenByType({ userId, verify, type: TokenType.ACCESS_TOKEN })
 }
 
 export function signRefreshToken({ userId, verify }: { userId: string; verify: UserVerifyStatus }) {
-    return signTokenByType({ userId, verify, type: TokenType.RefreshToken })
+    return signTokenByType({ userId, verify, type: TokenType.REFRESH_TOKEN })
 }
 
 export function signAccessAndRefreshToken({ userId, verify }: { userId: string; verify: UserVerifyStatus }) {
@@ -53,9 +53,9 @@ export function signAccessAndRefreshToken({ userId, verify }: { userId: string; 
 }
 
 export function signEmailVerifyToken(userId: string) {
-    return signTokenByType({ userId, type: TokenType.EmailVerifyToken })
+    return signTokenByType({ userId, type: TokenType.EMAIL_VERIFY_TOKEN })
 }
 
 export function signForgotPasswordToken(userId: string) {
-    return signTokenByType({ userId, type: TokenType.ForgotPasswordToken })
+    return signTokenByType({ userId, type: TokenType.FORGOT_PASSWORD_TOKEN })
 }

@@ -99,7 +99,7 @@ export const requireVerifiedUser = async (req: Request, res: Response, next: Nex
         )
     }
 
-    if (user?.verify !== UserVerifyStatus.Verified) {
+    if (user?.verify !== UserVerifyStatus.VERIFIED) {
         return next(
             new ErrorWithStatus({
                 message: USER_MESSAGES.USER_NOT_VERIFIED,

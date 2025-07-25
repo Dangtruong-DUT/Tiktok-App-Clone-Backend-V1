@@ -108,7 +108,7 @@ export const verifyEmailController = async (req: Request<ParamsDictionary, Verif
     const user = req.user as User
 
     // if user found, update the verified field to true
-    if (user.verify === UserVerifyStatus.Verified) {
+    if (user.verify === UserVerifyStatus.VERIFIED) {
         res.status(HTTP_STATUS.OK).json({
             message: AUTH_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE
         })
@@ -132,7 +132,7 @@ export const resendVerifyEmailController = async (req: Request, res: Response) =
         return
     }
     // if user found, update the verified field to true
-    if (user.verify === UserVerifyStatus.Verified) {
+    if (user.verify === UserVerifyStatus.VERIFIED) {
         res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: AUTH_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE
         })

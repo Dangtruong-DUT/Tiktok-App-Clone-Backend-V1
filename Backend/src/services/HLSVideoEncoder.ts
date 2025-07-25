@@ -18,7 +18,7 @@ class HLSVideoEncoder {
     async enqueueVideo(videoPath: string) {
         const idVideo = path.basename(videoPath, path.extname(videoPath))
         this.videoPaths.push(videoPath)
-        await databaseService.videoStatus.insertOne(new VideoStatus({ name: idVideo, status: EncodingStatus.Pending }))
+        await databaseService.videoStatus.insertOne(new VideoStatus({ name: idVideo, status: EncodingStatus.PENDING }))
         this.processEncode()
     }
 
@@ -33,7 +33,7 @@ class HLSVideoEncoder {
         await databaseService.videoStatus
             .updateOne(
                 { name: idVideo },
-                { $set: { status: EncodingStatus.Processing }, $currentDate: { updated_at: true } }
+                { $set: { status: EncodingStatus.PROCESSING }, $currentDate: { updated_at: true } }
             )
             .catch(() => {
                 console.error(`Error updating video status for ${idVideo}`)
@@ -43,7 +43,7 @@ class HLSVideoEncoder {
             await fsPromise.unlink(videoPath)
             await databaseService.videoStatus.updateOne(
                 { name: idVideo },
-                { $set: { status: EncodingStatus.Completed }, $currentDate: { updated_at: true } }
+                { $set: { status: EncodingStatus.COMPLETED }, $currentDate: { updated_at: true } }
             )
         } catch (error) {
             console.error(`Error encoding video ${idVideo}:`, error)
@@ -51,7 +51,7 @@ class HLSVideoEncoder {
                 .updateOne(
                     { name: idVideo },
                     {
-                        $set: { status: EncodingStatus.Failed, message: FILE_MESSAGES.UPLOAD_FAILED },
+                        $set: { status: EncodingStatus.FAILED, message: FILE_MESSAGES.UPLOAD_FAILED },
                         $currentDate: { updated_at: true }
                     }
                 )

@@ -71,7 +71,7 @@ export const createTiktokPostValidator = validate(
 
                         if (
                             !(typeof value === 'string' && value.trim()) &&
-                            [PosterType.Comment, PosterType.quotePost].includes(type) &&
+                            [PosterType.COMMENT, PosterType.QUOTE_POST].includes(type) &&
                             isEmpty(medias) &&
                             isEmpty(mentions)
                         ) {
@@ -97,13 +97,13 @@ export const createTiktokPostValidator = validate(
                         // If parent_id is provided different null, then type must be comment, reports, quotes
                         if (
                             !ObjectId.isValid(value) &&
-                            [PosterType.Comment, PosterType.Reports, PosterType.quotePost].includes(type)
+                            [PosterType.COMMENT, PosterType.RE_POST, PosterType.QUOTE_POST].includes(type)
                         ) {
                             throw new Error(POST_MESSAGES.INVALID_PARENT_ID)
                         }
 
                         // If parent_id is provided and type is posts, then it must be null
-                        if (value != null && type === PosterType.post) {
+                        if (value != null && type === PosterType.POST) {
                             throw new Error(POST_MESSAGES.PARENT_ID_MUST_BE_NULL)
                         }
                         return true
@@ -147,7 +147,7 @@ export const createTiktokPostValidator = validate(
                 custom: {
                     options: (value, { req }) => {
                         if (
-                            (req.body.type === PosterType.post || req.body.type === PosterType.quotePost) &&
+                            (req.body.type === PosterType.POST || req.body.type === PosterType.QUOTE_POST) &&
                             isEmpty(value)
                         ) {
                             throw new Error(POST_MESSAGES.MEDIA_FILES_REQUIRED)

@@ -23,7 +23,7 @@ class MediasService {
                     url: isProduction
                         ? `${process.env.HOST}/api/static/image/${newFileName}.jpg`
                         : `http://localhost:${process.env.PORT}/api/static/image/${newFileName}.jpg`,
-                    type: MediaType.Image
+                    type: MediaType.IMAGE
                 }
             })
         )
@@ -40,7 +40,7 @@ class MediasService {
                 url: isProduction
                     ? `${envConfig.HOST}/api/static/video/${newFilename}`
                     : `http://localhost:${envConfig.PORT}/api/static/video/${newFilename}`,
-                type: MediaType.Video
+                type: MediaType.VIDEO
             }
         })
         return urls
@@ -56,7 +56,7 @@ class MediasService {
                     url: isProduction
                         ? `${process.env.HOST}/api/static/video-hls/${nameFileWithoutExtension}/master.m3u8`
                         : `http://localhost:${process.env.PORT}/api/static/video-hls/${nameFileWithoutExtension}/master.m3u8`,
-                    type: MediaType.HLSVideo
+                    type: MediaType.HLS_VIDEO
                 }
             })
         )

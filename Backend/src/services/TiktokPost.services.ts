@@ -344,7 +344,7 @@ class TikTokPostService {
                                     input: '$post_children',
                                     as: 'item',
                                     cond: {
-                                        $eq: ['$$item.type', PosterType.Reports]
+                                        $eq: ['$$item.type', PosterType.RE_POST]
                                     }
                                 }
                             }
@@ -355,7 +355,7 @@ class TikTokPostService {
                                     input: '$post_children',
                                     as: 'item',
                                     cond: {
-                                        $eq: ['$$item.type', PosterType.Comment]
+                                        $eq: ['$$item.type', PosterType.COMMENT]
                                     }
                                 }
                             }
@@ -366,7 +366,7 @@ class TikTokPostService {
                                     input: '$post_children',
                                     as: 'item',
                                     cond: {
-                                        $eq: ['$$item.type', PosterType.quotePost]
+                                        $eq: ['$$item.type', PosterType.QUOTE_POST]
                                     }
                                 }
                             }
