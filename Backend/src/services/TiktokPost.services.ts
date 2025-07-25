@@ -6,8 +6,9 @@ import Hashtag from '~/models/schemas/Hashtag.schemas'
 import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { POST_MESSAGES } from '~/constants/messages/post'
+import { Audience, PosterType } from '~/constants/enum'
 
-class TikTokenService {
+class TikTokPostService {
     async checkAndCreateHashtags(hashtags: string[]) {
         const hashtagDocument = await Promise.all(
             hashtags.map((hashtag: string) => {
@@ -248,7 +249,168 @@ class TikTokenService {
             updated_at: result.updated_at
         }
     }
+    async getChildrenPosts({
+        post_id,
+        type = 3,
+        page = 0,
+        limit = 10,
+        user_id
+    }: {
+        post_id: string
+        type: number
+        page: number
+        limit: number
+        user_id?: string
+    }) {
+        const posts = await databaseService.tiktokPost
+            .aggregate<TikTokPost>([
+                {
+                    $match: {
+                        parent_id: new ObjectId(post_id),
+                        type: Number(type)
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'hashtags',
+                        localField: 'hashtags',
+                        foreignField: '_id',
+                        as: 'hashtags'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'mentions',
+                        foreignField: '_id',
+                        as: 'mentions'
+                    }
+                },
+                {
+                    $addFields: {
+                        mentions: {
+                            $map: {
+                                input: '$mentions',
+                                as: 'mention',
+                                in: {
+                                    _id: '$$mention._id',
+                                    name: '$$mention.name',
+                                    ussername: '$$mention.username',
+                                    email: '$$mention.email'
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'likes',
+                        localField: '_id',
+                        foreignField: 'post_id',
+                        as: 'likes_count'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'bookmarks',
+                        localField: '_id',
+                        foreignField: 'post_id',
+                        as: 'bookmarks_count'
+                    }
+                },
+                {
+                    $addFields: {
+                        bookmarks_count: {
+                            $size: '$bookmarks_count'
+                        },
+                        likes_count: {
+                            $size: '$likes_count'
+                        }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'tiktok_post',
+                        localField: '_id',
+                        foreignField: 'parent_id',
+                        as: 'post_children'
+                    }
+                },
+                {
+                    $addFields: {
+                        repost_count: {
+                            $size: {
+                                $filter: {
+                                    input: '$post_children',
+                                    as: 'item',
+                                    cond: {
+                                        $eq: ['$$item.type', PosterType.Reports]
+                                    }
+                                }
+                            }
+                        },
+                        comment_count: {
+                            $size: {
+                                $filter: {
+                                    input: '$post_children',
+                                    as: 'item',
+                                    cond: {
+                                        $eq: ['$$item.type', PosterType.Comment]
+                                    }
+                                }
+                            }
+                        },
+                        quote_post_count: {
+                            $size: {
+                                $filter: {
+                                    input: '$post_children',
+                                    as: 'item',
+                                    cond: {
+                                        $eq: ['$$item.type', PosterType.quotePost]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        post_children: 0
+                    }
+                },
+                {
+                    $skip: page > 0 ? (page - 1) * limit : 0
+                },
+                {
+                    $limit: limit
+                }
+            ])
+            .toArray()
+
+        const postsAfterIncreaseViews = await Promise.all(
+            posts.map(async (post) => {
+                let mutateData = {}
+                if (post && post._id) {
+                    mutateData = await this.increasePostViews({ post_id: post._id.toString(), user_id })
+                }
+                return {
+                    ...post,
+                    ...mutateData
+                }
+            })
+        )
+
+        return postsAfterIncreaseViews
+    }
+
+    async getTotalChildrenPosts({ post_id, type = 3 }: { post_id: string; type: number }) {
+        const count = await databaseService.tiktokPost.countDocuments({
+            parent_id: new ObjectId(post_id),
+            type: Number(type)
+        })
+        return count
+    }
 }
 
-const tikTokPostService = new TikTokenService()
+const tikTokPostService = new TikTokPostService()
 export default tikTokPostService

@@ -2,7 +2,12 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { POST_MESSAGES } from '~/constants/messages/post'
 import { TokenPayload } from '~/models/requests/common.requests'
-import { CreateTikTokPostBodyReq, GetPostDetailParamsReq } from '~/models/requests/TiktokPost.requests'
+import {
+    CreateTikTokPostBodyReq,
+    GetChildrenPostsParamReq,
+    GetChildrenPostsQueryReq,
+    GetPostDetailParamsReq
+} from '~/models/requests/TiktokPost.requests'
 import { TiktokLikeReqBody, UnLikeReqParams } from '~/models/requests/likes.requests'
 import likePostService from '~/services/likes.services'
 import tikTokPostService from '~/services/TiktokPost.services'
@@ -48,12 +53,10 @@ export const getPostDetailController = async (req: Request<GetPostDetailParamsRe
         })
     }
     const mutateData = await tikTokPostService.increasePostViews({ post_id: post._id.toString(), user_id })
-    const views_count = (mutateData.guest_views || 0) + (mutateData.user_views || 0)
 
     const tiktokPost = {
         ...post,
-        ...mutateData,
-        views_count
+        ...mutateData
     }
 
     return res.json({
@@ -100,5 +103,35 @@ export const unBookMarksTiktokPostController = async (req: Request<UnBookMarkReq
     await bookMarkPostService.unBookMarkPost({ post_id, user_id })
     res.json({
         message: POST_MESSAGES.UNBOOKMARKS_SUCCESS
+    })
+}
+
+export const getChildrenPostsController = async (req: Request, res: Response) => {
+    const { post_id } = req.params as GetChildrenPostsParamReq
+    const { page = 1, limit = 10, type } = req.query as unknown as GetChildrenPostsQueryReq
+    const user_id = (req.decoded_authorization as TokenPayload)?.user_id
+    const [postOfCurrentPage, totalPosts] = await Promise.all([
+        tikTokPostService.getChildrenPosts({
+            post_id,
+            page: Number(page),
+            limit: Number(limit),
+            type,
+            user_id
+        }),
+        tikTokPostService.getTotalChildrenPosts({ post_id, type })
+    ])
+    const totalPage = Math.ceil(totalPosts / Number(limit))
+
+    return res.json({
+        message: POST_MESSAGES.GET_CHILDREN_POSTS_SUCCESS,
+        data: {
+            posts: postOfCurrentPage,
+            pagination: {
+                page: Number(page),
+                limit: Number(limit),
+                total_pages: totalPage,
+                type: Number(type)
+            }
+        }
     })
 }

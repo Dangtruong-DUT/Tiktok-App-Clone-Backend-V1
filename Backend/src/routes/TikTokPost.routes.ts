@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
     bookMarksTiktokPostController,
     createTikTokPostController,
+    getChildrenPostsController,
     getPostDetailController,
     likesTiktokPostController,
     unBookMarksTiktokPostController,
@@ -14,6 +15,7 @@ import { wrapRequestHandler } from '~/utils/handlers'
 import {
     bookMarksTiktokPostValidator,
     createTiktokPostValidator,
+    getChildrenPostsValidator,
     getPostDetailValidator,
     likeTiktokPostValidator,
     unBookMarksTiktokValidator,
@@ -50,6 +52,24 @@ tiktokPostRouter.get(
     getPostDetailValidator,
     wrapRequestHandler(audienceValidator),
     wrapRequestHandler(getPostDetailController)
+)
+
+/**
+ * Get children of post
+ * Path: /:post_id/comments
+ * method: GET
+ * query: {
+ * page: number
+ * limit: number
+ * type: number // 2: comments, 1: re·post, 3: quotes
+ * }
+ *
+ */
+tiktokPostRouter.get(
+    '/:post_id/children',
+    isUserLoginValidator(authenticate),
+    getChildrenPostsValidator,
+    wrapRequestHandler(getChildrenPostsController)
 )
 
 /**

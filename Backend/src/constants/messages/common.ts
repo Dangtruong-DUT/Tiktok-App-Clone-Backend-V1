@@ -11,3 +11,9 @@ export const COMMON_MESSAGES = {
     CONFLICT: 'Conflict',
     SERVICE_UNAVAILABLE: 'Service unavailable'
 } as const
+
+export const PAGINATION_MESSAGES = {
+    PAGE_NUMBER_MUST_BE_INTEGER: 'Page number must be an integer',
+    PAGE_NUMBER_MUST_BE_POSITIVE: 'Page number must be a positive integer',
+    LIMIT_MUST_BE_BETWEEN_1_AND_100: 'Limit must be between 1 and 100'
+}

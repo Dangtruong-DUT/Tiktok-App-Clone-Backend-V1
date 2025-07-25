@@ -3,6 +3,7 @@ import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
 import { Audience, MediaType, PosterType } from '~/constants/enum'
 import HTTP_STATUS from '~/constants/httpStatus'
+import { PAGINATION_MESSAGES } from '~/constants/messages/common'
 import { POST_MESSAGES } from '~/constants/messages/post'
 import { validate } from '~/middlewares/validation.middlewares'
 import { ErrorWithStatus } from '~/models/Errors'
@@ -195,5 +196,36 @@ export const unLikeTiktokPostValidator = validate(
             post_id: validatePostId
         },
         ['params']
+    )
+)
+
+export const getChildrenPostsValidator = validate(
+    checkSchema(
+        {
+            post_id: validatePostId,
+            page: {
+                isInt: {
+                    options: { min: 1 },
+                    errorMessage: PAGINATION_MESSAGES.PAGE_NUMBER_MUST_BE_POSITIVE
+                },
+                toInt: true,
+                optional: true
+            },
+            limit: {
+                isInt: {
+                    options: { min: 1, max: 100 },
+                    errorMessage: PAGINATION_MESSAGES.LIMIT_MUST_BE_BETWEEN_1_AND_100
+                },
+                toInt: true,
+                optional: true
+            },
+            type: {
+                isIn: {
+                    options: [numberEnumToArray(PosterType)],
+                    errorMessage: POST_MESSAGES.INVALID_POST_TYPE
+                }
+            }
+        },
+        ['params', 'query']
     )
 )
