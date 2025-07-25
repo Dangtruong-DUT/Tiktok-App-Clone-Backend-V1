@@ -229,3 +229,27 @@ export const getChildrenPostsValidator = validate(
         ['params', 'query']
     )
 )
+
+export const PaginationValidator = validate(
+    checkSchema(
+        {
+            page: {
+                isInt: {
+                    options: { min: 1 },
+                    errorMessage: PAGINATION_MESSAGES.PAGE_NUMBER_MUST_BE_POSITIVE
+                },
+                toInt: true,
+                optional: true
+            },
+            limit: {
+                isInt: {
+                    options: { min: 1, max: 100 },
+                    errorMessage: PAGINATION_MESSAGES.LIMIT_MUST_BE_BETWEEN_1_AND_100
+                },
+                toInt: true,
+                optional: true
+            }
+        },
+        ['query']
+    )
+)

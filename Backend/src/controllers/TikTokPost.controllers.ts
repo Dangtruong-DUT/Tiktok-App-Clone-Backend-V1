@@ -118,7 +118,7 @@ export const getChildrenPostsController = async (req: Request, res: Response) =>
             type,
             user_id
         }),
-        tikTokPostService.getTotalChildrenPosts({ post_id, type })
+        tikTokPostService.getNumberOfChildrenPosts({ post_id, type, user_id })
     ])
     const totalPage = Math.ceil(totalPosts / Number(limit))
 
@@ -131,6 +131,33 @@ export const getChildrenPostsController = async (req: Request, res: Response) =>
                 limit: Number(limit),
                 total_pages: totalPage,
                 type: Number(type)
+            }
+        }
+    })
+}
+
+export const getFriendPostsController = async (req: Request, res: Response) => {
+    const { page = 1, limit = 10 } = req.query as unknown as GetChildrenPostsQueryReq
+    console.log('getFriendPostsController', { page, limit })
+    const user_id = (req.decoded_authorization as TokenPayload)?.user_id
+    const [postOfCurrentPage, totalPosts] = await Promise.all([
+        tikTokPostService.getFriendPosts({
+            page: Number(page),
+            limit: Number(limit),
+            user_id
+        }),
+        tikTokPostService.getFriendPostsTotal({ user_id })
+    ])
+    const totalPage = Math.ceil(totalPosts / Number(limit))
+
+    return res.json({
+        message: POST_MESSAGES.GET_FRIEND_POSTS_SUCCESS,
+        data: {
+            posts: postOfCurrentPage,
+            pagination: {
+                page: Number(page),
+                limit: Number(limit),
+                total_pages: totalPage
             }
         }
     })

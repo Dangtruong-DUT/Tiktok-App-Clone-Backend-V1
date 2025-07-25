@@ -3,6 +3,7 @@ import {
     bookMarksTiktokPostController,
     createTikTokPostController,
     getChildrenPostsController,
+    getFriendPostsController,
     getPostDetailController,
     likesTiktokPostController,
     unBookMarksTiktokPostController,
@@ -18,6 +19,7 @@ import {
     getChildrenPostsValidator,
     getPostDetailValidator,
     likeTiktokPostValidator,
+    PaginationValidator,
     unBookMarksTiktokValidator,
     unLikeTiktokPostValidator
 } from '~/validations/post.validations'
@@ -41,6 +43,19 @@ tiktokPostRouter.post(
 )
 
 /**
+ * Get children of post
+ * Path: /friend
+ * method: GET
+ * query: {
+ * page: number
+ * limit: number
+ * type: number // 2: comments, 1: re·post, 3: quotes
+ * }
+ *
+ */
+tiktokPostRouter.get('/friend', authenticate, PaginationValidator, wrapRequestHandler(getFriendPostsController))
+
+/**
  * Description. Get post detail
  * Path: /:post_id
  * method: GET
@@ -56,7 +71,7 @@ tiktokPostRouter.get(
 
 /**
  * Get children of post
- * Path: /:post_id/comments
+ * Path: /:post_id/children
  * method: GET
  * query: {
  * page: number

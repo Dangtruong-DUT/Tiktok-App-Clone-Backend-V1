@@ -39,7 +39,7 @@ class UserService {
         const user = await databaseService.users.findOne({ _id: user_id }, { projection: this.safeUserProjection })
 
         const [access_token, refresh_token] = await signAccessAndRefreshToken({
-            verify: UserVerifyStatus.Unverified,
+            verify: UserVerifyStatus.UNVERIFIED,
             userId: user_id.toString()
         })
 
@@ -145,13 +145,13 @@ class UserService {
         const [tokens] = await Promise.all([
             signAccessAndRefreshToken({
                 userId: user_id,
-                verify: UserVerifyStatus.Verified
+                verify: UserVerifyStatus.VERIFIED
             }),
             databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
                 {
                     $set: {
                         email_verify_token: '',
-                        verify: UserVerifyStatus.Verified,
+                        verify: UserVerifyStatus.VERIFIED,
                         updated_at: '$$NOW'
                     }
                 }

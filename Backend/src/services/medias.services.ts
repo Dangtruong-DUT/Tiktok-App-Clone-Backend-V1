@@ -21,8 +21,8 @@ class MediasService {
                 fs.unlinkSync(file.filepath)
                 return {
                     url: isProduction
-                        ? `${process.env.HOST}/api/static/image/${newFileName}.jpg`
-                        : `http://localhost:${process.env.PORT}/api/static/image/${newFileName}.jpg`,
+                        ? `${envConfig.HOST}/api/static/image/${newFileName}.jpg`
+                        : `http://localhost:${envConfig.PORT}/api/static/image/${newFileName}.jpg`,
                     type: MediaType.IMAGE
                 }
             })
@@ -54,8 +54,8 @@ class MediasService {
                 const nameFileWithoutExtension = getFileNameWithoutExtension(newFilename)
                 return {
                     url: isProduction
-                        ? `${process.env.HOST}/api/static/video-hls/${nameFileWithoutExtension}/master.m3u8`
-                        : `http://localhost:${process.env.PORT}/api/static/video-hls/${nameFileWithoutExtension}/master.m3u8`,
+                        ? `${envConfig.HOST}/api/static/video-hls/${nameFileWithoutExtension}/master.m3u8`
+                        : `http://localhost:${envConfig.PORT}/api/static/video-hls/${nameFileWithoutExtension}/master.m3u8`,
                     type: MediaType.HLS_VIDEO
                 }
             })

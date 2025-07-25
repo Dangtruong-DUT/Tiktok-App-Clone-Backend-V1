@@ -41,5 +41,6 @@ export const POST_MESSAGES = {
     GET_POST_DETAIL_FAILED: 'Failed to get post detail',
     POST_FAILED: 'Failed to create post',
     YOU_DO_NOT_HAVE_PERMISSION_TO_VIEW_THIS_POST: 'You do not have permission to view this post',
-    GET_CHILDREN_POSTS_SUCCESS: 'Get children posts successfully'
+    GET_CHILDREN_POSTS_SUCCESS: 'Get children posts successfully',
+    GET_FRIEND_POSTS_SUCCESS: 'Get friend posts successfully'
 } as const
