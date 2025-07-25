@@ -6,7 +6,6 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import { AUTH_MESSAGES } from '~/constants/messages/auth'
 import { VALIDATION_MESSAGES } from '~/constants/messages/validation'
 import { ErrorWithStatus } from '~/models/Errors'
-import databaseService from '~/services/database.services'
 import usersServices from '~/services/users.services'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
@@ -19,18 +18,17 @@ export const checkEmailExists: CustomValidator = async (value: string) => {
 }
 
 export const checkEmailNotExists: CustomValidator = async (value: string, { req }) => {
-    const user = await databaseService.users.findOne({ email: value })
+    const user = await usersServices.getUserByEmail(value)
     if (!user) throw new Error(AUTH_MESSAGES.EMAIL_NOT_EXISTS)
     req.user = user
     return true
 }
 
 export const checkEmailAndPasswordNotExists: CustomValidator = async (value: string, { req }) => {
-    const user = await databaseService.users.findOne({
-        email: req.body.email,
-        password: hashPassword(req.body.password)
-    })
-    if (!user) throw new Error(AUTH_MESSAGES.EMAIL_OR_PASSWORD_DOES_NOT_MATCH)
+    const user = await usersServices.getUserByEmail(req.body.email)
+    if (!user || hashPassword(req.body.password) !== user.password) {
+        throw new Error(AUTH_MESSAGES.EMAIL_OR_PASSWORD_DOES_NOT_MATCH)
+    }
     req.user = user
     return true
 }
@@ -42,7 +40,7 @@ export const verifyForgotPasswordToken: CustomValidator = async (token: string, 
                 token,
                 secretOrPublicKey: envConfig.JWT_SECRET_FORGOT_PASSWORD
             }),
-            databaseService.users.findOne({ forgot_password_token: token })
+            usersServices.getUserByForgotPasswordToken(token)
         ])
 
         if (!user) {
@@ -78,7 +76,7 @@ export const verifyEmailVerifyToken: CustomValidator = async (token: string, { r
     try {
         const [decoded_email_verify_token, user] = await Promise.all([
             verifyToken({ token, secretOrPublicKey: envConfig.JWT_SECRET_EMAIL_VERIFY_TOKEN }),
-            databaseService.users.findOne({ email_verify_token: token })
+            usersServices.getUserByEmailVerifyToken(token)
         ])
 
         if (!user) {

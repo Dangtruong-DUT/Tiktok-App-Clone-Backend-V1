@@ -3,7 +3,6 @@ import databaseService from '~/services/database.services'
 import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
 import Follower from '~/models/schemas/Follower.schemas'
-import { UserVerifyStatus } from '~/constants/enum'
 
 class UsersRepository {
     private get safeUserProjection() {
@@ -33,7 +32,15 @@ class UsersRepository {
         return await databaseService.users.findOne({ username }, { projection })
     }
 
-    async updateUser(user_id: string, updateData: any) {
+    async findUserByForgotPasswordToken(token: string) {
+        return await databaseService.users.findOne({ forgot_password_token: token })
+    }
+
+    async findUserByEmailVerifyToken(token: string) {
+        return await databaseService.users.findOne({ email_verify_token: token })
+    }
+
+    async updateUser(user_id: string, updateData: object) {
         return await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, updateData)
     }
 

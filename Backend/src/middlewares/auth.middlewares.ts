@@ -83,12 +83,11 @@ export const authenticateRefreshToken = async (req: Request, res: Response, next
 import { UserVerifyStatus } from '~/constants/enum'
 import { USER_MESSAGES } from '~/constants/messages/user'
 import _ from 'lodash'
-import databaseService from '~/services/database.services'
-import { ObjectId } from 'mongodb'
+import usersServices from '~/services/users.services'
 
 export const requireVerifiedUser = async (req: Request, res: Response, next: NextFunction) => {
     const { user_id } = req.decoded_authorization || {}
-    const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+    const user = await usersServices.getUserById(user_id)
 
     if (!user) {
         return next(

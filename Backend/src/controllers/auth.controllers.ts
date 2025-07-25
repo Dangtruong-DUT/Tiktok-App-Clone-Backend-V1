@@ -1,5 +1,4 @@
 import HTTP_STATUS from '~/constants/httpStatus'
-import databaseService from '~/services/database.services'
 import { UserVerifyStatus } from '~/constants/enum'
 import User from '~/models/schemas/User.schema'
 import {
@@ -123,7 +122,7 @@ export const verifyEmailController = async (req: Request<ParamsDictionary, Verif
 
 export const resendVerifyEmailController = async (req: Request, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
-    const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+    const user = await usersServices.getUserById(user_id)
     // if user is not found throw an error
     if (user === null) {
         res.status(HTTP_STATUS.NOT_FOUND).json({

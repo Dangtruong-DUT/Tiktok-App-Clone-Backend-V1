@@ -4,10 +4,10 @@ import { RegisterRequestBody } from '~/models/requests/auth.requests'
 import { CreateTikTokPostBodyReq } from '~/models/requests/TiktokPost.requests'
 import { Audience, PosterType, UserVerifyStatus } from '~/constants/enum'
 import usersServices from '~/services/users.services'
-import databaseService from '~/services/database.services'
 import User from '~/models/schemas/User.schema'
 import { hashPassword } from '~/utils/crypto'
 import tikTokPostService from '~/services/TiktokPost.services'
+import usersRepository from '~/repositories/users.repository'
 
 // password for faker users
 const PASSWORD = 'defaultPassword123'
@@ -52,7 +52,7 @@ const insertUsers = async (users: RegisterRequestBody[]) => {
     const userIds: ObjectId[] = await Promise.all(
         users.map(async (user) => {
             const user_id = new ObjectId()
-            await databaseService.users.insertOne(
+            await usersRepository.insertUser(
                 new User({
                     ...user,
                     _id: user_id,

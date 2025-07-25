@@ -233,6 +233,18 @@ class UserService {
         return await usersRepository.findUserWithFollowersCount(user_id)
     }
 
+    async getUserByEmail(email: string) {
+        return await usersRepository.findUserByEmail(email, true)
+    }
+
+    async getUserByForgotPasswordToken(token: string) {
+        return await usersRepository.findUserByForgotPasswordToken(token)
+    }
+
+    async getUserByEmailVerifyToken(token: string) {
+        return await usersRepository.findUserByEmailVerifyToken(token)
+    }
+
     async getUserByUserName(username: string, viewerId?: string) {
         const user = await usersRepository.findUserByUsernameWithFollowersCount(username)
 
