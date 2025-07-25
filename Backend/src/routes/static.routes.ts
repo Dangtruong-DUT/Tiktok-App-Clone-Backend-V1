@@ -5,7 +5,7 @@ import {
     serveVideoStreamController,
     serveM3u8HLSController,
     serveSegmentHLSController
-} from '~/controllers/medias.controllers'
+} from '~/controllers/medias.controller'
 import { wrapRequestHandler } from '~/utils/handlers'
 
 const staticRouter = Router()

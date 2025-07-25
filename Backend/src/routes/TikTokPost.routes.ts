@@ -8,7 +8,7 @@ import {
     likesTiktokPostController,
     unBookMarksTiktokPostController,
     unLikesTiktokPostController
-} from '~/controllers/TikTokPost.controllers'
+} from '~/controllers/TikTokPost.controller'
 import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 import { audienceValidator } from '~/middlewares/post.middlewares'
 import { isUserLoginValidator } from '~/middlewares/user.middlewares'

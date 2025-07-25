@@ -4,7 +4,7 @@ import {
     uploadHLSVideosController,
     uploadImagesController,
     uploadVideosController
-} from '~/controllers/medias.controllers'
+} from '~/controllers/medias.controller'
 import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 const mediasRouter = Router()

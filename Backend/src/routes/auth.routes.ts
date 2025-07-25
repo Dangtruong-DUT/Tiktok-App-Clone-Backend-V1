@@ -11,9 +11,8 @@ import {
     resetPasswordController,
     verifyEmailController,
     verifyForgotPasswordTokenController
-} from '~/controllers/auth.controllers'
+} from '~/controllers/auth.controller'
 import { authenticate, authenticateRefreshToken } from '~/middlewares/auth.middlewares'
-import { OauthWithGoogleReqQuery } from '~/models/requests/auth.requests'
 import { wrapRequestHandler } from '~/utils/handlers'
 import {
     emailVerifyTokenValidator,

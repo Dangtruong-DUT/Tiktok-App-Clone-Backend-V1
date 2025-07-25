@@ -6,7 +6,7 @@ import {
     followUserController,
     unFollowUserController,
     changePasswordController
-} from '~/controllers/users.controllers'
+} from '~/controllers/users.controller'
 import {
     changePasswordValidator,
     followValidator,
