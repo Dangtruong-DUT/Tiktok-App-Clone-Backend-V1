@@ -1,10 +1,10 @@
 import { encodeHLSWithMultipleVideoStreams } from '~/utils/video'
 import fsPromise from 'fs/promises'
 import path from 'path'
-import databaseService from './database.services'
 import VideoStatus from '~/models/schemas/VideoStatus.schemas'
 import { EncodingStatus } from '~/constants/enum'
 import { FILE_MESSAGES } from '~/constants/messages/file'
+import mediasRepository from '~/repositories/medias.repository'
 
 class HLSVideoEncoder {
     private videoPaths: string[]
@@ -18,7 +18,7 @@ class HLSVideoEncoder {
     async enqueueVideo(videoPath: string) {
         const idVideo = path.basename(videoPath, path.extname(videoPath))
         this.videoPaths.push(videoPath)
-        await databaseService.videoStatus.insertOne(new VideoStatus({ name: idVideo, status: EncodingStatus.PENDING }))
+        await mediasRepository.createVideoStatus(new VideoStatus({ name: idVideo, status: EncodingStatus.PENDING }))
         this.processEncode()
     }
 
@@ -30,34 +30,21 @@ class HLSVideoEncoder {
 
         const videoPath = this.videoPaths.shift() as string
         const idVideo = path.basename(videoPath, path.extname(videoPath))
-        await databaseService.videoStatus
-            .updateOne(
-                { name: idVideo },
-                { $set: { status: EncodingStatus.PROCESSING }, $currentDate: { updated_at: true } }
-            )
-            .catch(() => {
-                console.error(`Error updating video status for ${idVideo}`)
-            })
+        await mediasRepository.updateVideoStatus(idVideo, {
+            status: EncodingStatus.PROCESSING
+        })
         try {
             await encodeHLSWithMultipleVideoStreams(videoPath)
             await fsPromise.unlink(videoPath)
-            await databaseService.videoStatus.updateOne(
-                { name: idVideo },
-                { $set: { status: EncodingStatus.COMPLETED }, $currentDate: { updated_at: true } }
-            )
+            await mediasRepository.updateVideoStatus(idVideo, {
+                status: EncodingStatus.COMPLETED
+            })
         } catch (error) {
             console.error(`Error encoding video ${idVideo}:`, error)
-            await databaseService.videoStatus
-                .updateOne(
-                    { name: idVideo },
-                    {
-                        $set: { status: EncodingStatus.FAILED, message: FILE_MESSAGES.UPLOAD_FAILED },
-                        $currentDate: { updated_at: true }
-                    }
-                )
-                .catch(() => {
-                    console.error(`Error updating video status for ${idVideo}`)
-                })
+            await mediasRepository.updateVideoStatus(idVideo, {
+                status: EncodingStatus.FAILED,
+                message: FILE_MESSAGES.UPLOAD_FAILED
+            })
             await fsPromise.unlink(path.dirname(videoPath))
         }
 

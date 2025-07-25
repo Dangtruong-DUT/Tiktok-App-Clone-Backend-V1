@@ -7,8 +7,8 @@ import fs from 'fs'
 import { MediaType } from '~/constants/enum'
 import { Media } from '~/models/Common'
 import { hlsVideoEncoder } from './HLSVideoEncoder'
-import databaseService from './database.services'
 import { envConfig, isProduction } from '~/config'
+import mediasRepository from '~/repositories/medias.repository'
 
 class MediasService {
     async UploadImages(req: Request) {
@@ -63,10 +63,7 @@ class MediasService {
         return urls
     }
     async CheckEncodingProgress(id: string) {
-        const data = await databaseService.videoStatus.findOne({
-            name: id
-        })
-        return data
+        return await mediasRepository.findVideoStatusByName(id)
     }
 }
 

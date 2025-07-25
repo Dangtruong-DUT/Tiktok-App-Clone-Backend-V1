@@ -1,38 +1,23 @@
-import Bookmarks from '~/models/schemas/Bookmarks.schemas'
-import databaseService from './database.services'
-import { ObjectId } from 'mongodb'
+import bookmarksRepository from '~/repositories/bookmarks.repository'
 
 class BookMarkPostService {
     async bookMarkPost({ post_id, user_id }: { post_id: string; user_id: string }) {
-        const post_id_ObjectId = new ObjectId(post_id)
-        const user_id_ObjectId = new ObjectId(user_id)
-        const result = await databaseService.bookmarks.findOneAndUpdate(
-            {
-                post_id: post_id_ObjectId,
-                user_id: user_id_ObjectId
-            },
-            {
-                $setOnInsert: new Bookmarks({
-                    post_id: post_id_ObjectId,
-                    user_id: user_id_ObjectId
-                })
-            },
-            {
-                upsert: true,
-                returnDocument: 'after'
-            }
-        )
-        return result
+        return await bookmarksRepository.createBookmark({ post_id, user_id })
     }
+
     async unBookMarkPost({ post_id, user_id }: { post_id: string; user_id: string }) {
-        const post_id_ObjectId = new ObjectId(post_id)
-        const user_id_ObjectId = new ObjectId(user_id)
-        const result = await databaseService.bookmarks.deleteOne({
-            post_id: post_id_ObjectId,
-            user_id: user_id_ObjectId
-        })
-        return result
+        return await bookmarksRepository.deleteBookmark({ post_id, user_id })
+    }
+
+    async checkBookmarkExists({ post_id, user_id }: { post_id: string; user_id: string }) {
+        const bookmark = await bookmarksRepository.findBookmark({ post_id, user_id })
+        return !!bookmark
+    }
+
+    async getBookmarksByUser(user_id: string, page = 0, limit = 10) {
+        return await bookmarksRepository.findBookmarksByUser(user_id, page, limit)
     }
 }
+
 const bookMarkPostService = new BookMarkPostService()
 export default bookMarkPostService

@@ -118,7 +118,7 @@ export const getChildrenPostsController = async (req: Request, res: Response) =>
             type,
             user_id
         }),
-        tikTokPostService.getNumberOfChildrenPosts({ post_id, type, user_id })
+        tikTokPostService.getNumberOfChildrenPosts({ post_id, type })
     ])
     const totalPage = Math.ceil(totalPosts / Number(limit))
 

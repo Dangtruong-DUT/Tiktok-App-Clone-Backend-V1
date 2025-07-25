@@ -68,7 +68,6 @@ class TikTokPostService {
 
     async increasePostViews({ post_id, user_id }: { post_id: string; user_id?: string }) {
         const result = await tikTokPostRepository.updatePostViews(post_id, user_id)
-
         if (!result) {
             throw new ErrorWithStatus({
                 message: POST_MESSAGES.POST_NOT_FOUND,
@@ -101,7 +100,7 @@ class TikTokPostService {
         })
 
         const postsAfterIncreaseViews = await Promise.all(
-            posts.map(async (post: { _id?: ObjectId; [key: string]: unknown }) => {
+            posts.map(async (post: any) => {
                 let mutateData = {}
                 if (post && post._id) {
                     mutateData = await this.increasePostViews({
@@ -123,7 +122,7 @@ class TikTokPostService {
         const posts = await tikTokPostRepository.findFriendPosts({ user_id, page, limit })
 
         const postsAfterIncreaseViews = await Promise.all(
-            posts.map(async (post: { _id?: ObjectId; [key: string]: unknown }) => {
+            posts.map(async (post: any) => {
                 let mutateData = {}
                 if (post && post._id) {
                     mutateData = await this.increasePostViews({
@@ -141,7 +140,15 @@ class TikTokPostService {
         return postsAfterIncreaseViews
     }
 
-    async getNumberOfChildrenPosts({ post_id, type = PosterType.QUOTE_POST }: { post_id: string; type: number }) {
+    async getNumberOfChildrenPosts({
+        post_id,
+        type = PosterType.QUOTE_POST,
+        user_id
+    }: {
+        post_id: string
+        type: number
+        user_id?: string
+    }) {
         return await tikTokPostRepository.countChildrenPosts({ post_id, type })
     }
 

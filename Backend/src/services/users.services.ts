@@ -1,4 +1,3 @@
-import databaseService from './database.services'
 import { UpdateUserRequestBody } from '~/models/requests/user.requests'
 import { hashPassword } from '~/utils/crypto'
 import { UserVerifyStatus } from '~/constants/enum'
@@ -10,22 +9,15 @@ import { signAccessAndRefreshToken, signEmailVerifyToken, signForgotPasswordToke
 import { getOauthGoogleToken, getOauthGoogleUserInfo } from '~/helpers/oauth'
 import { RegisterRequestBody } from '~/models/requests/auth.requests'
 import Follower from '~/models/schemas/Follower.schemas'
+import usersRepository from '~/repositories/users.repository'
 
 class UserService {
-    private get safeUserProjection() {
-        return {
-            password: 0,
-            email_verify_token: 0,
-            forgot_password_token: 0
-        }
-    }
-
     async register(payload: RegisterRequestBody) {
         const user_id = new ObjectId()
         const username = generateTimeBasedUsername()
         const email_verify_token = await signEmailVerifyToken(user_id.toString())
 
-        await databaseService.users.insertOne(
+        await usersRepository.insertUser(
             new User({
                 ...payload,
                 _id: user_id,
@@ -36,14 +28,14 @@ class UserService {
             })
         )
 
-        const user = await databaseService.users.findOne({ _id: user_id }, { projection: this.safeUserProjection })
+        const user = await usersRepository.findUserById(user_id.toString())
 
         const [access_token, refresh_token] = await signAccessAndRefreshToken({
             verify: UserVerifyStatus.UNVERIFIED,
             userId: user_id.toString()
         })
 
-        await databaseService.refreshToken.insertOne(new RefreshToken({ user_id: user_id, token: refresh_token }))
+        await usersRepository.insertRefreshToken(new RefreshToken({ user_id: user_id, token: refresh_token }))
 
         if (!user) {
             return { access_token: null, refresh_token: null, user: null }
@@ -57,22 +49,18 @@ class UserService {
     }
 
     async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
-        const [[access_token, refresh_token], user] = await Promise.all([
-            signAccessAndRefreshToken({ userId: user_id, verify }),
-            databaseService.users.findOne({ _id: new ObjectId(user_id) }, { projection: this.safeUserProjection })
-        ])
+        const [access_token, refresh_token] = await signAccessAndRefreshToken({ userId: user_id, verify })
+        const user = await usersRepository.findUserById(user_id)
 
         if (!user) {
             return { access_token: null, refresh_token: null, user: null }
         }
 
-        await databaseService.refreshToken.insertOne(
+        await usersRepository.insertRefreshToken(
             new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
         )
 
-        const followers_count = await databaseService.followers.countDocuments({
-            followed_user_id: user._id
-        })
+        const followers_count = await usersRepository.countFollowers(user_id)
 
         return {
             access_token,
@@ -84,36 +72,71 @@ class UserService {
     async oauthGoogle(code: string) {
         const { id_token, access_token } = await getOauthGoogleToken(code)
         const userInfo = await getOauthGoogleUserInfo({ id_token, access_token })
-        const user = await databaseService.users.findOne(
-            { email: userInfo.email },
-            { projection: this.safeUserProjection }
-        )
+        const user = await usersRepository.findUserByEmail(userInfo.email)
 
         if (user) {
-            return this.login({
-                user_id: user._id.toString(),
+            const [access_token, refresh_token] = await signAccessAndRefreshToken({
+                userId: user._id.toString(),
                 verify: user.verify
             })
+            const followers_count = await usersRepository.countFollowers(user._id.toString())
+
+            await usersRepository.insertRefreshToken(new RefreshToken({ user_id: user._id, token: refresh_token }))
+
+            return {
+                access_token,
+                refresh_token,
+                user: { ...user, followers_count }
+            }
         } else {
-            const generatedPassword = Math.random().toString(36).slice(-8)
-            return this.register({
-                email: userInfo.email,
-                password: generatedPassword,
-                confirm_password: generatedPassword,
-                name: userInfo.name,
-                date_of_birth: new Date().toISOString()
+            const user_id = new ObjectId()
+            const username = generateTimeBasedUsername()
+
+            await usersRepository.insertUser(
+                new User({
+                    _id: user_id,
+                    name: userInfo.name,
+                    email: userInfo.email,
+                    date_of_birth: new Date(),
+                    password: '',
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                    email_verify_token: '',
+                    forgot_password_token: '',
+                    verify: UserVerifyStatus.VERIFIED,
+                    bio: '',
+                    location: '',
+                    website: '',
+                    username,
+                    avatar: userInfo.picture,
+                    cover_photo: ''
+                })
+            )
+
+            const [access_token, refresh_token] = await signAccessAndRefreshToken({
+                userId: user_id.toString(),
+                verify: UserVerifyStatus.VERIFIED
             })
+
+            await usersRepository.insertRefreshToken(new RefreshToken({ user_id: user_id, token: refresh_token }))
+
+            const newUser = await usersRepository.findUserById(user_id.toString())
+
+            return {
+                access_token,
+                refresh_token,
+                user: { ...newUser, followers_count: 0 }
+            }
         }
     }
+
     async logout(refresh_token: string) {
-        const result = await databaseService.refreshToken.deleteOne({ token: refresh_token })
+        const result = await usersRepository.deleteRefreshToken(refresh_token)
         return result.deletedCount > 0
     }
 
     async logoutAllDevices(user_id: string) {
-        const result = await databaseService.refreshToken.deleteMany({
-            user_id: new ObjectId(user_id)
-        })
+        const result = await usersRepository.deleteAllRefreshTokensByUser(user_id)
         return result.deletedCount > 0
     }
 
@@ -132,8 +155,8 @@ class UserService {
         })
 
         await Promise.all([
-            databaseService.refreshToken.deleteOne({ token: refresh_token }),
-            databaseService.refreshToken.insertOne(
+            usersRepository.deleteRefreshToken(refresh_token),
+            usersRepository.insertRefreshToken(
                 new RefreshToken({ user_id: new ObjectId(user_id), token: new_refresh_token })
             )
         ])
@@ -147,7 +170,7 @@ class UserService {
                 userId: user_id,
                 verify: UserVerifyStatus.VERIFIED
             }),
-            databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
+            usersRepository.updateUser(user_id, [
                 {
                     $set: {
                         email_verify_token: '',
@@ -160,10 +183,8 @@ class UserService {
 
         const [access_token, refresh_token] = tokens
 
-        await databaseService.refreshToken.deleteMany({
-            user_id: new ObjectId(user_id)
-        })
-        await databaseService.refreshToken.insertOne(
+        await usersRepository.deleteAllRefreshTokensByUser(user_id)
+        await usersRepository.insertRefreshToken(
             new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
         )
 
@@ -173,7 +194,7 @@ class UserService {
     async resendVerifyEmail(user_id: string) {
         const email_verify_token = await signEmailVerifyToken(user_id)
 
-        await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
+        await usersRepository.updateUser(user_id, [
             {
                 $set: {
                     email_verify_token,
@@ -186,7 +207,7 @@ class UserService {
     async forgotPassword(user_id: string) {
         const forgot_password_token = await signForgotPasswordToken(user_id)
 
-        await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
+        await usersRepository.updateUser(user_id, [
             {
                 $set: {
                     forgot_password_token,
@@ -197,7 +218,7 @@ class UserService {
     }
 
     async resetPassword(user_id: string, password: string) {
-        await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
+        await usersRepository.updateUser(user_id, [
             {
                 $set: {
                     password: hashPassword(password),
@@ -209,111 +230,80 @@ class UserService {
     }
 
     async getUserById(user_id: string) {
-        const user = await databaseService.users.findOne(
-            { _id: new ObjectId(user_id) },
-            { projection: this.safeUserProjection }
-        )
-
-        if (!user) return null
-
-        const followers_count = await databaseService.followers.countDocuments({
-            followed_user_id: user._id
-        })
-
-        return { ...user, followers_count }
+        return await usersRepository.findUserWithFollowersCount(user_id)
     }
 
     async getUserByUserName(username: string, viewerId?: string) {
-        const user = await databaseService.users.findOne({ username }, { projection: this.safeUserProjection })
+        const user = await usersRepository.findUserByUsernameWithFollowersCount(username)
 
-        if (!user) return null
+        if (!user) {
+            return null
+        }
 
         const isOwner = viewerId === user._id.toString()
 
-        const [followers_count, follower] = await Promise.all([
-            databaseService.followers.countDocuments({ followed_user_id: user._id }),
-            !viewerId || isOwner
-                ? Promise.resolve(null)
-                : databaseService.followers.findOne({
-                      user_id: new ObjectId(viewerId),
-                      followed_user_id: user._id
-                  })
-        ])
-
-        return { ...user, followers_count, is_following: !!follower }
+        // Add additional user info like following status, etc.
+        return {
+            ...user,
+            isOwner
+        }
     }
 
     async updateUserById(user_id: string, payload: UpdateUserRequestBody) {
-        const _payload = payload.date_of_birth
-            ? { ...payload, date_of_birth: new Date(payload.date_of_birth) }
-            : payload
-
-        const result = await databaseService.users.findOneAndUpdate(
-            { _id: new ObjectId(user_id) },
-            [
-                {
-                    $set: {
-                        ..._payload,
-                        updated_at: '$$NOW'
-                    }
-                }
-            ],
-            {
-                projection: this.safeUserProjection,
-                returnDocument: 'after'
+        const result = await usersRepository.updateUser(user_id, {
+            $set: {
+                ...payload,
+                updated_at: new Date()
             }
-        )
+        })
 
-        return result
+        if (result.modifiedCount === 0) {
+            return null
+        }
+
+        return await usersRepository.findUserWithFollowersCount(user_id)
     }
 
     async followUser({ user_id, followed_user_id }: { user_id: string; followed_user_id: string }) {
-        await databaseService.followers.findOneAndUpdate(
-            {
+        return await usersRepository.createFollower(
+            new Follower({
                 user_id: new ObjectId(user_id),
                 followed_user_id: new ObjectId(followed_user_id)
-            },
-            {
-                $setOnInsert: new Follower({
-                    _id: new ObjectId(),
-                    user_id: new ObjectId(user_id),
-                    followed_user_id: new ObjectId(followed_user_id)
-                })
-            },
-            { upsert: true }
+            })
         )
     }
 
     async unfollowUser(user_id: string, followed_user_id: string) {
-        await databaseService.followers.deleteOne({
-            user_id: new ObjectId(user_id),
-            followed_user_id: new ObjectId(followed_user_id)
-        })
+        return await usersRepository.deleteFollower(user_id, followed_user_id)
     }
 
     async changePassword(user_id: string, password: string) {
-        await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
-            {
-                $set: {
-                    password: hashPassword(password),
-                    updated_at: '$$NOW'
-                }
+        return await usersRepository.updateUser(user_id, {
+            $set: {
+                password: hashPassword(password),
+                updated_at: new Date()
             }
-        ])
+        })
     }
 
     async checkEmailExist(email: string) {
-        const user = await databaseService.users.findOne({ email })
-        return !!user
+        return await usersRepository.checkEmailExists(email)
     }
 
     async checkFriendshipStatus({ user_id, target_user_id }: { user_id: string; target_user_id: string }) {
-        const follower = await databaseService.followers.findOne({
-            user_id: new ObjectId(user_id),
-            followed_user_id: new ObjectId(target_user_id)
-        })
+        return await usersRepository.checkFriendshipStatus(user_id, target_user_id)
+    }
 
-        return !!follower
+    async searchUsers(query: string, page = 0, limit = 10) {
+        return await usersRepository.searchUsers(query, page, limit)
+    }
+
+    async getUserFollowers(user_id: string, page = 0, limit = 10) {
+        return await usersRepository.getUserFollowers(user_id, page, limit)
+    }
+
+    async getUserFollowing(user_id: string, page = 0, limit = 10) {
+        return await usersRepository.getUserFollowing(user_id, page, limit)
     }
 }
 
