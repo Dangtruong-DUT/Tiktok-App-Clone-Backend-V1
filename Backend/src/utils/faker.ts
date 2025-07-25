@@ -3,10 +3,10 @@ import { faker } from '@faker-js/faker'
 import { RegisterRequestBody } from '~/models/requests/auth.requests'
 import { CreateTikTokPostBodyReq } from '~/models/requests/TiktokPost.requests'
 import { Audience, PosterType, UserVerifyStatus } from '~/constants/enum'
-import usersServices from '~/services/users.services'
+import usersServices from '~/services/users.service'
 import User from '~/models/schemas/User.schema'
 import { hashPassword } from '~/utils/crypto'
-import tikTokPostService from '~/services/TiktokPost.services'
+import tikTokPostService from '~/services/TiktokPost.service'
 import usersRepository from '~/repositories/users.repository'
 
 // password for faker users

@@ -5,7 +5,9 @@ import { initFolder } from './utils/file'
 import apiRouter from './routes/api.routes'
 import corsMiddleware from 'cors'
 
-databaseService.connect()
+databaseService.connect().then(async () => {
+    await Promise.all([databaseService.indexPosts(), databaseService.indexHashtags()])
+})
 const app = express()
 const port = process.env.PORT || 3000
 

@@ -50,7 +50,7 @@ class UserService {
 
     async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
         const [access_token, refresh_token] = await signAccessAndRefreshToken({ userId: user_id, verify })
-        const user = await usersRepository.findUserById(user_id)
+        const user = await usersRepository.getUserProfileWithDetails({ target_user_id: user_id })
 
         if (!user) {
             return { access_token: null, refresh_token: null, user: null }
@@ -60,33 +60,34 @@ class UserService {
             new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
         )
 
-        const followers_count = await usersRepository.countFollowers(user_id)
-
         return {
             access_token,
             refresh_token,
-            user: { ...user, followers_count }
+            user: {
+                ...user,
+                isOwner: true
+            }
         }
     }
 
     async oauthGoogle(code: string) {
         const { id_token, access_token } = await getOauthGoogleToken(code)
         const userInfo = await getOauthGoogleUserInfo({ id_token, access_token })
-        const user = await usersRepository.findUserByEmail(userInfo.email)
+        const isExists = await usersRepository.checkEmailExists(userInfo.email)
 
-        if (user) {
+        if (isExists) {
+            const user = await usersRepository.getUserProfileWithDetails({ target_user_id: userInfo.email })
             const [access_token, refresh_token] = await signAccessAndRefreshToken({
                 userId: user._id.toString(),
                 verify: user.verify
             })
-            const followers_count = await usersRepository.countFollowers(user._id.toString())
 
             await usersRepository.insertRefreshToken(new RefreshToken({ user_id: user._id, token: refresh_token }))
 
             return {
                 access_token,
                 refresh_token,
-                user: { ...user, followers_count }
+                user: { ...user, isOwner: true }
             }
         } else {
             const user_id = new ObjectId()
@@ -113,19 +114,20 @@ class UserService {
                 })
             )
 
-            const [access_token, refresh_token] = await signAccessAndRefreshToken({
-                userId: user_id.toString(),
-                verify: UserVerifyStatus.VERIFIED
-            })
+            const [[access_token, refresh_token], user] = await Promise.all([
+                signAccessAndRefreshToken({
+                    userId: user_id.toString(),
+                    verify: UserVerifyStatus.VERIFIED
+                }),
+                usersRepository.getUserProfileWithDetails({ target_user_id: user_id.toString() })
+            ])
 
             await usersRepository.insertRefreshToken(new RefreshToken({ user_id: user_id, token: refresh_token }))
-
-            const newUser = await usersRepository.findUserById(user_id.toString())
 
             return {
                 access_token,
                 refresh_token,
-                user: { ...newUser, followers_count: 0 }
+                user: { ...user, isOwner: true }
             }
         }
     }
@@ -229,12 +231,12 @@ class UserService {
         ])
     }
 
-    async getUserById(user_id: string) {
-        return await usersRepository.findUserWithFollowersCount(user_id)
+    async getUserById(user_id: string, viewer_id?: string) {
+        return await usersRepository.findUserById(user_id, viewer_id)
     }
 
-    async getUserByEmail(email: string) {
-        return await usersRepository.findUserByEmail(email, true)
+    async getUserByEmail(email: string, viewer_id?: string) {
+        return await usersRepository.findUserByEmail(email, viewer_id)
     }
 
     async getUserByForgotPasswordToken(token: string) {
@@ -246,7 +248,7 @@ class UserService {
     }
 
     async getUserByUserName(username: string, viewerId?: string) {
-        const user = await usersRepository.findUserByUsernameWithFollowersCount(username)
+        const user = await usersRepository.findUserByUsername(username, viewerId)
 
         if (!user) {
             return null
@@ -272,8 +274,11 @@ class UserService {
         if (result.modifiedCount === 0) {
             return null
         }
-
-        return await usersRepository.findUserWithFollowersCount(user_id)
+        const user = await usersRepository.getUserProfileWithDetails({ target_user_id: user_id })
+        return {
+            ...user,
+            isOwner: true
+        }
     }
 
     async followUser({ user_id, followed_user_id }: { user_id: string; followed_user_id: string }) {
@@ -306,16 +311,20 @@ class UserService {
         return await usersRepository.checkFriendshipStatus(user_id, target_user_id)
     }
 
-    async searchUsers(query: string, page = 0, limit = 10) {
-        return await usersRepository.searchUsers(query, page, limit)
+    async searchUsers(query: string, page = 0, limit = 10, viewer_id?: string) {
+        return await usersRepository.searchUsers({ query, page, limit, viewer_id })
     }
 
-    async getUserFollowers(user_id: string, page = 0, limit = 10) {
-        return await usersRepository.getUserFollowers(user_id, page, limit)
+    async getUserFollowers(user_id: string, page = 0, limit = 10, viewer_id?: string) {
+        return await usersRepository.getUserFollowers(user_id, page, limit, viewer_id)
     }
 
-    async getUserFollowing(user_id: string, page = 0, limit = 10) {
-        return await usersRepository.getUserFollowing(user_id, page, limit)
+    async getUserFollowing(user_id: string, page = 0, limit = 10, viewer_id?: string) {
+        return await usersRepository.getUserFollowing(user_id, page, limit, viewer_id)
+    }
+
+    async getUserProfileWithDetails(target_user_id: string, viewer_id?: string) {
+        return await usersRepository.getUserProfileWithDetails({ target_user_id, viewer_id })
     }
 }
 

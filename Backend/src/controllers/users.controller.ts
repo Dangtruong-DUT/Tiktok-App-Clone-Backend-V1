@@ -15,7 +15,7 @@ import { TokenPayload } from '~/models/requests/common.requests'
 
 export const getMeProfileController = async (req: Request, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
-    const user = await usersServices.getUserById(user_id)
+    const user = await usersServices.getUserById(user_id, user_id)
     if (!user) {
         throw new ErrorWithStatus({ message: USER_MESSAGES.USER_NOT_FOUND, status: 404 })
     }

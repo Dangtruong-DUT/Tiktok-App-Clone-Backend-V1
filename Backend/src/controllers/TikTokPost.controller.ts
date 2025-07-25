@@ -122,13 +122,13 @@ export const getChildrenPostsController = async (req: Request, res: Response) =>
     return res.json({
         message: POST_MESSAGES.GET_CHILDREN_POSTS_SUCCESS,
         data: {
-            posts,
-            pagination: {
-                page: Number(page),
-                limit: Number(limit),
-                total_pages: totalPage,
-                type: Number(type)
-            }
+            posts
+        },
+        meta: {
+            page: Number(page),
+            limit: Number(limit),
+            total_pages: totalPage,
+            type: Number(type)
         }
     })
 }
@@ -147,12 +147,12 @@ export const getFriendPostsController = async (req: Request, res: Response) => {
     return res.json({
         message: POST_MESSAGES.GET_FRIEND_POSTS_SUCCESS,
         data: {
-            posts,
-            pagination: {
-                page: Number(page),
-                limit: Number(limit),
-                total_pages: totalPage
-            }
+            posts
+        },
+        meta: {
+            page: Number(page),
+            limit: Number(limit),
+            total_pages: totalPage
         }
     })
 }

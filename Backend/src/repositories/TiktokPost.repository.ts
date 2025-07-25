@@ -75,6 +75,10 @@ class TikTokPostRepository {
                                     { $eq: ['$audience', 1] },
                                     viewerId ? { $eq: ['$user_id', viewerId] } : { $eq: [1, 2] } // guest không thấy private
                                 ]
+                            },
+
+                            {
+                                $eq: ['$audience', 0] // public
                             }
                         ]
                     }
@@ -231,6 +235,78 @@ class TikTokPostRepository {
         ]
 
         return await databaseService.tiktokPost.aggregate(pipeline).toArray()
+    }
+
+    async countSearchPostsByQueryContent({ query, viewer_id }: { query: string; viewer_id?: string }) {
+        const viewerId = viewer_id ? new ObjectId(viewer_id) : null
+
+        const pipeline: any[] = [
+            {
+                $match: {
+                    $text: { $search: query },
+                    type: 0
+                }
+            },
+            {
+                $lookup: {
+                    from: 'followers',
+                    let: { postUserId: '$user_id' },
+                    pipeline: viewerId
+                        ? [
+                              {
+                                  $match: {
+                                      $expr: {
+                                          $or: [
+                                              {
+                                                  $and: [
+                                                      { $eq: ['$user_id', viewerId] },
+                                                      { $eq: ['$followed_user_id', '$$postUserId'] }
+                                                  ]
+                                              },
+                                              {
+                                                  $and: [
+                                                      { $eq: ['$followed_user_id', viewerId] },
+                                                      { $eq: ['$user_id', '$$postUserId'] }
+                                                  ]
+                                              }
+                                          ]
+                                      }
+                                  }
+                              }
+                          ]
+                        : [],
+                    as: 'friendship'
+                }
+            },
+            {
+                $match: {
+                    $expr: {
+                        $or: [
+                            { $eq: ['$audience', 0] },
+                            {
+                                $and: [
+                                    { $eq: ['$audience', 2] },
+                                    viewerId ? { $gte: [{ $size: '$friendship' }, 2] } : { $eq: [1, 2] }
+                                ]
+                            },
+                            {
+                                $and: [
+                                    { $eq: ['$audience', 1] },
+                                    viewerId ? { $eq: ['$user_id', viewerId] } : { $eq: [1, 2] }
+                                ]
+                            },
+                            {
+                                $eq: ['$audience', 0] // public
+                            }
+                        ]
+                    }
+                }
+            },
+            { $count: 'total' }
+        ]
+
+        const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        return result?.total || 0
     }
 
     async findPostById(post_id: string) {
@@ -587,6 +663,332 @@ class TikTokPostRepository {
         ]
 
         return await databaseService.tiktokPost.aggregate(pipeline).toArray()
+    }
+
+    async searchPostsByHashtagName({
+        query,
+        page = 1,
+        limit = 10,
+        viewer_id
+    }: {
+        query: string
+        page?: number
+        limit?: number
+        viewer_id?: string
+    }) {
+        const viewerId = viewer_id ? new ObjectId(viewer_id) : null
+
+        const pipeline: any[] = [
+            {
+                $match: {
+                    $text: { $search: query }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'tiktok_post',
+                    localField: '_id',
+                    foreignField: 'hashtags',
+                    as: 'post'
+                }
+            },
+            { $unwind: '$post' },
+            { $replaceRoot: { newRoot: '$post' } },
+
+            // Kiểm tra audience
+            {
+                $lookup: {
+                    from: 'followers',
+                    let: { postUserId: '$user_id' },
+                    pipeline: viewerId
+                        ? [
+                              {
+                                  $match: {
+                                      $expr: {
+                                          $or: [
+                                              {
+                                                  $and: [
+                                                      { $eq: ['$user_id', viewerId] },
+                                                      { $eq: ['$followed_user_id', '$$postUserId'] }
+                                                  ]
+                                              },
+                                              {
+                                                  $and: [
+                                                      { $eq: ['$followed_user_id', viewerId] },
+                                                      { $eq: ['$user_id', '$$postUserId'] }
+                                                  ]
+                                              }
+                                          ]
+                                      }
+                                  }
+                              }
+                          ]
+                        : [],
+                    as: 'friendship'
+                }
+            },
+            {
+                $match: {
+                    $expr: {
+                        $or: [
+                            { $eq: ['$audience', 0] },
+                            {
+                                $and: [
+                                    { $eq: ['$audience', 2] },
+                                    viewerId ? { $gte: [{ $size: '$friendship' }, 2] } : { $eq: [1, 2] }
+                                ]
+                            },
+                            {
+                                $and: [
+                                    { $eq: ['$audience', 1] },
+                                    viewerId ? { $eq: ['$user_id', viewerId] } : { $eq: [1, 2] }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+
+            // Hashtags & mentions
+            {
+                $lookup: {
+                    from: 'hashtags',
+                    localField: 'hashtags',
+                    foreignField: '_id',
+                    as: 'hashtags'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'mentions',
+                    foreignField: '_id',
+                    as: 'mentions'
+                }
+            },
+            {
+                $addFields: {
+                    mentions: {
+                        $map: {
+                            input: '$mentions',
+                            as: 'm',
+                            in: {
+                                _id: '$$m._id',
+                                name: '$$m.name',
+                                username: '$$m.username',
+                                email: '$$m.email'
+                            }
+                        }
+                    }
+                }
+            },
+
+            // Likes & bookmarks count
+            {
+                $lookup: {
+                    from: 'likes',
+                    localField: '_id',
+                    foreignField: 'post_id',
+                    as: 'likes'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'bookmarks',
+                    localField: '_id',
+                    foreignField: 'post_id',
+                    as: 'bookmarks'
+                }
+            },
+            {
+                $addFields: {
+                    likes_count: { $size: '$likes' },
+                    bookmarks_count: { $size: '$bookmarks' }
+                }
+            },
+
+            // Children posts: comments, reposts, quotes
+            {
+                $lookup: {
+                    from: 'tiktok_post',
+                    localField: '_id',
+                    foreignField: 'parent_id',
+                    as: 'children_posts'
+                }
+            },
+            {
+                $addFields: {
+                    comments_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 2] }
+                            }
+                        }
+                    },
+                    reposts_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 1] }
+                            }
+                        }
+                    },
+                    quotes_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 3] }
+                            }
+                        }
+                    }
+                }
+            },
+
+            // Check liked, bookmarked
+            {
+                $lookup: {
+                    from: 'likes',
+                    let: { postId: '$_id' },
+                    pipeline: viewerId
+                        ? [
+                              {
+                                  $match: {
+                                      $expr: {
+                                          $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewerId] }]
+                                      }
+                                  }
+                              }
+                          ]
+                        : [],
+                    as: 'likes_by_viewer'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'bookmarks',
+                    let: { postId: '$_id' },
+                    pipeline: viewerId
+                        ? [
+                              {
+                                  $match: {
+                                      $expr: {
+                                          $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewerId] }]
+                                      }
+                                  }
+                              }
+                          ]
+                        : [],
+                    as: 'bookmarks_by_viewer'
+                }
+            },
+            {
+                $addFields: {
+                    is_liked: viewerId ? { $gt: [{ $size: '$likes_by_viewer' }, 0] } : false,
+                    is_bookmarked: viewerId ? { $gt: [{ $size: '$bookmarks_by_viewer' }, 0] } : false
+                }
+            },
+
+            {
+                $project: {
+                    likes: 0,
+                    bookmarks: 0,
+                    friendship: 0,
+                    children_posts: 0,
+                    likes_by_viewer: 0,
+                    bookmarks_by_viewer: 0
+                }
+            },
+
+            { $sort: { created_at: -1 } },
+            { $skip: page > 0 ? (page - 1) * limit : 0 },
+            { $limit: limit }
+        ]
+
+        return await databaseService.hashtags.aggregate(pipeline).toArray()
+    }
+
+    async countSearchPostsByHashtagName({ query, viewer_id }: { query: string; viewer_id?: string }) {
+        const viewerId = viewer_id ? new ObjectId(viewer_id) : null
+
+        const pipeline: any[] = [
+            {
+                $match: {
+                    $text: { $search: query }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'tiktok_post',
+                    localField: '_id',
+                    foreignField: 'hashtags',
+                    as: 'post'
+                }
+            },
+            { $unwind: '$post' },
+            { $replaceRoot: { newRoot: '$post' } },
+
+            {
+                $lookup: {
+                    from: 'followers',
+                    let: { postUserId: '$user_id' },
+                    pipeline: viewerId
+                        ? [
+                              {
+                                  $match: {
+                                      $expr: {
+                                          $or: [
+                                              {
+                                                  $and: [
+                                                      { $eq: ['$user_id', viewerId] },
+                                                      { $eq: ['$followed_user_id', '$$postUserId'] }
+                                                  ]
+                                              },
+                                              {
+                                                  $and: [
+                                                      { $eq: ['$followed_user_id', viewerId] },
+                                                      { $eq: ['$user_id', '$$postUserId'] }
+                                                  ]
+                                              }
+                                          ]
+                                      }
+                                  }
+                              }
+                          ]
+                        : [],
+                    as: 'friendship'
+                }
+            },
+            {
+                $match: {
+                    $expr: {
+                        $or: [
+                            { $eq: ['$audience', 0] },
+                            {
+                                $and: [
+                                    { $eq: ['$audience', 2] },
+                                    viewerId ? { $gte: [{ $size: '$friendship' }, 2] } : { $eq: [1, 2] }
+                                ]
+                            },
+                            {
+                                $and: [
+                                    { $eq: ['$audience', 1] },
+                                    viewerId ? { $eq: ['$user_id', viewerId] } : { $eq: [1, 2] }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+
+            { $count: 'total' }
+        ]
+
+        const [result] = await databaseService.hashtags.aggregate(pipeline).toArray()
+        return result?.total || 0
     }
 
     async countFriendPosts(user_id: string) {
@@ -978,6 +1380,20 @@ class TikTokPostRepository {
         ]
 
         const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        return result?.total || 0
+    }
+
+    async countSearchUsersByUsername({ query }: { query: string }) {
+        const pipeline = [
+            {
+                $match: {
+                    $text: { $search: query }
+                }
+            },
+            { $count: 'total' }
+        ]
+
+        const [result] = await databaseService.users.aggregate(pipeline).toArray()
         return result?.total || 0
     }
 }

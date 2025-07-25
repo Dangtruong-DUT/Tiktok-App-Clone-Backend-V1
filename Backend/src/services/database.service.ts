@@ -51,6 +51,23 @@ class DatabaseService {
     get likes(): Collection<Likes> {
         return this.db.collection(envConfig.DB_LIKES_COLLECTION as string)
     }
+    async indexHashtags() {
+        const exists = await this.hashtags.indexExists('name_text')
+        if (!exists) {
+            await this.hashtags.createIndex({ name: 'text' })
+        }
+    }
+    async indexPosts() {
+        const exists = await this.tiktokPost.indexExists('content_text')
+        if (!exists) {
+            await this.tiktokPost.createIndex(
+                { content: 'text' },
+                {
+                    default_language: 'none'
+                }
+            )
+        }
+    }
 }
 
 const databaseService = new DatabaseService()
