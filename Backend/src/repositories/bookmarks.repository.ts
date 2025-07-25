@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb'
-import databaseService from '~/services/database.services'
+import databaseService from '~/services/database.service'
 import Bookmarks from '~/models/schemas/Bookmarks.schemas'
 
 class BookmarksRepository {

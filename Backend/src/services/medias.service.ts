@@ -6,7 +6,7 @@ import path from 'path'
 import fs from 'fs'
 import { MediaType } from '~/constants/enum'
 import { Media } from '~/models/Common'
-import { hlsVideoEncoder } from './HLSVideoEncoder'
+import { hlsVideoEncoder } from './HLSVideoEncoder.service'
 import { envConfig, isProduction } from '~/config'
 import mediasRepository from '~/repositories/medias.repository'
 

@@ -1,5 +1,5 @@
 import { WithId } from 'mongodb'
-import databaseService from '~/services/database.services'
+import databaseService from '~/services/database.service'
 import Hashtag from '~/models/schemas/Hashtag.schemas'
 
 class HashtagRepository {

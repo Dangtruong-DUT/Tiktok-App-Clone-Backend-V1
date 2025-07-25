@@ -3,7 +3,7 @@ import path from 'path'
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { getImageReqParams, getVideoReqParam, getVideoHLSReqParam } from '~/models/requests/user.requests'
-import MediasService from '~/services/medias.services'
+import MediasService from '~/services/medias.service'
 import fs from 'fs'
 import { FILE_MESSAGES } from '~/constants/messages/file'
 

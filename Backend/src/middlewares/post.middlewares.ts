@@ -5,7 +5,7 @@ import { POST_MESSAGES } from '~/constants/messages/post'
 import { USER_MESSAGES } from '~/constants/messages/user'
 import { ErrorWithStatus } from '~/models/Errors'
 import TikTokPost from '~/models/schemas/TikTokPost.schemas'
-import usersServices from '~/services/users.services'
+import usersServices from '~/services/users.service'
 
 export async function audienceValidator(req: Request, res: Response, next: NextFunction): Promise<void> {
     const post = req.post as TikTokPost

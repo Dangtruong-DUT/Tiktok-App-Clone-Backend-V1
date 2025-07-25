@@ -5,6 +5,10 @@ import { ErrorWithStatus } from '~/models/Errors'
 import { envConfig } from '~/config'
 import { verifyToken } from '~/utils/jwt'
 import { JsonWebTokenError } from 'jsonwebtoken'
+import { UserVerifyStatus } from '~/constants/enum'
+import { USER_MESSAGES } from '~/constants/messages/user'
+import _ from 'lodash'
+import usersServices from '~/services/users.service'
 
 /**
  * Middleware verify access token
@@ -80,10 +84,6 @@ export const authenticateRefreshToken = async (req: Request, res: Response, next
 /**
  * Middleware kiểm tra user đã verify email chưa
  */
-import { UserVerifyStatus } from '~/constants/enum'
-import { USER_MESSAGES } from '~/constants/messages/user'
-import _ from 'lodash'
-import usersServices from '~/services/users.services'
 
 export const requireVerifiedUser = async (req: Request, res: Response, next: NextFunction) => {
     const { user_id } = req.decoded_authorization || {}

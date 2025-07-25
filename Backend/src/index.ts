@@ -1,5 +1,5 @@
 import express from 'express'
-import databaseService from '~/services/database.services'
+import databaseService from '~/services/database.service'
 import defaultErrorHandler from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
 import apiRouter from './routes/api.routes'

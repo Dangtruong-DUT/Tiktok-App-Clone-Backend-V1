@@ -6,7 +6,7 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import { AUTH_MESSAGES } from '~/constants/messages/auth'
 import { VALIDATION_MESSAGES } from '~/constants/messages/validation'
 import { ErrorWithStatus } from '~/models/Errors'
-import usersServices from '~/services/users.services'
+import usersServices from '~/services/users.service'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 

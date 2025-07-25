@@ -9,10 +9,10 @@ import {
     GetPostDetailParamsReq
 } from '~/models/requests/TiktokPost.requests'
 import { TiktokLikeReqBody, UnLikeReqParams } from '~/models/requests/likes.requests'
-import likePostService from '~/services/likes.services'
-import tikTokPostService from '~/services/TiktokPost.services'
+import likePostService from '~/services/likes.service'
+import tikTokPostService from '~/services/TiktokPost.service'
 import { TiktokBookMarkReqBody, UnBookMarkReqParams } from '~/models/requests/bookmarks.requests'
-import bookMarkPostService from '~/services/bookmarks.services'
+import bookMarkPostService from '~/services/bookmarks.service'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { ErrorWithStatus } from '~/models/Errors'
 
@@ -110,22 +110,19 @@ export const getChildrenPostsController = async (req: Request, res: Response) =>
     const { post_id } = req.params as GetChildrenPostsParamReq
     const { page = 1, limit = 10, type } = req.query as unknown as GetChildrenPostsQueryReq
     const user_id = (req.decoded_authorization as TokenPayload)?.user_id
-    const [postOfCurrentPage, totalPosts] = await Promise.all([
-        tikTokPostService.getChildrenPosts({
-            post_id,
-            page: Number(page),
-            limit: Number(limit),
-            type,
-            user_id
-        }),
-        tikTokPostService.getNumberOfChildrenPosts({ post_id, type })
-    ])
-    const totalPage = Math.ceil(totalPosts / Number(limit))
+    const { posts, total } = await tikTokPostService.getChildrenPosts({
+        post_id,
+        page: Number(page),
+        limit: Number(limit),
+        type,
+        user_id
+    })
+    const totalPage = Math.ceil(total / Number(limit))
 
     return res.json({
         message: POST_MESSAGES.GET_CHILDREN_POSTS_SUCCESS,
         data: {
-            posts: postOfCurrentPage,
+            posts,
             pagination: {
                 page: Number(page),
                 limit: Number(limit),
@@ -138,22 +135,19 @@ export const getChildrenPostsController = async (req: Request, res: Response) =>
 
 export const getFriendPostsController = async (req: Request, res: Response) => {
     const { page = 1, limit = 10 } = req.query as unknown as GetChildrenPostsQueryReq
-    console.log('getFriendPostsController', { page, limit })
     const user_id = (req.decoded_authorization as TokenPayload)?.user_id
-    const [postOfCurrentPage, totalPosts] = await Promise.all([
-        tikTokPostService.getFriendPosts({
-            page: Number(page),
-            limit: Number(limit),
-            user_id
-        }),
-        tikTokPostService.getFriendPostsTotal({ user_id })
-    ])
-    const totalPage = Math.ceil(totalPosts / Number(limit))
+    const { posts, total } = await tikTokPostService.getFriendPosts({
+        page: Number(page),
+        limit: Number(limit),
+        user_id
+    })
+
+    const totalPage = Math.ceil(total / Number(limit))
 
     return res.json({
         message: POST_MESSAGES.GET_FRIEND_POSTS_SUCCESS,
         data: {
-            posts: postOfCurrentPage,
+            posts,
             pagination: {
                 page: Number(page),
                 limit: Number(limit),

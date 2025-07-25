@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
-import usersServices from '~/services/users.services'
+import usersServices from '~/services/users.service'
 import {
     ChangePasswordRequestBody,
     followUserReqBody,

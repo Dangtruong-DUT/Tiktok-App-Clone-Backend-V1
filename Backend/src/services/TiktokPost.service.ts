@@ -92,13 +92,16 @@ class TikTokPostService {
         limit: number
         user_id?: string
     }) {
-        const posts = await tikTokPostRepository.findChildrenPosts({
-            post_id,
-            type,
-            page,
-            limit,
-            user_id
-        })
+        const [posts, total] = await Promise.all([
+            tikTokPostRepository.findChildrenPosts({
+                post_id,
+                type,
+                page,
+                limit,
+                user_id
+            }),
+            tikTokPostRepository.countChildrenPosts({ post_id, type, user_id })
+        ])
 
         const postsAfterIncreaseViews = await Promise.all(
             posts.map(async (post: { _id?: ObjectId; [key: string]: unknown }) => {
@@ -116,11 +119,17 @@ class TikTokPostService {
             })
         )
 
-        return postsAfterIncreaseViews
+        return {
+            posts: postsAfterIncreaseViews,
+            total
+        }
     }
 
     async getFriendPosts({ user_id, page = 0, limit = 10 }: { user_id: string; page?: number; limit?: number }) {
-        const posts = await tikTokPostRepository.findFriendPosts({ user_id, page, limit })
+        const [posts, total] = await Promise.all([
+            tikTokPostRepository.findFriendPosts({ user_id, page, limit }),
+            tikTokPostRepository.countFriendPosts(user_id)
+        ])
 
         const postsAfterIncreaseViews = await Promise.all(
             posts.map(async (post: { _id?: ObjectId; [key: string]: unknown }) => {
@@ -138,15 +147,10 @@ class TikTokPostService {
             })
         )
 
-        return postsAfterIncreaseViews
-    }
-
-    async getNumberOfChildrenPosts({ post_id, type = PosterType.QUOTE_POST }: { post_id: string; type: number }) {
-        return await tikTokPostRepository.countChildrenPosts({ post_id, type })
-    }
-
-    async getFriendPostsTotal({ user_id }: { user_id: string }) {
-        return await tikTokPostRepository.countFriendPosts(user_id)
+        return {
+            posts: postsAfterIncreaseViews,
+            total
+        }
     }
 }
 

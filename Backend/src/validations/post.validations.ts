@@ -7,8 +7,8 @@ import { PAGINATION_MESSAGES } from '~/constants/messages/common'
 import { POST_MESSAGES } from '~/constants/messages/post'
 import { validate } from '~/middlewares/validation.middlewares'
 import { ErrorWithStatus } from '~/models/Errors'
-import tikTokPostService from '~/services/TiktokPost.services'
-import usersServices from '~/services/users.services'
+import tikTokPostService from '~/services/TiktokPost.service'
+import usersServices from '~/services/users.service'
 import { numberEnumToArray } from '~/utils/common'
 
 const validatePostId: ParamSchema = {

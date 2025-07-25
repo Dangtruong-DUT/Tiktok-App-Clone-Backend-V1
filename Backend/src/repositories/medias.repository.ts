@@ -1,4 +1,4 @@
-import databaseService from '~/services/database.services'
+import databaseService from '~/services/database.service'
 import VideoStatus from '~/models/schemas/VideoStatus.schemas'
 import { EncodingStatus } from '~/constants/enum'
 

@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb'
-import databaseService from '~/services/database.services'
+import databaseService from '~/services/database.service'
 import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
 import Follower from '~/models/schemas/Follower.schemas'

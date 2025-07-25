@@ -14,7 +14,7 @@ import {
 } from '~/models/requests/auth.requests'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { ObjectId } from 'mongodb'
-import usersServices from '~/services/users.services'
+import usersServices from '~/services/users.service'
 import { Request, Response } from 'express'
 import { AUTH_MESSAGES } from '~/constants/messages/auth'
 import { envConfig } from '~/config'
