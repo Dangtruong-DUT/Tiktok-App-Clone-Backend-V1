@@ -27,6 +27,10 @@ class UsersRepository {
         return this.getUserProfileWithDetails({ target_user_id: user._id.toString(), viewer_id })
     }
 
+    async findUserObjectByEmail(email: string) {
+        return await databaseService.users.findOne({ email })
+    }
+
     async findUserByUsername(username: string, viewer_id?: string) {
         const user = await databaseService.users.findOne({ username }, { projection: { _id: 1 } })
         if (!user) return null

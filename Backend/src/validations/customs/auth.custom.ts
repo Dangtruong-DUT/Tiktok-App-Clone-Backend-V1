@@ -18,14 +18,14 @@ export const checkEmailExists: CustomValidator = async (value: string) => {
 }
 
 export const checkEmailNotExists: CustomValidator = async (value: string, { req }) => {
-    const user = await usersServices.getUserByEmail(value)
+    const user = await usersServices.getUserObjectByEmail(value)
     if (!user) throw new Error(AUTH_MESSAGES.EMAIL_NOT_EXISTS)
     req.user = user
     return true
 }
 
 export const checkEmailAndPasswordNotExists: CustomValidator = async (value: string, { req }) => {
-    const user = await usersServices.getUserByEmail(req.body.email)
+    const user = await usersServices.getUserObjectByEmail(req.body.email)
     if (!user || hashPassword(req.body.password) !== user.password) {
         throw new Error(AUTH_MESSAGES.EMAIL_OR_PASSWORD_DOES_NOT_MATCH)
     }

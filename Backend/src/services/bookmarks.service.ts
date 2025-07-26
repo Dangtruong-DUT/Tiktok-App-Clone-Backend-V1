@@ -1,6 +1,15 @@
 import bookmarksRepository from '~/repositories/bookmarks.repository'
 
 class BookMarkPostService {
+    private static instance: BookMarkPostService
+    private constructor() {}
+    static getInstance(): BookMarkPostService {
+        if (!BookMarkPostService.instance) {
+            BookMarkPostService.instance = new BookMarkPostService()
+        }
+        return BookMarkPostService.instance
+    }
+
     async bookMarkPost({ post_id, user_id }: { post_id: string; user_id: string }) {
         return await bookmarksRepository.createBookmark({ post_id, user_id })
     }
@@ -19,5 +28,4 @@ class BookMarkPostService {
     }
 }
 
-const bookMarkPostService = new BookMarkPostService()
-export default bookMarkPostService
+export default BookMarkPostService.getInstance()

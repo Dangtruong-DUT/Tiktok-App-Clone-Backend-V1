@@ -3,6 +3,15 @@ import databaseService from '~/services/database.service'
 import Bookmarks from '~/models/schemas/Bookmarks.schemas'
 
 class BookmarksRepository {
+    private static instance: BookmarksRepository
+    static getInstance(): BookmarksRepository {
+        if (!BookmarksRepository.instance) {
+            BookmarksRepository.instance = new BookmarksRepository()
+        }
+        return BookmarksRepository.instance
+    }
+    private constructor() {}
+
     async createBookmark({ post_id, user_id }: { post_id: string; user_id: string }) {
         const post_id_ObjectId = new ObjectId(post_id)
         const user_id_ObjectId = new ObjectId(user_id)
@@ -61,5 +70,4 @@ class BookmarksRepository {
     }
 }
 
-const bookmarksRepository = new BookmarksRepository()
-export default bookmarksRepository
+export default BookmarksRepository.getInstance()

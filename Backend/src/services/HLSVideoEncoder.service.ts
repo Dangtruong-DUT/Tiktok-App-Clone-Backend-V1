@@ -7,10 +7,18 @@ import { FILE_MESSAGES } from '~/constants/messages/file'
 import mediasRepository from '~/repositories/medias.repository'
 
 class HLSVideoEncoder {
+    private static instance: HLSVideoEncoder
+    static getInstance(): HLSVideoEncoder {
+        if (!HLSVideoEncoder.instance) {
+            HLSVideoEncoder.instance = new HLSVideoEncoder()
+        }
+        return HLSVideoEncoder.instance
+    }
+
     private videoPaths: string[]
     private encoding: boolean
 
-    constructor() {
+    private constructor() {
         this.videoPaths = []
         this.encoding = false
     }
@@ -54,4 +62,4 @@ class HLSVideoEncoder {
 }
 
 // Export the encoder instance
-export const hlsVideoEncoder = new HLSVideoEncoder()
+export default HLSVideoEncoder.getInstance()

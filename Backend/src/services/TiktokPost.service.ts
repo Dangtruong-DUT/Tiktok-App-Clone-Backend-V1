@@ -10,6 +10,15 @@ import hashtagRepository from '~/repositories/hashtag.repository'
 import likesBookmarksRepository from '~/repositories/likesBookmarks.repository'
 
 class TikTokPostService {
+    private static instance: TikTokPostService
+    private constructor() {}
+    static getInstance(): TikTokPostService {
+        if (!TikTokPostService.instance) {
+            TikTokPostService.instance = new TikTokPostService()
+        }
+        return TikTokPostService.instance
+    }
+
     async checkAndCreateHashtags(hashtags: string[]) {
         return await hashtagRepository.findAndCreateHashtags(hashtags)
     }
@@ -154,5 +163,4 @@ class TikTokPostService {
     }
 }
 
-const tikTokPostService = new TikTokPostService()
-export default tikTokPostService
+export default TikTokPostService.getInstance()

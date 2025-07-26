@@ -3,6 +3,15 @@ import databaseService from '~/services/database.service'
 import Likes from '~/models/schemas/Likes.schemas'
 
 class LikesRepository {
+    private static instance: LikesRepository
+    static getInstance(): LikesRepository {
+        if (!LikesRepository.instance) {
+            LikesRepository.instance = new LikesRepository()
+        }
+        return LikesRepository.instance
+    }
+    private constructor() {}
+
     async createLike({ post_id, user_id }: { post_id: string; user_id: string }) {
         const post_id_ObjectId = new ObjectId(post_id)
         const user_id_ObjectId = new ObjectId(user_id)
@@ -70,5 +79,4 @@ class LikesRepository {
     }
 }
 
-const likesRepository = new LikesRepository()
-export default likesRepository
+export default LikesRepository.getInstance()

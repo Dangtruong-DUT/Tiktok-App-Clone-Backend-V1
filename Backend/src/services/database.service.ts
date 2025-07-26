@@ -13,10 +13,19 @@ const uri = `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@tik
 class DatabaseService {
     private client: MongoClient
     private db: Db
-    constructor() {
+    private constructor() {
         this.client = new MongoClient(uri)
         this.db = this.client.db(envConfig.DB_NAME)
     }
+
+    static getInstance(): DatabaseService {
+        if (!DatabaseService.instance) {
+            DatabaseService.instance = new DatabaseService()
+        }
+        return DatabaseService.instance
+    }
+    private static instance: DatabaseService
+
     async connect() {
         try {
             await this.client.connect()
@@ -70,6 +79,4 @@ class DatabaseService {
     }
 }
 
-const databaseService = new DatabaseService()
-
-export default databaseService
+export default DatabaseService.getInstance()

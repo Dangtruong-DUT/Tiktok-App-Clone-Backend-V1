@@ -13,8 +13,7 @@ interface EmailParams {
     subject: string
     replyToAddresses?: string | string[]
 }
-
-export class EmailService {
+class EmailService {
     private static instance: EmailService
     private sesClient: SESClient
 

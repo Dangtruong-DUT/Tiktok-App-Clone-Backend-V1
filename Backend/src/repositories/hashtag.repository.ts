@@ -3,6 +3,15 @@ import databaseService from '~/services/database.service'
 import Hashtag from '~/models/schemas/Hashtag.schemas'
 
 class HashtagRepository {
+    private static instance: HashtagRepository
+    static getInstance(): HashtagRepository {
+        if (!HashtagRepository.instance) {
+            HashtagRepository.instance = new HashtagRepository()
+        }
+        return HashtagRepository.instance
+    }
+    private constructor() {}
+
     async findAndCreateHashtag(hashtag: string) {
         return await databaseService.hashtags.findOneAndUpdate(
             {
@@ -26,5 +35,4 @@ class HashtagRepository {
     }
 }
 
-const hashtagRepository = new HashtagRepository()
-export default hashtagRepository
+export default HashtagRepository.getInstance()

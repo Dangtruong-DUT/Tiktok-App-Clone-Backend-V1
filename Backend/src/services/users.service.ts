@@ -17,6 +17,14 @@ import { envConfig } from '~/config'
 import sesEmailService from '~/services/aws/ses.email.service'
 
 class UserService {
+    private static instance: UserService
+    private constructor() {}
+    static getInstance(): UserService {
+        if (!UserService.instance) {
+            UserService.instance = new UserService()
+        }
+        return UserService.instance
+    }
     async register(payload: RegisterRequestBody) {
         const user_id = new ObjectId()
         const username = generateTimeBasedUsername()
@@ -286,6 +294,17 @@ class UserService {
         return user
     }
 
+    async getUserObjectByEmail(email: string) {
+        const user = await usersRepository.findUserObjectByEmail(email)
+        if (!user) {
+            throw new ErrorWithStatus({
+                message: USER_MESSAGES.USER_NOT_FOUND,
+                status: HTTP_STATUS.NOT_FOUND
+            })
+        }
+        return user
+    }
+
     async getUserByForgotPasswordToken(token: string) {
         return await usersRepository.findUserByForgotPasswordToken(token)
     }
@@ -380,4 +399,4 @@ class UserService {
     }
 }
 
-export default new UserService()
+export default UserService.getInstance()

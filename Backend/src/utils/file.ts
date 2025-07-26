@@ -135,3 +135,27 @@ export const getExtensionFileName = (fileName: string): string => {
 export const getFileNameWithExtension = (fileName: string, ext: string): string => {
     return `${getFileNameWithoutExtension(fileName)}.${ext}`
 }
+
+/**
+ * Đệ quy thu thập tất cả đường dẫn file trong một thư mục (bao gồm cả các thư mục con).
+ * @param directory - Thư mục gốc cần quét.
+ * @param fileList - Danh sách kết quả (nội bộ, không cần truyền).
+ * @returns Mảng các đường dẫn file tuyệt đối.
+ */
+
+export function collectFilePathsFromDirectory(directory: string, fileList: string[] = []): string[] {
+    const entries = fs.readdirSync(directory)
+
+    for (const entry of entries) {
+        const fullPath = path.join(directory, entry)
+        const stat = fs.statSync(fullPath)
+
+        if (stat.isDirectory()) {
+            collectFilePathsFromDirectory(fullPath, fileList)
+        } else {
+            fileList.push(fullPath)
+        }
+    }
+
+    return fileList
+}

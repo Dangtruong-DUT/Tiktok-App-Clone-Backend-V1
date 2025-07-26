@@ -4,6 +4,15 @@ import TikTokPost from '~/models/schemas/TikTokPost.schemas'
 import { PosterType } from '~/constants/enum'
 
 class TikTokPostRepository {
+    private static instance: TikTokPostRepository
+    static getInstance(): TikTokPostRepository {
+        if (!TikTokPostRepository.instance) {
+            TikTokPostRepository.instance = new TikTokPostRepository()
+        }
+        return TikTokPostRepository.instance
+    }
+    private constructor() {}
+
     async insertPost(post: TikTokPost) {
         return await databaseService.tiktokPost.insertOne(post)
     }
@@ -1398,5 +1407,4 @@ class TikTokPostRepository {
     }
 }
 
-const tikTokPostRepository = new TikTokPostRepository()
-export default tikTokPostRepository
+export default TikTokPostRepository.getInstance()

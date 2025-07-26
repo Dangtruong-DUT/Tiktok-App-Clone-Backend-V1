@@ -1,6 +1,15 @@
 import likesRepository from '~/repositories/likes.repository'
 
 class LikePostService {
+    private static instance: LikePostService
+    private constructor() {}
+    static getInstance(): LikePostService {
+        if (!LikePostService.instance) {
+            LikePostService.instance = new LikePostService()
+        }
+        return LikePostService.instance
+    }
+
     async LikePost({ post_id, user_id }: { post_id: string; user_id: string }) {
         return await likesRepository.createLike({ post_id, user_id })
     }
@@ -23,5 +32,4 @@ class LikePostService {
     }
 }
 
-const likePostService = new LikePostService()
-export default likePostService
+export default LikePostService.getInstance()

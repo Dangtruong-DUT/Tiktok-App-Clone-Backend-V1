@@ -1,8 +1,8 @@
 import * as AWS from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { envConfig } from '~/config'
-import path from 'path'
 import fs from 'fs'
+import mime from 'mime'
 
 class S3Service {
     private static instance: S3Service
@@ -30,15 +30,14 @@ class S3Service {
 
     public async uploadFile({
         fileName,
-        relativeFilePath,
+        absoluteFilePath,
         contentType
     }: {
         fileName: string
-        relativeFilePath: string
+        absoluteFilePath: string
         contentType: string
     }) {
         try {
-            const absoluteFilePath = path.resolve(relativeFilePath)
             const file = fs.readFileSync(absoluteFilePath)
 
             const upload = new Upload({
@@ -58,11 +57,35 @@ class S3Service {
                 console.log(progress)
             })
 
-            await upload.done()
+            return await upload.done()
         } catch (error) {
             console.error('Error uploading file to S3:', error)
             throw error
         }
+    }
+
+    public async uploadImageToS3({ fileName, absoluteFilePath }: { fileName: string; absoluteFilePath: string }) {
+        return this.uploadFile({
+            fileName: `images/${fileName}`,
+            absoluteFilePath,
+            contentType: mime.getType(absoluteFilePath) || 'image/jpeg'
+        })
+    }
+
+    public async uploadVideoToS3({
+        fileName,
+        absoluteFilePath,
+        idVideo
+    }: {
+        fileName: string
+        absoluteFilePath: string
+        idVideo: string
+    }) {
+        return this.uploadFile({
+            fileName: `videos/${idVideo}/${fileName}`,
+            absoluteFilePath,
+            contentType: mime.getType(absoluteFilePath) || 'video/mp4'
+        })
     }
 }
 
