@@ -4,10 +4,12 @@ import defaultErrorHandler from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
 import apiRouter from './routes/api.routes'
 import corsMiddleware from 'cors'
+import './utils/s3'
 
 databaseService.connect().then(async () => {
     await Promise.all([databaseService.indexPosts(), databaseService.indexHashtags()])
 })
+
 const app = express()
 const port = process.env.PORT || 3000
 

@@ -51,7 +51,7 @@ export default class User {
         this.created_at = data.created_at || date
         this.email_verify_token = data.email_verify_token || ''
         this.forgot_password_token = data.forgot_password_token || ''
-        this.verify = data.verify || UserVerifyStatus.Unverified
+        this.verify = data.verify || UserVerifyStatus.UNVERIFIED
         this.bio = data.bio || ''
         this.location = data.location || ''
         this.website = data.website || ''

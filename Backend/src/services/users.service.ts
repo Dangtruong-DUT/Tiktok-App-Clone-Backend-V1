@@ -10,6 +10,11 @@ import { getOauthGoogleToken, getOauthGoogleUserInfo } from '~/helpers/oauth'
 import { RegisterRequestBody } from '~/models/requests/auth.requests'
 import Follower from '~/models/schemas/Follower.schemas'
 import usersRepository from '~/repositories/users.repository'
+import { ErrorWithStatus } from '~/models/Errors'
+import HTTP_STATUS from '~/constants/httpStatus'
+import { USER_MESSAGES } from '~/constants/messages/user'
+import { envConfig } from '~/config'
+import sesEmailService from '~/services/aws/ses.email.service'
 
 class UserService {
     async register(payload: RegisterRequestBody) {
@@ -30,6 +35,11 @@ class UserService {
 
         const user = await usersRepository.findUserById(user_id.toString())
 
+        await sesEmailService.sendVerifyEmail({
+            toAddress: user.email,
+            link: `${envConfig.FRONTEND_URL}/verify-email?token=${email_verify_token}`
+        })
+
         const [access_token, refresh_token] = await signAccessAndRefreshToken({
             verify: UserVerifyStatus.UNVERIFIED,
             userId: user_id.toString()
@@ -38,13 +48,16 @@ class UserService {
         await usersRepository.insertRefreshToken(new RefreshToken({ user_id: user_id, token: refresh_token }))
 
         if (!user) {
-            return { access_token: null, refresh_token: null, user: null }
+            throw new ErrorWithStatus({
+                message: USER_MESSAGES.USER_NOT_FOUND,
+                status: HTTP_STATUS.NOT_FOUND
+            })
         }
 
         return {
             access_token,
             refresh_token,
-            user: { ...user, followers_count: 0 }
+            user: { ...user, isOwner: true }
         }
     }
 
@@ -53,7 +66,10 @@ class UserService {
         const user = await usersRepository.getUserProfileWithDetails({ target_user_id: user_id })
 
         if (!user) {
-            return { access_token: null, refresh_token: null, user: null }
+            throw new ErrorWithStatus({
+                message: USER_MESSAGES.USER_NOT_FOUND,
+                status: HTTP_STATUS.NOT_FOUND
+            })
         }
 
         await usersRepository.insertRefreshToken(
@@ -75,14 +91,23 @@ class UserService {
         const userInfo = await getOauthGoogleUserInfo({ id_token, access_token })
         const isExists = await usersRepository.checkEmailExists(userInfo.email)
 
+        if (userInfo.email_verified === false) {
+            throw new ErrorWithStatus({
+                message: 'Email not verified',
+                status: HTTP_STATUS.BAD_REQUEST
+            })
+        }
+
         if (isExists) {
-            const user = await usersRepository.getUserProfileWithDetails({ target_user_id: userInfo.email })
+            const user = await this.getUserByEmail(userInfo.email)
             const [access_token, refresh_token] = await signAccessAndRefreshToken({
-                userId: user._id.toString(),
+                userId: user._id?.toString() as string,
                 verify: user.verify
             })
 
-            await usersRepository.insertRefreshToken(new RefreshToken({ user_id: user._id, token: refresh_token }))
+            await usersRepository.insertRefreshToken(
+                new RefreshToken({ user_id: user._id as ObjectId, token: refresh_token })
+            )
 
             return {
                 access_token,
@@ -194,7 +219,14 @@ class UserService {
     }
 
     async resendVerifyEmail(user_id: string) {
-        const email_verify_token = await signEmailVerifyToken(user_id)
+        const [user, email_verify_token] = await Promise.all([
+            usersRepository.findUserById(user_id),
+            signEmailVerifyToken(user_id)
+        ])
+        await sesEmailService.sendVerifyEmail({
+            toAddress: user.email,
+            link: `${envConfig.FRONTEND_URL}/verify-email?token=${email_verify_token}`
+        })
 
         await usersRepository.updateUser(user_id, [
             {
@@ -207,15 +239,23 @@ class UserService {
     }
 
     async forgotPassword(user_id: string) {
-        const forgot_password_token = await signForgotPasswordToken(user_id)
-
-        await usersRepository.updateUser(user_id, [
-            {
-                $set: {
-                    forgot_password_token,
-                    updated_at: '$$NOW'
+        const [forgot_password_token, user] = await Promise.all([
+            signForgotPasswordToken(user_id),
+            usersRepository.findUserById(user_id)
+        ])
+        await Promise.all([
+            sesEmailService.sendForgotPasswordEmail({
+                toAddress: user.email,
+                link: `${envConfig.FRONTEND_URL}/reset-password?token=${forgot_password_token}`
+            }),
+            usersRepository.updateUser(user_id, [
+                {
+                    $set: {
+                        forgot_password_token,
+                        updated_at: '$$NOW'
+                    }
                 }
-            }
+            ])
         ])
     }
 
@@ -236,7 +276,14 @@ class UserService {
     }
 
     async getUserByEmail(email: string, viewer_id?: string) {
-        return await usersRepository.findUserByEmail(email, viewer_id)
+        const user = await usersRepository.findUserByEmail(email, viewer_id)
+        if (!user) {
+            throw new ErrorWithStatus({
+                message: USER_MESSAGES.USER_NOT_FOUND,
+                status: HTTP_STATUS.NOT_FOUND
+            })
+        }
+        return user
     }
 
     async getUserByForgotPasswordToken(token: string) {
@@ -251,12 +298,14 @@ class UserService {
         const user = await usersRepository.findUserByUsername(username, viewerId)
 
         if (!user) {
-            return null
+            throw new ErrorWithStatus({
+                message: USER_MESSAGES.USER_NOT_FOUND,
+                status: HTTP_STATUS.NOT_FOUND
+            })
         }
 
-        const isOwner = viewerId === user._id.toString()
+        const isOwner = viewerId === user._id?.toString()
 
-        // Add additional user info like following status, etc.
         return {
             ...user,
             isOwner
@@ -267,12 +316,15 @@ class UserService {
         const result = await usersRepository.updateUser(user_id, {
             $set: {
                 ...payload,
-                updated_at: new Date()
+                updated_at: '$$NOW'
             }
         })
 
         if (result.modifiedCount === 0) {
-            return null
+            throw new ErrorWithStatus({
+                message: USER_MESSAGES.USER_NOT_FOUND,
+                status: HTTP_STATUS.NOT_FOUND
+            })
         }
         const user = await usersRepository.getUserProfileWithDetails({ target_user_id: user_id })
         return {
@@ -298,7 +350,7 @@ class UserService {
         return await usersRepository.updateUser(user_id, {
             $set: {
                 password: hashPassword(password),
-                updated_at: new Date()
+                updated_at: '$$NOW'
             }
         })
     }

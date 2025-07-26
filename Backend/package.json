@@ -38,6 +38,9 @@
         "typescript-eslint": "^8.21.0"
     },
     "dependencies": {
+        "@aws-sdk/client-s3": "^3.850.0",
+        "@aws-sdk/client-ses": "^3.848.0",
+        "@aws-sdk/lib-storage": "^3.850.0",
         "@types/formidable": "^3.4.5",
         "@types/minimist": "^1.2.5",
         "cors": "^2.8.5",

@@ -29,5 +29,11 @@ export const envSchema = z.object({
     GOOGLE_REDIRECT_CLIENT_URL: z.string().url(),
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
-    GOOGLE_REDIRECT_URI: z.string().url()
+    GOOGLE_REDIRECT_URI: z.string().url(),
+    AWS_ACCESS_KEY_ID: z.string().min(1),
+    AWS_SECRET_ACCESS_KEY: z.string().min(1),
+    AWS_REGION: z.string().min(1),
+    AWS_S3_BUCKET_NAME: z.string().min(1),
+    SES_FROM_ADDRESS: z.string().email(),
+    FRONTEND_URL: z.string().url()
 })

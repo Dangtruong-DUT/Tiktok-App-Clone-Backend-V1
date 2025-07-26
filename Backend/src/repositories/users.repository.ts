@@ -511,7 +511,7 @@ class UsersRepository {
             }
         })
 
-        const [result] = await databaseService.users.aggregate(pipeline).toArray()
+        const [result] = await databaseService.users.aggregate<User>(pipeline).toArray()
         return result
     }
 }
