@@ -15,7 +15,7 @@ const staticRouter = Router()
  * path: /image/:name
  * body: {}
  */
-staticRouter.get('/image/:name', wrapRequestHandler(serveImageController))
+staticRouter.get('/images/:name', wrapRequestHandler(serveImageController))
 
 /**
  * Description. get single video
@@ -23,7 +23,7 @@ staticRouter.get('/image/:name', wrapRequestHandler(serveImageController))
  * path: /video/:id
  * body: {}
  */
-staticRouter.get('/video/:name', wrapRequestHandler(serveVideoController))
+staticRouter.get('/videos/:name', wrapRequestHandler(serveVideoController))
 
 /**
  * Description. streaming video
@@ -41,7 +41,7 @@ staticRouter.get('/video-stream/:name', wrapRequestHandler(serveVideoStreamContr
  * @returns {master.m3u8} - The HLS playlist URL for the video.
  */
 
-staticRouter.get('/video-hls/:id/master.m3u8', wrapRequestHandler(serveM3u8HLSController))
+staticRouter.get('/videos-hls/:id/master.m3u8', wrapRequestHandler(serveM3u8HLSController))
 
 /**
  * Streams video in HLS format segment.
@@ -49,5 +49,6 @@ staticRouter.get('/video-hls/:id/master.m3u8', wrapRequestHandler(serveM3u8HLSCo
  * @path /video-hls/:id/:v/:segment
  */
 
-staticRouter.get('/video-hls/:id/:v/:segment', wrapRequestHandler(serveSegmentHLSController))
+staticRouter.get('/videos-hls/:id/:v/:segment', wrapRequestHandler(serveSegmentHLSController))
+
 export default staticRouter

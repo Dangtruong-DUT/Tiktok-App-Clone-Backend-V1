@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
 import path from 'path'
-import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir'
+import { UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { getImageReqParams, getVideoReqParam, getVideoHLSReqParam } from '~/models/requests/user.requests'
 import MediasService from '~/services/medias.service'
 import fs from 'fs'
 import { FILE_MESSAGES } from '~/constants/messages/file'
+import { s3Service } from '~/services/aws/s3.service'
 
 export const uploadImagesController = async (req: Request, res: Response) => {
     const url = await MediasService.UploadImages(req)
@@ -39,27 +40,40 @@ export const uploadHLSVideosController = async (req: Request, res: Response) => 
 
 export const serveImageController = async (req: Request<getImageReqParams>, res: Response) => {
     const { name } = req.params
-    return res.sendFile(path.resolve(UPLOAD_IMAGE_DIR, name), (error) => {
-        if (error) {
-            res.status(HTTP_STATUS.NOT_FOUND).send(FILE_MESSAGES.FILE_NOT_FOUND)
-        }
-    })
+    await s3Service.sendFileFromS3(res, `images/${name}`)
 }
 
 export const serveVideoController = async (req: Request<getVideoReqParam>, res: Response) => {
     const { name } = req.params
-    const idFolderVideo = path.basename(name, path.extname(name))
+    const nameWithoutExtension = path.basename(name, path.extname(name))
+    res.setHeader('Content-Type', 'video/mp4')
+    res.setHeader('Accept-Ranges', 'bytes')
+    await s3Service.sendFileFromS3(res, `videos/${nameWithoutExtension}/${name}`)
+}
 
-    const folderPath = path.resolve(UPLOAD_VIDEO_DIR, idFolderVideo)
-    const videoPath = path.resolve(folderPath, name)
+export const serveM3u8HLSController = async (req: Request<getVideoHLSReqParam>, res: Response) => {
+    const { id } = req.params
+    await s3Service.sendFileFromS3(res, `videos-hls/${id}/master.m3u8`)
+}
 
-    return res.sendFile(videoPath, (error) => {
-        if (error) {
-            res.status(HTTP_STATUS.NOT_FOUND).send(FILE_MESSAGES.FILE_NOT_FOUND)
-        }
+export const serveSegmentHLSController = async (req: Request<getVideoHLSReqParam>, res: Response) => {
+    const { id, v, segment } = req.params
+    await s3Service.sendFileFromS3(res, `videos-hls/${id}/${v}/${segment}`)
+}
+
+export const checkEncodingProgressController = async (req: Request, res: Response) => {
+    const { id } = req.params as unknown as getVideoHLSReqParam
+    const data = await MediasService.CheckEncodingProgress(id)
+    res.json({
+        message: FILE_MESSAGES.GET_VIDEO_HLS_STATUS_SUCCESS,
+        data
     })
 }
 
+/**
+ * @deprecated This controller is deprecated and replaced by serveVideoStreamController.
+ *
+ * */
 export const serveVideoStreamController = async (req: Request<getVideoReqParam>, res: Response, next: NextFunction) => {
     const range = req.headers.range
     if (!range) {
@@ -106,34 +120,4 @@ export const serveVideoStreamController = async (req: Request<getVideoReqParam>,
         next(err)
     })
     videoStream.pipe(res)
-}
-
-export const serveM3u8HLSController = async (req: Request<getVideoHLSReqParam>, res: Response) => {
-    const { id } = req.params
-    const folderPath = path.resolve(UPLOAD_VIDEO_DIR, id)
-    res.sendFile(path.resolve(folderPath, 'master.m3u8'), (error) => {
-        if (error) {
-            res.status(HTTP_STATUS.NOT_FOUND).send(FILE_MESSAGES.FILE_NOT_FOUND)
-        }
-    })
-}
-
-export const serveSegmentHLSController = async (req: Request<getVideoHLSReqParam>, res: Response) => {
-    const { id, v, segment } = req.params
-
-    const filePath = path.resolve(UPLOAD_VIDEO_DIR, id, v, segment)
-    res.sendFile(path.resolve(filePath), (error) => {
-        if (error) {
-            res.status(HTTP_STATUS.NOT_FOUND).send(FILE_MESSAGES.FILE_NOT_FOUND)
-        }
-    })
-}
-
-export const checkEncodingProgressController = async (req: Request, res: Response) => {
-    const { id } = req.params as unknown as getVideoHLSReqParam
-    const data = await MediasService.CheckEncodingProgress(id)
-    res.json({
-        message: FILE_MESSAGES.GET_VIDEO_HLS_STATUS_SUCCESS,
-        data
-    })
 }

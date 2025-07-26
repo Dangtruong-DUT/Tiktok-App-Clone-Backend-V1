@@ -3,6 +3,7 @@ import { Upload } from '@aws-sdk/lib-storage'
 import { envConfig } from '~/config'
 import fs from 'fs'
 import mime from 'mime'
+import { Response } from 'express'
 
 class S3Service {
     private static instance: S3Service
@@ -86,6 +87,14 @@ class S3Service {
             absoluteFilePath,
             contentType: mime.getType(absoluteFilePath) || 'video/mp4'
         })
+    }
+
+    public async sendFileFromS3(res: Response, filePath: string) {
+        const data = await this.s3Client.getObject({
+            Bucket: this.bucketName,
+            Key: filePath
+        })
+        ;(data.Body as any).pipe(res)
     }
 }
 

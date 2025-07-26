@@ -4,7 +4,6 @@ import defaultErrorHandler from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
 import apiRouter from './routes/api.routes'
 import corsMiddleware from 'cors'
-import './utils/s3'
 
 databaseService.connect().then(async () => {
     await Promise.all([databaseService.indexPosts(), databaseService.indexHashtags()])

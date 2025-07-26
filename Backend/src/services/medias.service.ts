@@ -9,7 +9,7 @@ import { Media } from '~/models/Common'
 import hlsVideoEncoder from './HLSVideoEncoder.service'
 import { envConfig, isProduction } from '~/config'
 import mediasRepository from '~/repositories/medias.repository'
-import { s3Service } from '~/services/aws/s3.upload.service'
+import { s3Service } from '~/services/aws/s3.service'
 import { ErrorWithStatus } from '~/models/Errors'
 import { POST_MESSAGES } from '~/constants/messages/post'
 import HTTP_STATUS from '~/constants/httpStatus'
@@ -33,7 +33,7 @@ class MediasService {
                 const newFileNameWithExtension = `${newFileName}.jpg`
                 const newPath = path.resolve(UPLOAD_IMAGE_DIR, newFileNameWithExtension)
                 await sharp(file.filepath).jpeg().toFile(newPath)
-                const uploadResult = await s3Service.uploadImageToS3({
+                await s3Service.uploadImageToS3({
                     fileName: newFileNameWithExtension,
                     absoluteFilePath: newPath
                 })
@@ -42,7 +42,9 @@ class MediasService {
                 await Promise.all([fs.unlink(file.filepath), fs.unlink(newPath)])
 
                 return {
-                    url: uploadResult.Location,
+                    url: isProduction
+                        ? `${envConfig.HOST}/api/static/images/${newFileNameWithExtension}`
+                        : `http://localhost:${envConfig.PORT}/api/static/images/${newFileNameWithExtension}`,
                     type: MediaType.IMAGE
                 }
             })
@@ -65,7 +67,9 @@ class MediasService {
                 await fs.rm(dirPath, { recursive: true, force: true })
 
                 return {
-                    url: result.Location as string,
+                    url: isProduction
+                        ? `${envConfig.HOST}/api/static/videos/${newFilename}`
+                        : `http://localhost:${envConfig.PORT}/api/static/videos/${newFilename}`,
                     type: MediaType.VIDEO
                 }
             })
@@ -82,8 +86,8 @@ class MediasService {
                 const nameFileWithoutExtension = getFileNameWithoutExtension(newFilename)
                 return {
                     url: isProduction
-                        ? `${envConfig.HOST}/api/static/video-hls/${nameFileWithoutExtension}/master.m3u8`
-                        : `http://localhost:${envConfig.PORT}/api/static/video-hls/${nameFileWithoutExtension}/master.m3u8`,
+                        ? `${envConfig.HOST}/api/static/videos-hls/${nameFileWithoutExtension}/master.m3u8`
+                        : `http://localhost:${envConfig.PORT}/api/static/videos-hls/${nameFileWithoutExtension}/master.m3u8`,
                     type: MediaType.HLS_VIDEO
                 }
             })
