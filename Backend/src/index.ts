@@ -4,12 +4,16 @@ import defaultErrorHandler from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
 import apiRouter from './routes/api.routes'
 import corsMiddleware from 'cors'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
 
 databaseService.connect().then(async () => {
     await Promise.all([databaseService.indexPosts(), databaseService.indexHashtags()])
 })
 
 const app = express()
+const httpServer = createServer(app)
+
 const port = process.env.PORT || 3000
 
 // create folder upload
@@ -25,6 +29,19 @@ app.use((req, res, next) => {
 // Error handling middleware
 app.use(defaultErrorHandler)
 
-app.listen(port, () => {
+const io = new Server(httpServer, {
+    cors: {
+        origin: '*'
+    }
+})
+
+io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id)
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id)
+    })
+})
+httpServer.listen(port, () => {
     console.log(`Server running on port ${port}`)
 })

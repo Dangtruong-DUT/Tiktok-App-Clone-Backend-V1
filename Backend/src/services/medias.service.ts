@@ -57,7 +57,7 @@ class MediasService {
             files.map(async (file) => {
                 const newFilename = file.newFilename as string
                 const idVideo = getFileNameWithoutExtension(newFilename)
-                const result = await s3Service.uploadVideoToS3({
+                await s3Service.uploadVideoToS3({
                     fileName: file.newFilename as string,
                     absoluteFilePath: file.filepath,
                     idVideo

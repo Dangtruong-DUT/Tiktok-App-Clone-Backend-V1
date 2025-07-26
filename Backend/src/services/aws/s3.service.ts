@@ -94,6 +94,7 @@ class S3Service {
             Bucket: this.bucketName,
             Key: filePath
         })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ;(data.Body as any).pipe(res)
     }
 }
