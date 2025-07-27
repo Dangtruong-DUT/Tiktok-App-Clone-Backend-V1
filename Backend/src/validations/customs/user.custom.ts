@@ -20,10 +20,21 @@ export const validateTargetUserId: CustomValidator = async (value: string, { req
         })
     }
     const { user_id } = (req as Request).decoded_authorization as TokenPayload
-    if (user._id.toString() === user_id) {
+    if (user._id && user._id.toString() === user_id) {
         throw new ErrorWithStatus({
             message: USER_MESSAGES.CANNOT_UPDATE_YOURSELF,
             status: HTTP_STATUS.FORBIDDEN
+        })
+    }
+    return true
+}
+
+export const checkUserExistsById: CustomValidator = async (value: string, { req }) => {
+    const user = await usersServices.getUserById(value)
+    if (!user) {
+        throw new ErrorWithStatus({
+            message: USER_MESSAGES.USER_NOT_FOUND,
+            status: HTTP_STATUS.NOT_FOUND
         })
     }
     return true

@@ -1,7 +1,7 @@
 import { checkSchema } from 'express-validator'
-import { PAGINATION_MESSAGES } from '~/constants/messages/common'
 import { SEARCH_MESSAGES } from '~/constants/messages/search'
 import { validate } from '~/middlewares/validation.middlewares'
+import { limitSchema, pageSchema } from '~/validations/schemas/pagination.schema'
 
 export const searchValidator = validate(
     checkSchema(
@@ -14,22 +14,8 @@ export const searchValidator = validate(
                     errorMessage: SEARCH_MESSAGES.DOEST_NOT_BE_EMPTY
                 }
             },
-            page: {
-                isInt: {
-                    options: { min: 1 },
-                    errorMessage: PAGINATION_MESSAGES.PAGE_NUMBER_MUST_BE_POSITIVE
-                },
-                toInt: true,
-                optional: true
-            },
-            limit: {
-                isInt: {
-                    options: { min: 1, max: 100 },
-                    errorMessage: PAGINATION_MESSAGES.LIMIT_MUST_BE_BETWEEN_1_AND_100
-                },
-                toInt: true,
-                optional: true
-            }
+            page: pageSchema,
+            limit: limitSchema
         },
         ['query']
     )

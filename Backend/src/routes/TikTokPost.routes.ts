@@ -13,13 +13,13 @@ import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middleware
 import { audienceValidator } from '~/middlewares/post.middlewares'
 import { isUserLoginValidator } from '~/middlewares/user.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
+import { paginationValidator } from '~/validations/pagination.validation'
 import {
     bookMarksTiktokPostValidator,
     createTiktokPostValidator,
     getChildrenPostsValidator,
     getPostDetailValidator,
     likeTiktokPostValidator,
-    PaginationValidator,
     unBookMarksTiktokValidator,
     unLikeTiktokPostValidator
 } from '~/validations/post.validations'
@@ -53,7 +53,7 @@ tiktokPostRouter.post(
  * }
  *
  */
-tiktokPostRouter.get('/friend', authenticate, PaginationValidator, wrapRequestHandler(getFriendPostsController))
+tiktokPostRouter.get('/friend', authenticate, paginationValidator, wrapRequestHandler(getFriendPostsController))
 
 /**
  * Description. Get post detail

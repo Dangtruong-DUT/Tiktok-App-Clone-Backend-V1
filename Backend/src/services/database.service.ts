@@ -8,6 +8,7 @@ import Hashtag from '~/models/schemas/Hashtag.schemas'
 import Bookmarks from '~/models/schemas/Bookmarks.schemas'
 import Likes from '~/models/schemas/Likes.schemas'
 import { envConfig } from '~/config'
+import Conversation from '~/models/schemas/Conversation.schemas'
 
 const uri = `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@tiktok.dpv6i.mongodb.net/?retryWrites=true&w=majority&appName=Tiktok`
 class DatabaseService {
@@ -59,6 +60,9 @@ class DatabaseService {
     }
     get likes(): Collection<Likes> {
         return this.db.collection(envConfig.DB_LIKES_COLLECTION as string)
+    }
+    get conversations(): Collection<Conversation> {
+        return this.db.collection(envConfig.DB_CONVERSATIONS_COLLECTION as string)
     }
     async indexHashtags() {
         const exists = await this.hashtags.indexExists('name_text')

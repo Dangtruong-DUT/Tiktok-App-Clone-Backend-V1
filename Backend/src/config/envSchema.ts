@@ -14,6 +14,7 @@ export const envSchema = z.object({
     DB_HASHTAGS_COLLECTION: z.string().min(1),
     DB_BOOKMARKS_COLLECTION: z.string().min(1),
     DB_LIKES_COLLECTION: z.string().min(1),
+    DB_CONVERSATIONS_COLLECTION: z.string().min(1),
 
     PASSWORD_SECRET: z.string().min(1),
     JWT_SECRET: z.string().min(1),

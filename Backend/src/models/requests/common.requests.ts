@@ -6,3 +6,8 @@ export interface TokenPayload extends JwtPayload {
     token_Type: TokenType
     verify: UserVerifyStatus
 }
+
+export interface PaginationQuery {
+    page?: number
+    limit?: number
+}
