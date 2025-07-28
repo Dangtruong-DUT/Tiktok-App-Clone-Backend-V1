@@ -43,6 +43,8 @@
         "@aws-sdk/lib-storage": "^3.850.0",
         "@types/formidable": "^3.4.5",
         "@types/minimist": "^1.2.5",
+        "@types/swagger-jsdoc": "^6.0.4",
+        "@types/swagger-ui-express": "^4.1.8",
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
         "express": "^5.1.0",
@@ -57,6 +59,9 @@
         "sharp": "^0.33.5",
         "slash": "^5.1.0",
         "socket.io": "^4.8.1",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.1",
+        "yaml": "^2.8.0",
         "zod": "^4.0.5"
     },
     "optionalDependencies": {

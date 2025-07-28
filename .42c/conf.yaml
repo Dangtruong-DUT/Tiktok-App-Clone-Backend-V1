@@ -1,0 +1,3 @@
+apis:
+  Backend/swagger.yaml:
+    alias: swagger-petstore-openapi-3.0

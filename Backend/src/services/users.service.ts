@@ -295,14 +295,7 @@ class UserService {
     }
 
     async getUserObjectByEmail(email: string) {
-        const user = await usersRepository.findUserObjectByEmail(email)
-        if (!user) {
-            throw new ErrorWithStatus({
-                message: USER_MESSAGES.USER_NOT_FOUND,
-                status: HTTP_STATUS.NOT_FOUND
-            })
-        }
-        return user
+        return await usersRepository.findUserObjectByEmail(email)
     }
 
     async getUserByForgotPasswordToken(token: string) {

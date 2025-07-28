@@ -60,7 +60,7 @@ export const registerController = async (req: Request<ParamsDictionary, Register
         })
     }
 
-    res.status(HTTP_STATUS.OK).json({
+    res.status(HTTP_STATUS.CREATED).json({
         message: AUTH_MESSAGES.REGISTER_SUCCESS,
         data: {
             access_token,

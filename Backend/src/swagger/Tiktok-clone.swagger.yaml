@@ -1,0 +1,353 @@
+openapi: 3.0.4
+info:
+    title: Tiktok-Clone-2025 - OpenAPI 1.0
+    description: |-
+        Đây là tài liệu API chính thức cho **Tiktok-Clone-2025**, một nền tảng chia sẻ video ngắn tương tự TikTok.
+
+        API này được xây dựng dựa trên chuẩn **OpenAPI 3.0**, sử dụng phương pháp thiết kế "Design First". Mục tiêu là cung cấp một hệ thống RESTful API rõ ràng, dễ hiểu và dễ tích hợp cho cả frontend lẫn đối tác phát triển.
+
+        **Một số tính năng chính của hệ thống bao gồm:**
+        - Đăng ký, đăng nhập, xác minh người dùng
+        - Tải lên video, xem feed, tương tác (like, comment, share)
+        - Quản lý hồ sơ người dùng và mối quan hệ follow
+        - Hệ thống nhắn tin thời gian thực (WebSocket)
+        - Gợi ý video, hashtag và tìm kiếm nâng cao
+
+        **Tài nguyên tham khảo:**
+        - [OpenAPI Specification](https://swagger.io/specification/)
+        - [Swagger Editor](https://editor.swagger.io)
+
+    termsOfService: https://tiktok-clone-2025.io/terms/
+    contact:
+        name: API Support Team
+        email: support@tiktok-clone-2025.io
+    license:
+        name: Apache 2.0
+        url: https://www.apache.org/licenses/LICENSE-2.0.html
+    version: 1.0.0
+
+externalDocs:
+    description: Tài liệu chi tiết về OpenAPI & Swagger
+    url: https://swagger.io
+
+servers:
+    - url: http://localhost:3000/api
+      description: Local Server
+
+tags:
+    - name: auth
+      description: Đăng ký, đăng nhập, xác minh và quản lý token
+    - name: user
+      description: Thao tác với người dùng hồ sơ, theo dõi, block,...
+    - name: video
+      description: Quản lý video đăng, xoá, lấy feed, tương tác,...
+    - name: comment
+      description: Bình luận, like bình luận,...
+    - name: message
+      description: Tin nhắn riêng tư (qua WebSocket)
+    - name: notification
+      description: Thông báo người dùng
+    - name: admin
+      description: Thao tác dành cho quản trị viên hệ thống
+paths:
+    /auth/login:
+        post:
+            tags:
+                - auth
+            summary: Đăng nhập người dùng
+            description: Xác thực thông tin đăng nhập của người dùng.
+            operationId: loginUser
+            requestBody:
+                description: Thông tin đăng nhập của người dùng
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                    format: email
+                                    example: ndtrg281@gmail.com
+                                password:
+                                    type: string
+                                    format: password
+                                    example: yourpassword
+                required: true
+            responses:
+                '200':
+                    description: Đăng nhập thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Login success'
+                                    data:
+                                        $ref: '#/components/schemas/success_authentication'
+                '422':
+                    description: Dữ liệu đầu vào không hợp lệ (Validation error)
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: Validation error
+                                        description: Thông báo lỗi tổng thể
+                                    errors:
+                                        type: object
+                                        description: Danh sách lỗi theo từng trường
+                                        properties:
+                                            email:
+                                                type: object
+                                                properties:
+                                                    type:
+                                                        type: string
+                                                        example: field
+                                                    value:
+                                                        type: string
+                                                        example: ndtrg281  @gmail.com
+                                                    msg:
+                                                        type: string
+                                                        example: Invalid email format
+                                                    path:
+                                                        type: string
+                                                        example: email
+                                                    location:
+                                                        type: string
+                                                        example: body
+                                            password:
+                                                type: object
+                                                properties:
+                                                    type:
+                                                        type: string
+                                                        example: field
+                                                    value:
+                                                        type: string
+                                                        example: Truong@1234.
+                                                    msg:
+                                                        type: string
+                                                        example: Email or password does not match
+                                                    path:
+                                                        type: string
+                                                        example: password
+                                                    location:
+                                                        type: string
+    /auth/register:
+        post:
+            tags:
+                - auth
+            summary: Đăng ký người dùng mới
+            description: Tạo tài khoản người dùng mới với thông tin đăng ký.
+            operationId: registerUser
+            requestBody:
+                description: Thông tin đăng ký của người dùng
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                    example: hello
+                                email:
+                                    type: string
+                                    format: email
+                                    example: 'ndtrg281@gmail.com'
+                                password:
+                                    type: string
+                                    format: password
+                                    example: yourpassword
+                                confirm_password:
+                                    type: string
+                                    format: password
+                                    example: yourpassword
+                                date_of_birth:
+                                    type: string
+                                    format: ISO8601
+                                    example: '2025-02-03T06:49:06.375Z'
+                required: true
+            responses:
+                '201':
+                    description: Đăng ký thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Register success'
+                                    data:
+                                        $ref: '#/components/schemas/success_authentication'
+                '422':
+                    description: Dữ liệu đầu vào không hợp lệ (Validation error)
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: Validation error
+                                        description: Thông báo lỗi tổng thể
+                                    errors:
+                                        type: object
+                                        description: Danh sách lỗi theo từng trường
+                                        properties:
+                                            name:
+                                                type: object
+                                                properties:
+                                                    type:
+                                                        type: string
+                                                        example: field
+                                                    value:
+                                                        type: string
+                                                        example: ''
+                                                    msg:
+                                                        type: string
+                                                        example: Name is required
+    /users/me:
+        get:
+            summary: Lấy thông tin người dùng
+            description: Lấy thông tin chi tiết của người dùng đã đăng nhập.
+            operationId: getCurrentUser
+            tags:
+                - user
+            security:
+                - bearerAuth: []
+
+            responses:
+                '200':
+                    description: Lấy thông tin người dùng thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'User information retrieved successfully'
+                                    data:
+                                        $ref: '#/components/schemas/User'
+                '401':
+                    description: Chưa đăng nhập
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: Unauthorized
+
+components:
+    schemas:
+        User:
+            type: object
+            properties:
+                _id:
+                    type: string
+                    format: mongoid
+                    example: '687dfe7e5db6fa0f4b96a5df'
+                name:
+                    type: string
+                    example: 'hello'
+                email:
+                    type: string
+                    format: email
+                    example: 'ndtrg281@gmail.com'
+                date_of_birth:
+                    type: string
+                    format: ISO8601
+                    example: '2025-02-03T06:49:06.375Z'
+                updated_at:
+                    type: string
+                    format: ISO8601
+                    example: '2025-07-27T03:48:10.405Z'
+                created_at:
+                    type: string
+                    format: ISO8601
+                    example: '2025-07-21T08:46:54.495Z'
+                verify:
+                    $ref: '#/components/schemas/UserVerifyStatus'
+                bio:
+                    type: string
+                    example: 'Hello, I am a user of this app.'
+                location:
+                    type: string
+                    example: 'Vietnam'
+                website:
+                    type: string
+                    format: uri
+                    example: 'https://example.com'
+                username:
+                    type: string
+                    example: 'User61448881'
+                avatar:
+                    type: string
+                    format: uri
+                    example: 'https://example.com/avatar.jpg'
+                cover_photo:
+                    type: string
+                    format: uri
+                    example: 'https://example.com/cover.jpg'
+                following_count:
+                    type: integer
+
+                    example: 0
+                followers_count:
+                    type: integer
+                    example: 1
+                is_followed:
+                    type: boolean
+                    example: false
+                isOwner:
+                    type: boolean
+                    example: true
+        success_authentication:
+            type: object
+            properties:
+                access_token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+                refresh_token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+                user:
+                    $ref: '#/components/schemas/User'
+        UserVerifyStatus:
+            type: number
+            description: Trạng thái xác minh người dùng
+            enum: [UNVERIFIED, VERIFIED, BANNED]
+            example: 1
+        MediaType:
+            type: number
+            description: Loại media
+            enum: [IMAGE, VIDEO, HLS_VIDEO]
+            example: 1
+        EncodingStatus:
+            type: number
+            description: Trạng thái encode video
+            enum: [PENDING, PROCESSING, COMPLETED, FAILED]
+            example: 2
+        Audience:
+            type: number
+            description: Đối tượng được phép xem bài viết
+            enum: [PUBLIC, PRIVATE, FRIENDS]
+            example: 0
+        PosterType:
+            type: number
+            description: Loại hành động đăng bài
+            enum: [POST, RE_POST, COMMENT, QUOTE_POST]
+            example: 0
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+            description: |
+                Sử dụng token JWT để xác thực. Token được gửi trong header Authorization với định dạng `Bearer <token>`.
