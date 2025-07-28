@@ -96,7 +96,8 @@ src/
 ├── services/         # Business logic
 │   └── aws/          # AWS integrations
 ├── socket/           # WebSocket handlers
-├── swagger/          # API documentation
+├── docs/
+│   └── swagger/          # API documentation
 ├── templates/        # Email templates
 ├── utils/            # Common utilities
 └── validations/      # Input validations
