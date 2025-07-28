@@ -8,13 +8,27 @@ import { Server } from 'socket.io'
 import { initSocket } from '~/socket'
 import swaggerUi from 'swagger-ui-express'
 import helmet from 'helmet'
-import cors from 'cors'
+import cors, { CorsOptions } from 'cors'
+import { rateLimit } from 'express-rate-limit'
 import { envConfig } from '~/config/envConfig'
 import openapiSpecification from '~/config/swagger'
 
 databaseService.connect().then(async () => {
     await Promise.all([databaseService.indexPosts(), databaseService.indexHashtags()])
 })
+
+//https://www.npmjs.com/package/express-rate-limit
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 100,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    ipv6Subnet: 56
+})
+
+const corsOptions: CorsOptions = {
+    origin: envConfig.FRONTEND_URL
+}
 
 const app = express()
 const httpServer = createServer(app)
@@ -24,7 +38,8 @@ const port = envConfig.PORT || 3000
 initFolder()
 
 app.use(helmet())
-app.use(cors())
+app.use(cors(corsOptions))
+app.use(limiter)
 
 app.use(express.json())
 app.use('/api/v1', apiRouter)
@@ -38,9 +53,7 @@ app.use((req, res, next) => {
 app.use(defaultErrorHandler)
 
 const io = new Server(httpServer, {
-    cors: {
-        origin: '*'
-    }
+    cors: corsOptions
 })
 
 initSocket(io)

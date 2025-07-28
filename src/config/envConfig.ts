@@ -5,15 +5,16 @@ import path from 'path'
 import { envSchema } from '~/config/envSchema'
 
 const options = argv(process.argv.slice(2))
-export const isProduction = Boolean(options.production)
+export const fileEnv = options.env || '.env'
+console.info(`Using environment file: ${options.env}`)
 
 config({
-    path: '.env'
+    path: fileEnv
 })
 
 const checkEnv = async () => {
     const chalk = (await import('chalk')).default
-    if (!fs.existsSync(path.resolve('.env'))) {
+    if (!fs.existsSync(path.resolve(fileEnv))) {
         console.log(chalk.red(`.env file not found! Please create a .env file in the root directory.`))
         process.exit(1)
     }
