@@ -27,7 +27,7 @@ const limiter = rateLimit({
 })
 
 const corsOptions: CorsOptions = {
-    origin: envConfig.FRONTEND_URL
+    origin: '*'
 }
 
 const app = express()
