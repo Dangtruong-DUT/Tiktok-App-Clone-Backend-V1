@@ -1,1 +1,0 @@
-export {default as TextWithTags} from './RenderTextWithTag';
