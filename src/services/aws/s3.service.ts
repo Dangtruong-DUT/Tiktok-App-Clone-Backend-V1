@@ -2,7 +2,6 @@ import * as AWS from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { envConfig } from '~/config/envConfig'
 import fs from 'fs'
-import mime from 'mime'
 import { Response } from 'express'
 
 class S3Service {
@@ -69,7 +68,7 @@ class S3Service {
         return this.uploadFile({
             fileName: `images/${fileName}`,
             absoluteFilePath,
-            contentType: mime.getType(absoluteFilePath) || 'image/jpeg'
+            contentType: (await import('mime')).default.getType(absoluteFilePath) || 'image/jpeg'
         })
     }
 
@@ -85,7 +84,7 @@ class S3Service {
         return this.uploadFile({
             fileName: `videos/${idVideo}/${fileName}`,
             absoluteFilePath,
-            contentType: mime.getType(absoluteFilePath) || 'video/mp4'
+            contentType: (await import('mime')).default.getType(absoluteFilePath) || 'video/mp4'
         })
     }
 

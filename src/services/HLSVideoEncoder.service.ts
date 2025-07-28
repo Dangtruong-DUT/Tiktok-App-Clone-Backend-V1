@@ -8,7 +8,6 @@ import mediasRepository from '~/repositories/medias.repository'
 import { s3Service } from '~/services/aws/s3.service'
 import { collectFilePathsFromDirectory } from '~/utils/file'
 import { UPLOAD_VIDEO_DIR } from '~/constants/dir'
-import mime from 'mime'
 
 class HLSVideoEncoder {
     private static instance: HLSVideoEncoder
@@ -50,12 +49,12 @@ class HLSVideoEncoder {
             await fsPromise.unlink(videoPath)
             const files = collectFilePathsFromDirectory(path.resolve(UPLOAD_VIDEO_DIR, idVideo))
             await Promise.all(
-                files.map((filePath) => {
+                files.map(async (filePath) => {
                     const fileName = filePath.replace(path.resolve(UPLOAD_VIDEO_DIR), '').replaceAll('\\', '/')
                     return s3Service.uploadFile({
                         fileName: `videos-hls${fileName}`,
                         absoluteFilePath: filePath,
-                        contentType: mime.getType(filePath) || 'application/octet-stream'
+                        contentType: (await import('mime')).default.getType(filePath) || 'application/octet-stream'
                     })
                 })
             )

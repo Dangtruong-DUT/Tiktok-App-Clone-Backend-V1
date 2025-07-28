@@ -8,6 +8,9 @@ const options = argv(process.argv.slice(2))
 export const fileEnv = options.env || '.env'
 console.info(`Using environment file: ${options.env}`)
 
+export const isProduction = options.env === '.env.production'
+console.info(`Is production environment: ${isProduction}`)
+
 config({
     path: fileEnv
 })
