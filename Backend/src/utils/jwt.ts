@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { envConfig } from '~/config'
+import { envConfig } from '~/config/envConfig'
 import { TokenPayload } from '~/models/requests/common.requests'
 
 /**

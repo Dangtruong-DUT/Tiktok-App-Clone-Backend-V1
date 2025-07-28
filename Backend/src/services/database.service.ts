@@ -7,7 +7,7 @@ import TikTokPost from '~/models/schemas/TikTokPost.schemas'
 import Hashtag from '~/models/schemas/Hashtag.schemas'
 import Bookmarks from '~/models/schemas/Bookmarks.schemas'
 import Likes from '~/models/schemas/Likes.schemas'
-import { envConfig } from '~/config'
+import { envConfig } from '~/config/envConfig'
 import Conversation from '~/models/schemas/Conversation.schemas'
 
 const uri = `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@tiktok.dpv6i.mongodb.net/?retryWrites=true&w=majority&appName=Tiktok`

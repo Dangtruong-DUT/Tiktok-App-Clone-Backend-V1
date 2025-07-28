@@ -3,33 +3,32 @@ import databaseService from '~/services/database.service'
 import defaultErrorHandler from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
 import apiRouter from './routes/api.routes'
-import corsMiddleware from 'cors'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import { initSocket } from '~/socket'
-import YAML from 'yaml'
 import swaggerUi from 'swagger-ui-express'
-import fs from 'fs'
-import path from 'path'
+import helmet from 'helmet'
+import cors from 'cors'
+import { envConfig } from '~/config/envConfig'
+import openapiSpecification from '~/config/swagger'
 
 databaseService.connect().then(async () => {
     await Promise.all([databaseService.indexPosts(), databaseService.indexHashtags()])
 })
-const file = fs.readFileSync(path.resolve('src/swagger/Tiktok-clone.swagger.yaml'), 'utf8')
-const swaggerDocument = YAML.parse(file)
 
 const app = express()
 const httpServer = createServer(app)
-
-const port = process.env.PORT || 3000
+const port = envConfig.PORT || 3000
 
 // create folder upload
 initFolder()
 
+app.use(helmet())
+app.use(cors())
+
 app.use(express.json())
-app.use(corsMiddleware())
-app.use('/api', apiRouter)
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+app.use('/api/v1', apiRouter)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
 
 app.use((req, res, next) => {
     res.status(404).send("Sorry, the page you're looking for was not found.")
@@ -44,7 +43,6 @@ const io = new Server(httpServer, {
     }
 })
 
-// Initialize socket.io
 initSocket(io)
 
 httpServer.listen(port, () => {

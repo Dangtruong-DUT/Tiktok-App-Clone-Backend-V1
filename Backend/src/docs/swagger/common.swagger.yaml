@@ -1,0 +1,88 @@
+# Common schemas và components được shared giữa các module
+
+components:
+    schemas:
+        # Common Response Schemas
+        SuccessResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Thao tác thành công'
+                data:
+                    type: object
+                    additionalProperties: true
+                    example: {}
+            required:
+                - message
+
+        ErrorResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Bad Request'
+                errors:
+                    type: object
+                    additionalProperties: true
+            required:
+                - message
+
+        ValidationErrorResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    description: Thông báo lỗi tổng thể
+                    example: 'Validation Error'
+                errors:
+                    type: object
+                    additionalProperties:
+                        type: object
+                        properties:
+                            msg:
+                                type: string
+                            path:
+                                type: string
+                            location:
+                                type: string
+                    example:
+                        email:
+                            msg: 'Email is required'
+                            path: 'email'
+                            location: 'body'
+            required:
+                - message
+                - errors
+
+        UnauthorizedResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Unauthorized'
+            required:
+                - message
+
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+            description: Sử dụng token JWT để xác thực. Token được gửi trong header Authorization với định dạng Bearer <token>.
+
+tags:
+    - name: auth
+      description: Đăng ký, đăng nhập, xác minh và quản lý token
+    - name: users
+      description: Thao tác với người dùng hồ sơ, theo dõi, block,...
+    - name: posts
+      description: Quản lý video đăng, xoá, lấy feed, tương tác,...
+    - name: medias
+      description: Tải lên và quản lý media (ảnh, video)
+    - name: search
+      description: Tìm kiếm video, người dùng, hashtag
+    - name: conversations
+      description: Tin nhắn riêng tư và cuộc trò chuyện
+    - name: static
+      description: Tài nguyên tĩnh (hình ảnh, video)

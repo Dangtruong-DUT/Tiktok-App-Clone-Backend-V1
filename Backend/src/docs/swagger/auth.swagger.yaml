@@ -1,0 +1,586 @@
+openapi: 3.0.4
+info:
+    title: Tiktok-Clone-2025 - OpenAPI 1.0 (Auth Module)
+    description: Authentication and authorization endpoints for Tiktok Clone API
+    version: 1.0.0
+
+servers:
+    - url: http://localhost:3000/api
+      description: Local Development Server
+    - url: https://api.tiktok-clone-2025.io/api
+      description: Production Server
+
+paths:
+    /auth/login/google:
+        get:
+            tags:
+                - auth
+            summary: Đăng nhập bằng Google OAuth
+            description: Xác thực người dùng thông qua Google OAuth.
+            operationId: oauthGoogleLogin
+            parameters:
+                - in: query
+                  name: code
+                  required: true
+                  schema:
+                      type: string
+                  description: Authorization code từ Google
+            responses:
+                '200':
+                    description: Đăng nhập thành công
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessAuthentication'
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+    /auth/login:
+        post:
+            tags:
+                - auth
+            summary: Đăng nhập người dùng
+            description: Xác thực thông tin đăng nhập của người dùng.
+            operationId: loginUser
+            requestBody:
+                description: Thông tin đăng nhập của người dùng
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LoginRequest'
+            responses:
+                '200':
+                    description: Đăng nhập thành công
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessAuthentication'
+                '422':
+                    description: Dữ liệu đầu vào không hợp lệ
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    /auth/register:
+        post:
+            tags:
+                - auth
+            summary: Đăng ký người dùng mới
+            description: Tạo tài khoản người dùng mới với thông tin đăng ký.
+            operationId: registerUser
+            requestBody:
+                description: Thông tin đăng ký của người dùng
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RegisterRequest'
+            responses:
+                '201':
+                    description: Đăng ký thành công
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessAuthentication'
+                '422':
+                    description: Dữ liệu đầu vào không hợp lệ
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    /auth/logout:
+        post:
+            tags:
+                - auth
+            summary: Đăng xuất người dùng
+            description: Hủy bỏ access token và refresh token của người dùng.
+            operationId: logoutUser
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LogoutRequest'
+            responses:
+                '200':
+                    description: Đăng xuất thành công
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+    /auth/logout/all:
+        post:
+            tags:
+                - auth
+            summary: Đăng xuất khỏi tất cả thiết bị
+            description: Hủy bỏ tất cả refresh token của người dùng trên các thiết bị.
+            operationId: logoutAllDevices
+            security:
+                - bearerAuth: []
+            responses:
+                '200':
+                    description: Đăng xuất khỏi tất cả thiết bị thành công
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+    /auth/refresh-token:
+        post:
+            tags:
+                - auth
+            summary: Làm mới access token
+            description: Tạo access token mới từ refresh token.
+            operationId: refreshToken
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RefreshTokenRequest'
+            responses:
+                '200':
+                    description: Làm mới token thành công
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessAuthentication'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+    /auth/verify-email:
+        post:
+            tags:
+                - auth
+            summary: Xác minh email
+            description: Xác minh email người dùng thông qua token.
+            operationId: verifyEmail
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/VerifyEmailRequest'
+            responses:
+                '200':
+                    description: Xác minh email thành công
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+    /auth/resend-verify-email:
+        post:
+            tags:
+                - auth
+            summary: Gửi lại email xác minh
+            description: Gửi lại email xác minh cho người dùng.
+            operationId: resendVerifyEmail
+            security:
+                - bearerAuth: []
+            responses:
+                '200':
+                    description: Gửi lại email xác minh thành công
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+    /auth/forgot-password:
+        post:
+            tags:
+                - auth
+            summary: Quên mật khẩu
+            description: Gửi email reset mật khẩu.
+            operationId: forgotPassword
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ForgotPasswordRequest'
+            responses:
+                '200':
+                    description: Gửi email reset mật khẩu thành công
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+    /auth/verify-forgot-password:
+        post:
+            tags:
+                - auth
+            summary: Xác minh token reset mật khẩu
+            description: Xác minh token reset mật khẩu từ email.
+            operationId: verifyForgotPassword
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/VerifyForgotPasswordRequest'
+            responses:
+                '200':
+                    description: Xác minh token thành công
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+    /auth/reset-password:
+        post:
+            tags:
+                - auth
+            summary: Đặt lại mật khẩu
+            description: Đặt lại mật khẩu mới cho người dùng.
+            operationId: resetPassword
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ResetPasswordRequest'
+            responses:
+                '200':
+                    description: Đặt lại mật khẩu thành công
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+    schemas:
+        LoginRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: 'ndtrg281@gmail.com'
+                password:
+                    type: string
+                    minLength: 6
+                    example: 'yourpassword'
+            required:
+                - email
+                - password
+
+        RegisterRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                    minLength: 1
+                    maxLength: 100
+                    example: 'Nguyen Van A'
+                email:
+                    type: string
+                    format: email
+                    example: 'ndtrg281@gmail.com'
+                password:
+                    type: string
+                    minLength: 6
+                    example: 'yourpassword'
+                confirm_password:
+                    type: string
+                    minLength: 6
+                    example: 'yourpassword'
+                date_of_birth:
+                    type: string
+                    format: date-time
+                    example: '2025-02-03T06:49:06.375Z'
+            required:
+                - name
+                - email
+                - password
+                - confirm_password
+                - date_of_birth
+
+        LogoutRequest:
+            type: object
+            properties:
+                refresh_token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+            required:
+                - refresh_token
+
+        RefreshTokenRequest:
+            type: object
+            properties:
+                refresh_token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+            required:
+                - refresh_token
+
+        VerifyEmailRequest:
+            type: object
+            properties:
+                email_verify_token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+            required:
+                - email_verify_token
+
+        ForgotPasswordRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: 'ndtrg281@gmail.com'
+            required:
+                - email
+
+        VerifyForgotPasswordRequest:
+            type: object
+            properties:
+                forgot_password_token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+            required:
+                - forgot_password_token
+
+        ResetPasswordRequest:
+            type: object
+            properties:
+                forgot_password_token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+                password:
+                    type: string
+                    minLength: 6
+                    example: 'newpassword'
+                confirm_password:
+                    type: string
+                    minLength: 6
+                    example: 'newpassword'
+            required:
+                - forgot_password_token
+                - password
+                - confirm_password
+
+        SuccessAuthentication:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Login success'
+                data:
+                    type: object
+                    properties:
+                        access_token:
+                            type: string
+                            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjg3ZGZlN2U1ZGI2ZmEwZjRiOTZhNWRmIiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJpYXQiOjE3NTM2ODUwNTQsImV4cCI6MTc1Mzc3MTQ1NH0.vXYJJpNRScDnn_NbFPFxavx1n9zkE4-PYVYGFQfNC0g'
+                        refresh_token:
+                            type: string
+                            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjg3ZGZlN2U1ZGI2ZmEwZjRiOTZhNWRmIiwidG9rZW5fdHlwZSI6MSwidmVyaWZ5IjoxLCJpYXQiOjE3NTM2ODUwNTQsImV4cCI6MTc1NjI3NzA1NH0.6bgMeIMr9QVxRhSjAe5VxRdpLLaswTefua5nnxjsGqM'
+                        user:
+                            $ref: '#/components/schemas/User'
+            required:
+                - message
+                - data
+
+        User:
+            type: object
+            properties:
+                _id:
+                    type: string
+                    format: mongoid
+                    example: '687dfe7e5db6fa0f4b96a5df'
+                name:
+                    type: string
+                    example: 'Nguyen Van A'
+                email:
+                    type: string
+                    format: email
+                    example: 'ndtrg281@gmail.com'
+                date_of_birth:
+                    type: string
+                    format: date-time
+                    description: Ngày sinh theo chuẩn ISO 8601
+                    example: '2025-02-03T06:49:06.375Z'
+                updated_at:
+                    type: string
+                    format: date-time
+                    description: Thời gian cập nhật theo chuẩn ISO 8601
+                    example: '2025-07-27T03:48:10.405Z'
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Thời gian tạo theo chuẩn ISO 8601
+                    example: '2025-07-21T08:46:54.495Z'
+                verify:
+                    $ref: '#/components/schemas/UserVerifyStatus'
+                bio:
+                    type: string
+                    example: 'Hello, I am a TikTok user!'
+                location:
+                    type: string
+                    example: 'Ho Chi Minh City, Vietnam'
+                website:
+                    type: string
+                    format: uri
+                    example: 'https://example.com'
+                username:
+                    type: string
+                    example: 'User61448881'
+                avatar:
+                    type: string
+                    format: uri
+                    example: 'https://example.com/avatar.jpg'
+                cover_photo:
+                    type: string
+                    format: uri
+                    example: 'https://example.com/cover.jpg'
+                following_count:
+                    type: integer
+                    minimum: 0
+                    example: 0
+                followers_count:
+                    type: integer
+                    minimum: 0
+                    example: 1
+                is_followed:
+                    type: boolean
+                    example: false
+                isOwner:
+                    type: boolean
+                    example: true
+            required:
+                - _id
+                - name
+                - email
+                - date_of_birth
+                - updated_at
+                - created_at
+                - verify
+                - username
+
+        SuccessResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Thao tác thành công'
+            required:
+                - message
+
+        ErrorResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Bad Request'
+                errors:
+                    type: object
+                    additionalProperties: true
+            required:
+                - message
+
+        ValidationErrorResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    description: Thông báo lỗi tổng thể
+                    example: 'Validation Error'
+                errors:
+                    type: object
+                    additionalProperties:
+                        type: object
+                        properties:
+                            msg:
+                                type: string
+                            path:
+                                type: string
+                            location:
+                                type: string
+                    example:
+                        email:
+                            msg: 'Email is required'
+                            path: 'email'
+                            location: 'body'
+            required:
+                - message
+                - errors
+
+        UnauthorizedResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Unauthorized'
+            required:
+                - message
+
+        UserVerifyStatus:
+            type: number
+            description: Trạng thái xác minh người dùng
+            enum: [UNVERIFIED, VERIFIED, BANNED]
+            example: 1
+
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+            description: Sử dụng token JWT để xác thực. Token được gửi trong header Authorization với định dạng Bearer <token>.

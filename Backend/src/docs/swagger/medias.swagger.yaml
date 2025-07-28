@@ -1,0 +1,336 @@
+openapi: 3.0.4
+info:
+    title: Tiktok-Clone-2025 - OpenAPI 1.0 (Media Module)
+    description: Media upload and management endpoints for Tiktok Clone API
+    version: 1.0.0
+
+servers:
+    - url: http://localhost:3000/api
+      description: Local Development Server
+    - url: https://api.tiktok-clone-2025.io/api
+      description: Production Server
+
+paths:
+    /medias/upload-image:
+        post:
+            summary: Tải lên hình ảnh
+            description: Tải lên một hoặc nhiều hình ảnh.
+            operationId: uploadImage
+            tags:
+                - medias
+            security:
+                - bearerAuth: []
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                file:
+                                    type: array
+                                    items:
+                                        type: string
+                                        format: binary
+                                    minItems: 1
+                                    maxItems: 6
+                                    description: File hình ảnh cần tải lên (JPEG, PNG, GIF) - tối đa 6 file
+                            required:
+                                - file
+            responses:
+                '200':
+                    description: Tải lên hình ảnh thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'File uploaded successfully'
+                                    data:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                url:
+                                                    type: string
+                                                    format: uri
+                                                    example: 'http://localhost:3000/api/static/images/3aac2269b64670ece68801900.jpg'
+                                                type:
+                                                    type: integer
+                                                    example: 0
+                                                    description: MediaType.IMAGE (0)
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+    /medias/upload-video:
+        post:
+            summary: Tải lên video
+            description: Tải lên video sử dụng form-data với key là file (maximum 1 file)
+            operationId: uploadVideo
+            tags:
+                - medias
+            security:
+                - bearerAuth: []
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                file:
+                                    type: string
+                                    format: binary
+                                    description: Video file to upload (maximum 1 file)
+            responses:
+                '200':
+                    description: Tải lên video thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'File uploaded successfully'
+                                    data:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                url:
+                                                    type: string
+                                                    format: uri
+                                                    example: 'http://localhost:3000/api/static/videos/ZBe_IVYAzXZP1DZ5tD2MT.mp4'
+                                                type:
+                                                    type: integer
+                                                    example: 1
+                                                    description: MediaType.VIDEO (1)
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+    /medias/upload-video-hls:
+        post:
+            summary: Tải lên video HLS
+            description: Tải lên video để encode thành định dạng HLS sử dụng form-data với key là file (maximum 1 file)
+            operationId: uploadVideoHLS
+            tags:
+                - medias
+            security:
+                - bearerAuth: []
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                file:
+                                    type: string
+                                    format: binary
+                                    description: Video file to upload for HLS encoding (maximum 1 file)
+            responses:
+                '200':
+                    description: Tải lên video HLS thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'File uploaded successfully'
+                                    data:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                url:
+                                                    type: string
+                                                    format: uri
+                                                    example: 'http://localhost:3000/api/static/videos-hls/SfNzysvSDpKQZ_xpY7YVn/master.m3u8'
+                                                type:
+                                                    type: integer
+                                                    example: 2
+                                                    description: MediaType.HLS_VIDEO (2)
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+    /medias/upload-hls-status/{id}:
+        get:
+            summary: Kiểm tra trạng thái encode video HLS
+            description: Kiểm tra trạng thái xử lý video HLS.
+            operationId: checkEncodingStatus
+            tags:
+                - medias
+            security:
+                - bearerAuth: []
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: string
+                      format: mongoid
+                  description: ID của video HLS
+            responses:
+                '200':
+                    description: Get video HLS status success
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Get video HLS status success'
+                                    data:
+                                        type: object
+                                        properties:
+                                            _id:
+                                                type: string
+                                                format: mongoid
+                                                example: '68872221032f1cc35a6e69f5'
+                                            name:
+                                                type: string
+                                                example: 'SfNzysvSDpKQZ_xpY7YVn'
+                                            status:
+                                                type: integer
+                                                enum: [0, 1, 2, 3]
+                                                description: 'PENDING=0, PROCESSING=1, COMPLETED=2, FAILED=3'
+                                                example: 1
+                                            message:
+                                                type: string
+                                                example: ''
+                                            created_at:
+                                                type: string
+                                                format: date-time
+                                                description: Thời gian tạo theo chuẩn ISO 8601
+                                                example: '2025-07-28T07:09:21.393Z'
+                                            updated_at:
+                                                type: string
+                                                format: date-time
+                                                description: Thời gian cập nhật theo chuẩn ISO 8601
+                                                example: '2025-07-28T07:09:22.352Z'
+                '404':
+                    description: Không tìm thấy video
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+components:
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+    schemas:
+        Media:
+            type: object
+            properties:
+                _id:
+                    type: string
+                    format: mongoid
+                    example: '60f7b0b3b3f4b20015f7b0b3'
+                url:
+                    type: string
+                    format: uri
+                    example: 'http://localhost:3000/static/video/video_123.mp4'
+                type:
+                    $ref: '#/components/schemas/MediaType'
+                name:
+                    type: string
+                    example: 'video_123.mp4'
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Thời gian tạo theo chuẩn ISO 8601
+                    example: '2025-07-21T08:46:54.495Z'
+            required:
+                - _id
+                - url
+                - type
+                - name
+                - created_at
+
+        VideoMedia:
+            allOf:
+                - $ref: '#/components/schemas/Media'
+                - type: object
+                  properties:
+                      encoding_status:
+                          $ref: '#/components/schemas/EncodingStatus'
+                      quality:
+                          type: array
+                          items:
+                              type: string
+                          example: ['720p', '480p', '360p']
+
+        MediaType:
+            type: integer
+            description: 'Loại media: IMAGE=0, VIDEO=1, HLS_VIDEO=2'
+            enum: [0, 1, 2]
+            example: 1
+
+        EncodingStatus:
+            type: integer
+            description: 'Trạng thái encode video: PENDING=0, PROCESSING=1, COMPLETED=2, FAILED=3'
+            enum: [0, 1, 2, 3]
+            example: 2
+
+        ErrorResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Bad Request'
+                errors:
+                    type: object
+                    additionalProperties: true
+            required:
+                - message
+
+        UnauthorizedResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Unauthorized'
+            required:
+                - message

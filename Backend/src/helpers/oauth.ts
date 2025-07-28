@@ -1,4 +1,4 @@
-import { envConfig } from '~/config'
+import { envConfig } from '~/config/envConfig'
 
 interface OauthGoogleTokenResponse {
     access_token: string

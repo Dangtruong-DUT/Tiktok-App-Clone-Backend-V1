@@ -1,0 +1,181 @@
+openapi: 3.0.4
+info:
+    title: Tiktok-Clone-2025 - OpenAPI 1.0 (Conversations Module)
+    description: Messaging and conversation endpoints for Tiktok Clone API
+    version: 1.0.0
+
+servers:
+    - url: http://localhost:3000/api
+      description: Local Development Server
+    - url: https://api.tiktok-clone-2025.io/api
+      description: Production Server
+
+paths:
+    /conversations/receivers/{receiver_id}:
+        get:
+            summary: Lấy cuộc trò chuyện với người nhận
+            description: Lấy danh sách tin nhắn trong cuộc trò chuyện với một người dùng cụ thể.
+            operationId: getConversation
+            tags:
+                - conversations
+            security:
+                - bearerAuth: []
+            parameters:
+                - in: path
+                  name: receiver_id
+                  required: true
+                  schema:
+                      type: string
+                      format: mongoid
+                  description: ID của người nhận tin nhắn
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                  description: Số trang (bắt đầu từ 1)
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                  description: Số lượng item trên mỗi trang
+            responses:
+                '200':
+                    description: Lấy cuộc trò chuyện thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Lấy cuộc trò chuyện thành công'
+                                    data:
+                                        type: object
+                                        properties:
+                                            conversations:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/Conversation'
+                                    meta:
+                                        $ref: '#/components/schemas/PaginationMeta'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+                '404':
+                    description: Không tìm thấy cuộc trò chuyện
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+    schemas:
+        Conversation:
+            type: object
+            properties:
+                _id:
+                    type: string
+                    format: mongoid
+                    example: '60f7b0b3b3f4b20015f7b0b3'
+                sender_id:
+                    type: string
+                    format: mongoid
+                    example: '60f7b0b3b3f4b20015f7b0b4'
+                receiver_id:
+                    type: string
+                    format: mongoid
+                    example: '60f7b0b3b3f4b20015f7b0b5'
+                content:
+                    type: string
+                    example: 'Hello, how are you?'
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Thời gian tạo theo chuẩn ISO 8601
+                    example: '2025-07-21T08:46:54.495Z'
+                updated_at:
+                    type: string
+                    format: date-time
+                    description: Thời gian cập nhật theo chuẩn ISO 8601
+                    example: '2025-07-27T03:48:10.405Z'
+            required:
+                - _id
+                - sender_id
+                - receiver_id
+                - content
+                - created_at
+                - updated_at
+
+        PaginationMeta:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    description: Trang hiện tại
+                    example: 1
+                limit:
+                    type: integer
+                    description: Số lượng item trên mỗi trang
+                    example: 10
+                total_pages:
+                    type: integer
+                    description: Tổng số trang
+                    example: 5
+            required:
+                - page
+                - limit
+                - total_pages
+
+        PaginationInfo:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    description: Trang hiện tại
+                    example: 1
+                limit:
+                    type: integer
+                    description: Số lượng item trên mỗi trang
+                    example: 10
+                total_page:
+                    type: integer
+                    description: Tổng số trang
+                    example: 5
+                total_items:
+                    type: integer
+                    description: Tổng số item
+                    example: 50
+            required:
+                - page
+                - limit
+                - total_page
+                - total_items
+
+        ErrorResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Bad Request'
+                errors:
+                    type: object
+                    additionalProperties: true
+            required:
+                - message
+
+        UnauthorizedResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Unauthorized'
+            required:
+                - message

@@ -1,0 +1,194 @@
+openapi: 3.0.4
+info:
+    title: Tiktok-Clone-2025 - OpenAPI 1.0 (Static Resources Module)
+    description: Static resource serving endpoints for Tiktok Clone API
+    version: 1.0.0
+
+servers:
+    - url: http://localhost:3000/api
+      description: Local Development Server
+    - url: https://api.tiktok-clone-2025.io/api
+      description: Production Server
+
+paths:
+    /static/images/{name}:
+        get:
+            summary: Lấy hình ảnh tĩnh
+            description: Truy cập hình ảnh đã tải lên.
+            operationId: getStaticImage
+            tags:
+                - static
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  schema:
+                      type: string
+                  description: Tên file hình ảnh
+            responses:
+                '200':
+                    description: Trả về hình ảnh thành công
+                    content:
+                        image/*:
+                            schema:
+                                type: string
+                                format: binary
+                '404':
+                    description: Không tìm thấy hình ảnh
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+    /static/videos/{name}:
+        get:
+            summary: Lấy video tĩnh
+            description: Truy cập video đã tải lên.
+            operationId: getStaticVideo
+            tags:
+                - static
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  schema:
+                      type: string
+                  description: Tên file video
+            responses:
+                '200':
+                    description: Trả về video thành công
+                    content:
+                        video/*:
+                            schema:
+                                type: string
+                                format: binary
+                '404':
+                    description: Không tìm thấy video
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+    /static/video-stream/{name}:
+        get:
+            summary: Stream video
+            description: Streaming video với hỗ trợ Range request.
+            operationId: streamVideo
+            tags:
+                - static
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  schema:
+                      type: string
+                  description: Tên file video để stream
+                - in: header
+                  name: Range
+                  schema:
+                      type: string
+                  description: Range header để stream video
+            responses:
+                '206':
+                    description: Partial content streaming thành công
+                    content:
+                        video/*:
+                            schema:
+                                type: string
+                                format: binary
+                '416':
+                    description: Range Not Satisfiable
+                '404':
+                    description: Không tìm thấy video
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+    /static/videos-hls/{id}/master.m3u8:
+        get:
+            summary: Lấy HLS master playlist
+            description: Truy cập master playlist cho video HLS.
+            operationId: getHLSMasterPlaylist
+            tags:
+                - static
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: string
+                      format: mongoid
+                  description: ID của video HLS
+            responses:
+                '200':
+                    description: Trả về master playlist thành công
+                    content:
+                        application/vnd.apple.mpegurl:
+                            schema:
+                                type: string
+                '404':
+                    description: Không tìm thấy video HLS
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+    /static/videos-hls/{id}/{v}/{segment}:
+        get:
+            summary: Lấy HLS segment
+            description: Truy cập segment video HLS.
+            operationId: getHLSSegment
+            tags:
+                - static
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: string
+                      format: mongoid
+                  description: ID của video HLS
+                - in: path
+                  name: v
+                  required: true
+                  schema:
+                      type: string
+                  description: Version/quality của video
+                - in: path
+                  name: segment
+                  required: true
+                  schema:
+                      type: string
+                  description: Tên segment cần lấy
+            responses:
+                '200':
+                    description: Trả về segment thành công
+                    content:
+                        video/mp2t:
+                            schema:
+                                type: string
+                                format: binary
+                        application/vnd.apple.mpegurl:
+                            schema:
+                                type: string
+                '404':
+                    description: Không tìm thấy segment
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+    schemas:
+        ErrorResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: 'Bad Request'
+                errors:
+                    type: object
+                    additionalProperties: true
+            required:
+                - message

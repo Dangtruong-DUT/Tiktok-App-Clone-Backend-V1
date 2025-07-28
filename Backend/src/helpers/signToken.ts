@@ -1,5 +1,5 @@
 import { StringValue } from 'ms'
-import { envConfig } from '~/config'
+import { envConfig } from '~/config/envConfig'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import { signToken } from '~/utils/jwt'
 

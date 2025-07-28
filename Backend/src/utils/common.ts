@@ -1,4 +1,4 @@
-import { envConfig } from '~/config'
+import { envConfig } from '~/config/envConfig'
 import { UserVerifyStatus } from '~/constants/enum'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { ErrorWithStatus } from '~/models/Errors'

@@ -1,0 +1,247 @@
+openapi: 3.0.4
+info:
+    title: Tiktok-Clone-2025 - OpenAPI 1.0 (Search Module)
+    description: Search functionality endpoints for Tiktok Clone API
+    version: 1.0.0
+
+servers:
+    - url: http://localhost:3000/api
+      description: Local Development Server
+    - url: https://api.tiktok-clone-2025.io/api
+      description: Production Server
+
+paths:
+    /search:
+        get:
+            summary: Tìm kiếm nội dung
+            description: Tìm kiếm bài viết theo nội dung.
+            operationId: searchContent
+            tags:
+                - search
+            parameters:
+                - in: query
+                  name: q
+                  required: true
+                  schema:
+                      type: string
+                  description: Từ khóa tìm kiếm
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                  description: Số trang (bắt đầu từ 1)
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                  description: Số lượng item trên mỗi trang
+            responses:
+                '200':
+                    description: Tìm kiếm thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Tìm kiếm thành công'
+                                    data:
+                                        type: object
+                                        properties:
+                                            posts:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/Post'
+                                    meta:
+                                        $ref: '#/components/schemas/PaginationMeta'
+
+    /search/hashtags:
+        get:
+            summary: Tìm kiếm theo hashtag
+            description: Tìm kiếm bài viết theo hashtag.
+            operationId: searchHashtags
+            tags:
+                - search
+            parameters:
+                - in: query
+                  name: q
+                  required: true
+                  schema:
+                      type: string
+                  description: Hashtag cần tìm kiếm
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                  description: Số trang (bắt đầu từ 1)
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                  description: Số lượng item trên mỗi trang
+            responses:
+                '200':
+                    description: Tìm kiếm hashtag thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Tìm kiếm hashtag thành công'
+                                    data:
+                                        type: object
+                                        properties:
+                                            posts:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/Post'
+                                    meta:
+                                        $ref: '#/components/schemas/PaginationMeta'
+
+    /search/users:
+        get:
+            summary: Tìm kiếm người dùng
+            description: Tìm kiếm người dùng theo tên hoặc username.
+            operationId: searchUsers
+            tags:
+                - search
+            parameters:
+                - in: query
+                  name: q
+                  required: true
+                  schema:
+                      type: string
+                  description: Từ khóa tìm kiếm người dùng
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                  description: Số trang (bắt đầu từ 1)
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                  description: Số lượng item trên mỗi trang
+            responses:
+                '200':
+                    description: Tìm kiếm người dùng thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Tìm kiếm người dùng thành công'
+                                    data:
+                                        type: object
+                                        properties:
+                                            users:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/User'
+                                    meta:
+                                        $ref: '#/components/schemas/PaginationMeta'
+
+components:
+    schemas:
+        PaginationMeta:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    description: Trang hiện tại
+                    example: 1
+                limit:
+                    type: integer
+                    description: Số lượng item trên mỗi trang
+                    example: 10
+                total_pages:
+                    type: integer
+                    description: Tổng số trang
+                    example: 5
+            required:
+                - page
+                - limit
+                - total_pages
+
+        PaginationInfo:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    description: Trang hiện tại
+                    example: 1
+                limit:
+                    type: integer
+                    description: Số lượng item trên mỗi trang
+                    example: 10
+                total_page:
+                    type: integer
+                    description: Tổng số trang
+                    example: 5
+                total_items:
+                    type: integer
+                    description: Tổng số item
+                    example: 50
+            required:
+                - page
+                - limit
+                - total_page
+                - total_items
+
+        Post:
+            type: object
+            properties:
+                _id:
+                    type: string
+                    format: mongoid
+                    example: '60f7b0b3b3f4b20015f7b0b3'
+                user_id:
+                    type: string
+                    format: mongoid
+                    example: '60f7b0b3b3f4b20015f7b0b4'
+                content:
+                    type: string
+                    example: 'This is my new video! #viral #fun'
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Thời gian tạo theo chuẩn ISO 8601
+                    example: '2025-07-21T08:46:54.495Z'
+
+        User:
+            type: object
+            properties:
+                _id:
+                    type: string
+                    format: mongoid
+                    example: '687dfe7e5db6fa0f4b96a5df'
+                name:
+                    type: string
+                    example: 'Nguyen Van A'
+                username:
+                    type: string
+                    example: 'User61448881'
+                avatar:
+                    type: string
+                    format: uri
+                    example: 'https://example.com/avatar.jpg'

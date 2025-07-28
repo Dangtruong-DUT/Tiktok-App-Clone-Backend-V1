@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { envConfig } from '~/config'
+import { envConfig } from '~/config/envConfig'
 
 /**
  * Returns a SHA256 hash using SHA-3 for the given `content`.

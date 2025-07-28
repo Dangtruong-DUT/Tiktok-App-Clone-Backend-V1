@@ -1,6 +1,6 @@
 import * as AWS from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
-import { envConfig } from '~/config'
+import { envConfig } from '~/config/envConfig'
 import fs from 'fs'
 import mime from 'mime'
 import { Response } from 'express'

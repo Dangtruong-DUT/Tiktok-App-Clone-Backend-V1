@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import { CustomValidator } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
-import { envConfig } from '~/config'
+import { envConfig } from '~/config/envConfig'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { AUTH_MESSAGES } from '~/constants/messages/auth'
 import { VALIDATION_MESSAGES } from '~/constants/messages/validation'

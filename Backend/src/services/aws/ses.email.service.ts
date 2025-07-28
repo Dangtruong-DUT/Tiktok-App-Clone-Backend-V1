@@ -1,5 +1,5 @@
 import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses'
-import { envConfig } from '~/config'
+import { envConfig } from '~/config/envConfig'
 import path from 'path'
 import fs from 'fs'
 

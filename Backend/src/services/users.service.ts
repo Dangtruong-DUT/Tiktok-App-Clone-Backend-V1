@@ -13,7 +13,7 @@ import usersRepository from '~/repositories/users.repository'
 import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages/user'
-import { envConfig } from '~/config'
+import { envConfig } from '~/config/envConfig'
 import sesEmailService from '~/services/aws/ses.email.service'
 
 class UserService {
