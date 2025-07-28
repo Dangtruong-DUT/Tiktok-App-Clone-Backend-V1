@@ -38,7 +38,7 @@ const servers = [
         description: 'Local Development Server'
     },
     {
-        url: 'https://api.tiktok-clone-2025.io/api/v1',
+        url: 'https://api.taplamit.tech/api/v1',
         description: 'Production Server'
     }
 ]
