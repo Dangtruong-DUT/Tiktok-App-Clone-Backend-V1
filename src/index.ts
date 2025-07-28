@@ -26,10 +26,6 @@ const limiter = rateLimit({
     ipv6Subnet: 56
 })
 
-const corsOptions: CorsOptions = {
-    origin: '*'
-}
-
 const app = express()
 const httpServer = createServer(app)
 const port = envConfig.PORT || 3000
@@ -38,7 +34,7 @@ const port = envConfig.PORT || 3000
 initFolder()
 
 app.use(helmet())
-app.use(cors(corsOptions))
+app.use(cors())
 app.use(limiter)
 
 app.use(express.json())
@@ -52,9 +48,7 @@ app.use((req, res, next) => {
 // Error handling middleware
 app.use(defaultErrorHandler)
 
-const io = new Server(httpServer, {
-    cors: corsOptions
-})
+const io = new Server(httpServer)
 
 initSocket(io)
 
