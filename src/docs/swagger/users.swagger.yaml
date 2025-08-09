@@ -127,14 +127,24 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/FollowRequest'
+                            type: object
+                            properties:
+                                user_id:
+                                    type: string
+                                    format: mongoid
+                                    example: '60f7b0b3b3f4b20015f7b0b3'
+                                    description: ID của người dùng cần follow
             responses:
                 '200':
                     description: Theo dõi thành công
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/SuccessResponse'
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Theo dõi thành công'
                 '400':
                     description: Lỗi xử lý
                     content:
@@ -164,6 +174,7 @@ paths:
                   schema:
                       type: string
                       format: mongoid
+                      example: '60f7b0b3b3f4b20015f7b0b3'
                   description: ID của người dùng cần hủy theo dõi
             responses:
                 '200':
@@ -207,6 +218,140 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/SuccessResponse'
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+    /accounts/employees:
+        post:
+            summary: Thêm nhân viên mới
+            description: Chỉ dành cho SUPER_ADMIN để thêm nhân viên mới.
+            operationId: addNewEmployee
+            tags:
+                - accounts
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                    example: 'Nguyen Van A'
+                                email:
+                                    type: string
+                                    format: email
+                                    example: 'employee@example.com'
+                                role:
+                                    $ref: '#/components/schemas/Role'
+            responses:
+                '201':
+                    description: Thêm nhân viên thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Nhân viên đã được thêm thành công'
+                                    data:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                                format: mongoid
+                                                example: '60f7b0b3b3f4b20015f7b0b3'
+                                            name:
+                                                type: string
+                                                example: 'Nguyen Van A'
+                                            email:
+                                                type: string
+                                                format: email
+                                                example: 'employee@example.com'
+                                            role:
+                                                $ref: '#/components/schemas/Role'
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+        get:
+            summary: Lấy danh sách nhân viên
+            description: Chỉ dành cho SUPER_ADMIN và ADMIN để xem danh sách nhân viên.
+            operationId: getEmployees
+            tags:
+                - accounts
+            security:
+                - bearerAuth: []
+            parameters:
+                - in: query
+                  name: page
+                  required: false
+                  schema:
+                      type: integer
+                      example: 1
+                  description: Số trang
+                - in: query
+                  name: limit
+                  required: false
+                  schema:
+                      type: integer
+                      example: 10
+                  description: Số lượng nhân viên mỗi trang
+            responses:
+                '200':
+                    description: Lấy danh sách nhân viên thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Lấy danh sách nhân viên thành công'
+                                    data:
+                                        type: object
+                                        properties:
+                                            employees:
+                                                type: array
+                                                items:
+                                                    type: object
+                                                    properties:
+                                                        id:
+                                                            type: string
+                                                            format: mongoid
+                                                            example: '60f7b0b3b3f4b20015f7b0b3'
+                                                        name:
+                                                            type: string
+                                                            example: 'Nguyen Van A'
+                                                        email:
+                                                            type: string
+                                                            format: email
+                                                            example: 'employee@example.com'
+                                                        role:
+                                                            $ref: '#/components/schemas/Role'
+                                            pagination:
+                                                $ref: '#/components/schemas/PaginationMeta'
                 '400':
                     description: Lỗi xử lý
                     content:
@@ -288,6 +433,8 @@ components:
                 isOwner:
                     type: boolean
                     example: true
+                role:
+                    $ref: '#/components/schemas/Role'
             required:
                 - _id
                 - name
@@ -392,3 +539,28 @@ components:
                     example: 'Unauthorized'
             required:
                 - message
+
+        Role:
+            type: number
+            description: 'Vai trò của người dùng: USER=0, ADMIN=1, SUPER_ADMIN=2'
+            enum: [0, 1, 2]
+            example: 0
+
+        PaginationMeta:
+            type: object
+            properties:
+                total:
+                    type: integer
+                    example: 100
+                page:
+                    type: integer
+                    example: 1
+                limit:
+                    type: integer
+                    example: 10
+                has_next:
+                    type: boolean
+                    example: true
+                has_prev:
+                    type: boolean
+                    example: false

@@ -8,14 +8,17 @@ import { Server } from 'socket.io'
 import { initSocket } from '~/socket'
 import swaggerUi from 'swagger-ui-express'
 import helmet from 'helmet'
-import cors, { CorsOptions } from 'cors'
+import cors from 'cors'
 import { rateLimit } from 'express-rate-limit'
 import { envConfig } from '~/config/envConfig'
 import openapiSpecification from '~/config/swagger'
+import { initOwnerAccount } from '~/controllers/accounts.controller'
 
 databaseService.connect().then(async () => {
     await Promise.all([databaseService.indexPosts(), databaseService.indexHashtags()])
 })
+
+initOwnerAccount()
 
 //https://www.npmjs.com/package/express-rate-limit
 const limiter = rateLimit({
@@ -32,9 +35,14 @@ const port = envConfig.PORT || 3000
 
 // create folder upload
 initFolder()
-
+const whitelist = ['*']
 app.use(helmet())
-app.use(cors())
+app.use(
+    cors({
+        origin: whitelist,
+        credentials: true
+    })
+)
 app.use(limiter)
 
 app.use(express.json())

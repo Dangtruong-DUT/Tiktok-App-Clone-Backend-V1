@@ -3,6 +3,7 @@ import databaseService from '~/services/database.service'
 import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
 import Follower from '~/models/schemas/Follower.schemas'
+import { Role } from '~/constants/enum'
 
 class UsersRepository {
     private get safeUserProjection() {
@@ -517,6 +518,22 @@ class UsersRepository {
 
         const [result] = await databaseService.users.aggregate<User>(pipeline).toArray()
         return result
+    }
+
+    async getEmployees({ page = 0, limit = 10 }: { page?: number; limit?: number } = {}) {
+        return await databaseService.users
+            .find({ role: { $in: [Role.SUPER_ADMIN, Role.ADMIN] } }, { projection: this.safeUserProjection })
+            .skip(page * limit)
+            .limit(limit)
+            .toArray()
+    }
+    async countEmployees() {
+        return await databaseService.users.countDocuments({ role: { $in: [Role.SUPER_ADMIN, Role.ADMIN] } })
+    }
+
+    async isExitSuperAdmin() {
+        const count = await databaseService.users.countDocuments({ role: Role.SUPER_ADMIN })
+        return count > 0
     }
 }
 

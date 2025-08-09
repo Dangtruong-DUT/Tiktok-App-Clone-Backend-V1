@@ -19,13 +19,15 @@ import { Request, Response } from 'express'
 import { AUTH_MESSAGES } from '~/constants/messages/auth'
 import { envConfig } from '~/config/envConfig'
 import { TokenPayload } from '~/models/requests/common.requests'
+import authService from '~/services/auth.service'
 
 export const loginController = async (req: Request<ParamsDictionary, LoginRequestBody>, res: Response) => {
     const userFromClient = req.user as User
     const user_id = userFromClient._id as ObjectId
-    const { access_token, refresh_token, user } = await usersServices.login({
+    const { access_token, refresh_token, user } = await authService.login({
         user_id: user_id.toString(),
-        verify: userFromClient.verify
+        verify: userFromClient.verify,
+        role: userFromClient.role
     })
 
     if (!access_token || !refresh_token || !user) {
@@ -46,13 +48,13 @@ export const loginController = async (req: Request<ParamsDictionary, LoginReques
 
 export const oauthGoogleController = async (req: Request, res: Response) => {
     const { code } = req.query as unknown as OauthWithGoogleReqQuery
-    const { access_token, refresh_token } = await usersServices.oauthGoogle(code)
+    const { access_token, refresh_token } = await authService.oauthGoogle(code)
     const redirectUrl = `${envConfig.GOOGLE_REDIRECT_CLIENT_URL}?access_token=${access_token}&refresh_token=${refresh_token}`
     return res.redirect(redirectUrl)
 }
 
 export const registerController = async (req: Request<ParamsDictionary, RegisterRequestBody>, res: Response) => {
-    const { access_token, refresh_token, user } = await usersServices.register(req.body)
+    const { access_token, refresh_token, user } = await authService.register(req.body)
 
     if (!access_token || !refresh_token || !user) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -72,7 +74,7 @@ export const registerController = async (req: Request<ParamsDictionary, Register
 
 export const logoutController = async (req: Request<ParamsDictionary, LogoutRequestBody>, res: Response) => {
     const { refresh_token } = req.body
-    const result = await usersServices.logout(refresh_token)
+    const result = await authService.logout(refresh_token)
     if (result === false) {
         res.status(HTTP_STATUS.BAD_REQUEST).json({ message: AUTH_MESSAGES.LOGOUT_FAILED })
     } else {
@@ -82,7 +84,7 @@ export const logoutController = async (req: Request<ParamsDictionary, LogoutRequ
 
 export const logoutAllDevicesController = async (req: Request, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
-    const result = await usersServices.logoutAllDevices(user_id)
+    const result = await authService.logoutAllDevices(user_id)
     if (result === false) {
         res.status(HTTP_STATUS.BAD_REQUEST).json({ message: AUTH_MESSAGES.LOGOUT_FAILED })
     }
@@ -90,12 +92,13 @@ export const logoutAllDevicesController = async (req: Request, res: Response) =>
 }
 
 export const refreshTokenController = async (req: Request<ParamsDictionary, RefreshTokenReqBody>, res: Response) => {
-    const { user_id, verify } = req.decoded_refresh_token as TokenPayload
+    const { user_id, verify, role } = req.decoded_refresh_token as TokenPayload
     const { refresh_token: old_refresh_token } = req.body
-    const { access_token, refresh_token } = await usersServices.refreshToken({
+    const { access_token, refresh_token } = await authService.refreshToken({
         refresh_token: old_refresh_token,
         user_id,
-        verify
+        verify,
+        role
     })
     res.status(HTTP_STATUS.OK).json({
         message: AUTH_MESSAGES.REFRESH_TOKEN_SUCCESS,

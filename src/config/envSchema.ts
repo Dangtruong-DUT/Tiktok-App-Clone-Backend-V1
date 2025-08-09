@@ -36,5 +36,8 @@ export const envSchema = z.object({
     AWS_REGION: z.string().min(1),
     AWS_S3_BUCKET_NAME: z.string().min(1),
     SES_FROM_ADDRESS: z.string().email(),
-    FRONTEND_URL: z.string().url()
+    FRONTEND_URL: z.string().url(),
+
+    INITIAL_PASSWORD_OWNER: z.string().min(1),
+    INITIAL_EMAIL_OWNER: z.string().email()
 })

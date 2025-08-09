@@ -36,3 +36,14 @@ export enum PosterType {
     COMMENT,
     QUOTE_POST
 }
+
+export enum Role {
+    USER,
+    ADMIN,
+    SUPER_ADMIN
+}
+
+export enum AdminRole {
+    ADMIN = Role.ADMIN,
+    SUPER_ADMIN = Role.SUPER_ADMIN
+}
