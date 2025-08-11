@@ -114,20 +114,3 @@ export const forgotPasswordValidator = validate(
         ['body']
     )
 )
-
-export const oauthGoogleValidator = validate(
-    checkSchema(
-        {
-            code: {
-                trim: true,
-                notEmpty: {
-                    errorMessage: AUTH_MESSAGES.EMAIL_VERIFY_TOKEN_IS_REQUIRED
-                },
-                isString: {
-                    errorMessage: AUTH_MESSAGES.EMAIL_VERIFY_TOKEN_IS_REQUIRED
-                }
-            }
-        },
-        ['query']
-    )
-)

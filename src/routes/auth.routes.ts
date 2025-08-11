@@ -18,7 +18,6 @@ import {
     emailVerifyTokenValidator,
     forgotPasswordValidator,
     loginValidator,
-    oauthGoogleValidator,
     registerValidator,
     resetPasswordValidator,
     verifyForgotPasswordTokenValidator
@@ -32,7 +31,7 @@ const authRouter = Router()
  * method: get
  */
 
-authRouter.get('/login/google', oauthGoogleValidator, wrapRequestHandler(oauthGoogleController))
+authRouter.get('/login/google', wrapRequestHandler(oauthGoogleController))
 
 /**
  * Description. logs in a user

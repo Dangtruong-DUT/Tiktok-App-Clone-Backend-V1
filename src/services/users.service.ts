@@ -62,7 +62,7 @@ class UserService {
         ])
         await sesEmailService.sendVerifyEmail({
             toAddress: user.email,
-            link: `${envConfig.FRONTEND_URL}/verify-email?token=${email_verify_token}`
+            link: `${envConfig.FRONTEND_URL}/en/verify-email?token=${email_verify_token}`
         })
 
         await usersRepository.updateUser(user_id, [
@@ -83,7 +83,7 @@ class UserService {
         await Promise.all([
             sesEmailService.sendForgotPasswordEmail({
                 toAddress: user.email,
-                link: `${envConfig.FRONTEND_URL}/reset-password?token=${forgot_password_token}`
+                link: `${envConfig.FRONTEND_URL}/en/reset-password?token=${forgot_password_token}`
             }),
             usersRepository.updateUser(user_id, [
                 {

@@ -35,12 +35,11 @@ const port = envConfig.PORT || 3000
 
 // create folder upload
 initFolder()
-const whitelist = ['*']
+const whitelist = '*'
 app.use(helmet())
 app.use(
     cors({
-        origin: whitelist,
-        credentials: true
+        origin: whitelist
     })
 )
 app.use(limiter)
