@@ -4,6 +4,7 @@ import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
 import Follower from '~/models/schemas/Follower.schemas'
 import { Role } from '~/constants/enum'
+import { UserType } from '~/models/types/User.types'
 
 class UsersRepository {
     private get safeUserProjection() {
@@ -170,6 +171,36 @@ class UsersRepository {
                     followers_count: { $size: '$followers_count' }
                 }
             },
+            // Lookup likes count từ posts của user này
+            {
+                $lookup: {
+                    from: 'posts',
+                    localField: '_id',
+                    foreignField: 'user_id',
+                    as: 'user_posts'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'likes',
+                    let: { postIds: '$user_posts._id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ['$post_id', '$$postIds']
+                                }
+                            }
+                        }
+                    ],
+                    as: 'likes_on_posts'
+                }
+            },
+            {
+                $addFields: {
+                    likes_count: { $size: '$likes_on_posts' }
+                }
+            },
             {
                 $lookup: viewerId
                     ? {
@@ -205,7 +236,9 @@ class UsersRepository {
                     password: 0,
                     email_verify_token: 0,
                     forgot_password_token: 0,
-                    friend_ship: 0
+                    friend_ship: 0,
+                    user_posts: 0,
+                    likes_on_posts: 0
                 }
             },
             { $skip: page * limit },
@@ -271,6 +304,36 @@ class UsersRepository {
                 $addFields: {
                     'user.followers_count': { $size: '$user_followers_count' }
                 }
+            },
+            // Lookup likes count từ posts của user này
+            {
+                $lookup: {
+                    from: 'posts',
+                    localField: 'user._id',
+                    foreignField: 'user_id',
+                    as: 'user_posts'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'likes',
+                    let: { postIds: '$user_posts._id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ['$post_id', '$$postIds']
+                                }
+                            }
+                        }
+                    ],
+                    as: 'likes_on_posts'
+                }
+            },
+            {
+                $addFields: {
+                    'user.likes_count': { $size: '$likes_on_posts' }
+                }
             }
         ]
 
@@ -314,6 +377,8 @@ class UsersRepository {
                     'user.forgot_password_token': 0,
                     user_following_count: 0,
                     user_followers_count: 0,
+                    user_posts: 0,
+                    likes_on_posts: 0,
                     friend_ship: 0
                 }
             },
@@ -366,6 +431,36 @@ class UsersRepository {
                 $addFields: {
                     'followed_user.followers_count': { $size: '$user_followers_count' }
                 }
+            },
+            // Lookup likes count từ posts của user này
+            {
+                $lookup: {
+                    from: 'posts',
+                    localField: 'followed_user._id',
+                    foreignField: 'user_id',
+                    as: 'user_posts'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'likes',
+                    let: { postIds: '$user_posts._id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ['$post_id', '$$postIds']
+                                }
+                            }
+                        }
+                    ],
+                    as: 'likes_on_posts'
+                }
+            },
+            {
+                $addFields: {
+                    'followed_user.likes_count': { $size: '$likes_on_posts' }
+                }
             }
         ]
 
@@ -409,6 +504,8 @@ class UsersRepository {
                     'followed_user.forgot_password_token': 0,
                     user_following_count: 0,
                     user_followers_count: 0,
+                    user_posts: 0,
+                    likes_on_posts: 0,
                     friend_ship: 0
                 }
             },
@@ -461,6 +558,38 @@ class UsersRepository {
                         $size: '$followers_count'
                     }
                 }
+            },
+            // Lookup likes count từ posts của user này
+            {
+                $lookup: {
+                    from: 'posts',
+                    localField: '_id',
+                    foreignField: 'user_id',
+                    as: 'user_posts'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'likes',
+                    let: { postIds: '$user_posts._id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ['$post_id', '$$postIds']
+                                }
+                            }
+                        }
+                    ],
+                    as: 'likes_on_posts'
+                }
+            },
+            {
+                $addFields: {
+                    likes_count: {
+                        $size: '$likes_on_posts'
+                    }
+                }
             }
         ]
 
@@ -506,17 +635,19 @@ class UsersRepository {
             })
         }
 
-        // Project để ẩn các trường nhạy cảm
+        // Project để ẩn các trường nhạy cảm và cleanup
         pipeline.push({
             $project: {
                 password: 0,
                 email_verify_token: 0,
                 forgot_password_token: 0,
-                friend_ship: 0
+                friend_ship: 0,
+                user_posts: 0,
+                likes_on_posts: 0
             }
         })
 
-        const [result] = await databaseService.users.aggregate<User>(pipeline).toArray()
+        const [result] = await databaseService.users.aggregate<UserType>(pipeline).toArray()
         return result
     }
 

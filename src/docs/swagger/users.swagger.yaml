@@ -423,16 +423,25 @@ components:
                     type: integer
                     minimum: 0
                     example: 0
+                    description: Số người đang follow
                 followers_count:
                     type: integer
                     minimum: 0
                     example: 1
+                    description: Số người theo dõi
+                likes_count:
+                    type: integer
+                    minimum: 0
+                    example: 1250
+                    description: Tổng số lượt like trên tất cả posts của user
                 is_followed:
                     type: boolean
                     example: false
+                    description: Viewer có đang follow user này không
                 isOwner:
                     type: boolean
                     example: true
+                    description: Có phải chính chủ account không
                 role:
                     $ref: '#/components/schemas/Role'
             required:
