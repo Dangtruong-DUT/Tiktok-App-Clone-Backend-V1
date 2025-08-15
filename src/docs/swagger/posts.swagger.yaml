@@ -11,6 +11,57 @@ servers:
       description: Production Server
 
 paths:
+    /posts/foryou:
+        get:
+            summary: Lấy bài viết for you
+            description: Lấy danh sách bài viết đề xuất cho người dùng (for you page).
+            operationId: getForYouPosts
+            tags:
+                - posts
+            security:
+                - bearerAuth: []
+            parameters:
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                  description: Số trang (bắt đầu từ 1)
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                  description: Số lượng item trên mỗi trang
+            responses:
+                '200':
+                    description: Lấy danh sách bài viết thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Lấy danh sách bài viết thành công'
+                                    data:
+                                        type: object
+                                        properties:
+                                            posts:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/Post'
+                                    meta:
+                                        $ref: '#/components/schemas/PaginationMeta'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
     /posts:
         post:
             summary: Tạo bài viết mới
@@ -647,6 +698,7 @@ components:
             properties:
                 _id:
                     type: string
+                    format: mongoid
                     example: '687dfe7e5db6fa0f4b96a5df'
                 name:
                     type: string
@@ -655,6 +707,35 @@ components:
                     type: string
                     format: email
                     example: 'ndtrg281@gmail.com'
+                date_of_birth:
+                    type: string
+                    format: date-time
+                    description: Ngày sinh theo chuẩn ISO 8601
+                    example: '2025-02-03T06:49:06.375Z'
+                updated_at:
+                    type: string
+                    format: date-time
+                    description: Thời gian cập nhật theo chuẩn ISO 8601
+                    example: '2025-07-27T03:48:10.405Z'
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Thời gian tạo theo chuẩn ISO 8601
+                    example: '2025-07-21T08:46:54.495Z'
+                verify:
+                    type: boolean
+                    description: Trạng thái xác thực tài khoản
+                    example: true
+                bio:
+                    type: string
+                    example: 'Hello, I am a TikTok user!'
+                location:
+                    type: string
+                    example: 'Ho Chi Minh City, Vietnam'
+                website:
+                    type: string
+                    format: uri
+                    example: 'https://example.com'
                 username:
                     type: string
                     example: 'User61448881'
@@ -662,6 +743,47 @@ components:
                     type: string
                     format: uri
                     example: 'https://example.com/avatar.jpg'
+                cover_photo:
+                    type: string
+                    format: uri
+                    example: 'https://example.com/cover.jpg'
+                following_count:
+                    type: integer
+                    minimum: 0
+                    example: 0
+                    description: Số người đang follow
+                followers_count:
+                    type: integer
+                    minimum: 0
+                    example: 1
+                    description: Số người theo dõi
+                likes_count:
+                    type: integer
+                    minimum: 0
+                    example: 1250
+                    description: Tổng số lượt like trên tất cả posts của user
+                is_followed:
+                    type: boolean
+                    example: false
+                    description: Viewer có đang follow user này không
+                isOwner:
+                    type: boolean
+                    example: true
+                    description: Có phải chính chủ account không
+                role:
+                    type: number
+                    description: 'Vai trò của người dùng: USER=0, ADMIN=1, SUPER_ADMIN=2'
+                    enum: [0, 1, 2]
+                    example: 0
+            required:
+                - _id
+                - name
+                - email
+                - date_of_birth
+                - updated_at
+                - created_at
+                - verify
+                - username
 
         SuccessResponse:
             type: object

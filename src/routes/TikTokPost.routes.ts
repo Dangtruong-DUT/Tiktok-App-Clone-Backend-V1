@@ -3,6 +3,7 @@ import {
     bookMarksTiktokPostController,
     createTikTokPostController,
     getChildrenPostsController,
+    getForYouPostsController,
     getFriendPostsController,
     getPostDetailController,
     likesTiktokPostController,
@@ -49,11 +50,22 @@ tiktokPostRouter.post(
  * query: {
  * page: number
  * limit: number
- * type: number // 2: comments, 1: re·post, 3: quotes
  * }
  *
  */
 tiktokPostRouter.get('/friend', authenticate, paginationValidator, wrapRequestHandler(getFriendPostsController))
+
+/**
+ * Get children of post
+ * Path: /foryou
+ * method: GET
+ * query: {
+ * page: number
+ * limit: number
+ * }
+ *
+ */
+tiktokPostRouter.get('/foryou', paginationValidator, wrapRequestHandler(getForYouPostsController))
 
 /**
  * Description. Get post detail

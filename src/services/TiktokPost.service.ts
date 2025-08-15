@@ -161,6 +161,34 @@ class TikTokPostService {
             total
         }
     }
+
+    async getForYouPosts({ user_id, page = 0, limit = 10 }: { user_id?: string; page?: number; limit?: number }) {
+        const [posts, total] = await Promise.all([
+            tikTokPostRepository.findForYouPosts({ user_id, page, limit }),
+            tikTokPostRepository.countForYouPosts(user_id)
+        ])
+
+        const postsAfterIncreaseViews = await Promise.all(
+            posts.map(async (post: { _id?: ObjectId; [key: string]: unknown }) => {
+                let mutateData = {}
+                if (post && post._id) {
+                    mutateData = await this.increasePostViews({
+                        post_id: post._id.toString(),
+                        user_id
+                    })
+                }
+                return {
+                    ...post,
+                    ...mutateData
+                }
+            })
+        )
+
+        return {
+            posts: postsAfterIncreaseViews,
+            total
+        }
+    }
 }
 
 export default TikTokPostService.getInstance()
