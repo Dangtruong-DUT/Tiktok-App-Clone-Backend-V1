@@ -6,6 +6,7 @@ import { REGEX_USERNAME } from '~/constants/regex'
 import { validate } from '~/middlewares/validation.middlewares'
 import { ErrorWithStatus } from '~/models/Errors'
 import { TokenPayload } from '~/models/requests/common.requests'
+import { UserProfileWithSensitiveResponse } from '~/models/responses'
 import usersServices from '~/services/users.service'
 import { hashPassword } from '~/utils/crypto'
 import { validateTargetUserId } from '~/validations/customs/user.custom'
@@ -93,7 +94,10 @@ export const changePasswordValidator = validate(
                     options: async (value: string, { req }) => {
                         const decoded_authorization = (req as Request).decoded_authorization
                         const { user_id } = decoded_authorization as TokenPayload
-                        const user = await usersServices.getUserById(user_id)
+                        const user = (await usersServices.getUserById({
+                            user_id,
+                            isSensitiveHidden: false
+                        })) as UserProfileWithSensitiveResponse
                         if (!user) {
                             throw new ErrorWithStatus({
                                 message: USER_MESSAGES.USER_NOT_FOUND,
@@ -113,7 +117,10 @@ export const changePasswordValidator = validate(
                     options: async (value: string, { req }) => {
                         const decoded_authorization = (req as Request).decoded_authorization
                         const { user_id } = decoded_authorization as TokenPayload
-                        const user = await usersServices.getUserById(user_id)
+                        const user = (await usersServices.getUserById({
+                            user_id,
+                            isSensitiveHidden: false
+                        })) as UserProfileWithSensitiveResponse
                         if (!user) {
                             throw new Error(USER_MESSAGES.USER_NOT_FOUND)
                         }

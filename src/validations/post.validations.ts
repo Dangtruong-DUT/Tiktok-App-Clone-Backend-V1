@@ -130,7 +130,7 @@ export const createTiktokPostValidator = validate(
                     options: async (value: string[]) => {
                         const results = await Promise.all(
                             value.map(async (item) => {
-                                const user = await usersServices.getUserById(item)
+                                const user = await usersServices.getUserById({ user_id: item })
                                 return user !== null
                             })
                         )

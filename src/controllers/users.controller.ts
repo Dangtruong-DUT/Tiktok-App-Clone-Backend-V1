@@ -12,12 +12,13 @@ import {
 import { USER_MESSAGES } from '~/constants/messages/user'
 import { ErrorWithStatus } from '~/models/Errors'
 import { TokenPayload } from '~/models/requests/common.requests'
+import HTTP_STATUS from '~/constants/httpStatus'
 
 export const getMeProfileController = async (req: Request, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
-    const user = await usersServices.getUserById(user_id, user_id)
+    const user = await usersServices.getUserById({ user_id, viewer_id: user_id, isSensitiveHidden: true })
     if (!user) {
-        throw new ErrorWithStatus({ message: USER_MESSAGES.USER_NOT_FOUND, status: 404 })
+        throw new ErrorWithStatus({ message: USER_MESSAGES.USER_NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
     }
     res.json({
         message: USER_MESSAGES.GET_USER_SUCCESS,

@@ -14,8 +14,7 @@ import sesEmailService from '~/services/aws/ses.email.service'
 import { AddNewEmployeeReqBody } from '~/models/requests/account.request'
 import User from '~/models/schemas/User.schema'
 import { UserType } from '~/models/types/User.types'
-import { UserProfileResponse, SearchUserResponse, FollowListResponse } from '~/models/responses/user.responses'
-import { UserResponseTransformer } from '~/utils/transformers/user.transformer'
+import { UserProfileResponse, UserProfileWithSensitiveResponse } from '~/models/responses/user.responses'
 
 class UserService {
     private static instance: UserService
@@ -57,7 +56,7 @@ class UserService {
 
     async resendVerifyEmail(user_id: string) {
         const [user, email_verify_token] = await Promise.all([
-            usersRepository.findUserById(user_id),
+            usersRepository.findUserById({ user_id }),
             signEmailVerifyToken(user_id, Role.USER)
         ])
         await sesEmailService.sendVerifyEmail({
@@ -78,7 +77,7 @@ class UserService {
     async forgotPassword(user_id: string) {
         const [forgot_password_token, user] = await Promise.all([
             signForgotPasswordToken(user_id, Role.USER),
-            usersRepository.findUserById(user_id)
+            usersRepository.findUserById({ user_id })
         ])
         await Promise.all([
             sesEmailService.sendForgotPasswordEmail({
@@ -108,8 +107,16 @@ class UserService {
         ])
     }
 
-    async getUserById(user_id: string, viewer_id?: string): Promise<UserProfileResponse> {
-        const user = await usersRepository.findUserById(user_id, viewer_id)
+    async getUserById({
+        user_id,
+        viewer_id,
+        isSensitiveHidden
+    }: {
+        user_id: string
+        viewer_id?: string
+        isSensitiveHidden?: boolean
+    }): Promise<UserProfileResponse | UserProfileWithSensitiveResponse> {
+        const user = await usersRepository.findUserById({ user_id, viewer_id, isSensitiveHidden })
         if (!user) {
             throw new ErrorWithStatus({
                 message: USER_MESSAGES.USER_NOT_FOUND,
@@ -123,11 +130,11 @@ class UserService {
             isOwner
         }
 
-        return UserResponseTransformer.toUserProfile(userWithOwnership)
+        return userWithOwnership
     }
 
     async getUserByEmail(email: string, viewer_id?: string) {
-        const user = await usersRepository.findUserByEmail(email, viewer_id)
+        const user = await usersRepository.findUserByEmail({ email, viewer_id })
         if (!user) {
             throw new ErrorWithStatus({
                 message: USER_MESSAGES.USER_NOT_FOUND,
@@ -165,7 +172,7 @@ class UserService {
             isOwner
         }
 
-        return UserResponseTransformer.toUserProfile(userWithOwnership)
+        return userWithOwnership
     }
 
     async updateUserById(user_id: string, payload: UpdateUserRequestBody): Promise<UserProfileResponse> {
@@ -194,7 +201,7 @@ class UserService {
             isOwner: true
         }
 
-        return UserResponseTransformer.toMyProfile(userWithOwnership)
+        return userWithOwnership
     }
 
     async followUser({ user_id, followed_user_id }: { user_id: string; followed_user_id: string }) {
@@ -227,23 +234,23 @@ class UserService {
         return await usersRepository.checkFriendshipStatus(user_id, target_user_id)
     }
 
-    async searchUsers(query: string, page = 0, limit = 10, viewer_id?: string): Promise<SearchUserResponse[]> {
+    async searchUsers(query: string, page = 0, limit = 10, viewer_id?: string): Promise<UserProfileResponse[]> {
         const users = (await usersRepository.searchUsers({ query, page, limit, viewer_id })) as UserType[]
-        return UserResponseTransformer.toSearchUserList(users)
+        return users
     }
 
-    async getUserFollowers(user_id: string, page = 0, limit = 10, viewer_id?: string): Promise<FollowListResponse[]> {
+    async getUserFollowers(user_id: string, page = 0, limit = 10, viewer_id?: string): Promise<UserProfileResponse[]> {
         const followers = (await usersRepository.getUserFollowers(user_id, page, limit, viewer_id)) as {
             user: UserType
         }[]
-        return followers.map((follower) => UserResponseTransformer.toFollowList(follower.user))
+        return followers.map((follower) => follower.user)
     }
 
-    async getUserFollowing(user_id: string, page = 0, limit = 10, viewer_id?: string): Promise<FollowListResponse[]> {
+    async getUserFollowing(user_id: string, page = 0, limit = 10, viewer_id?: string): Promise<UserProfileResponse[]> {
         const following = (await usersRepository.getUserFollowing(user_id, page, limit, viewer_id)) as {
             followed_user: UserType
         }[]
-        return following.map((follow) => UserResponseTransformer.toFollowList(follow.followed_user))
+        return following.map((follow) => follow.followed_user)
     }
 
     async getUserProfileWithDetails(target_user_id: string, viewer_id?: string): Promise<UserProfileResponse> {
@@ -261,7 +268,7 @@ class UserService {
             isOwner
         }
 
-        return UserResponseTransformer.toUserProfile(userWithOwnership)
+        return userWithOwnership
     }
     async addNewEmployee(data: Omit<AddNewEmployeeReqBody, 'confirm_password'>) {
         const newUser = new User({

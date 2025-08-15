@@ -12,7 +12,7 @@ export const validateTargetUserId: CustomValidator = async (value: string, { req
     if (!ObjectId.isValid(value)) {
         throw new Error(USER_MESSAGES.INVALID_USER_ID)
     }
-    const user = await usersServices.getUserById(value)
+    const user = await usersServices.getUserById({ user_id: value })
     if (!user) {
         throw new ErrorWithStatus({
             message: USER_MESSAGES.USER_NOT_FOUND,
@@ -30,7 +30,7 @@ export const validateTargetUserId: CustomValidator = async (value: string, { req
 }
 
 export const checkUserExistsById: CustomValidator = async (value: string, { req }) => {
-    const user = await usersServices.getUserById(value)
+    const user = await usersServices.getUserById({ user_id: value })
     if (!user) {
         throw new ErrorWithStatus({
             message: USER_MESSAGES.USER_NOT_FOUND,

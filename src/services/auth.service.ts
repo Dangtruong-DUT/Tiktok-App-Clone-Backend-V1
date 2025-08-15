@@ -40,7 +40,7 @@ class AuthService {
             })
         )
 
-        const user = await usersRepository.findUserById(user_id.toString())
+        const user = await usersRepository.findUserById({ user_id: user_id.toString() })
 
         await sesEmailService.sendVerifyEmail({
             toAddress: user.email,
@@ -111,7 +111,13 @@ class AuthService {
         }
 
         if (isExists) {
-            const user = (await usersRepository.findUserByEmail(userInfo.email)) as User
+            const user = await usersRepository.findUserByEmail({ email: userInfo.email })
+            if (!user) {
+                throw new ErrorWithStatus({
+                    message: USER_MESSAGES.USER_NOT_FOUND,
+                    status: HTTP_STATUS.NOT_FOUND
+                })
+            }
             const [access_token, refresh_token] = await signAccessAndRefreshToken({
                 userId: user._id?.toString() as string,
                 verify: user.verify,
@@ -119,7 +125,7 @@ class AuthService {
             })
 
             await usersRepository.insertRefreshToken(
-                new RefreshToken({ user_id: user._id as ObjectId, token: refresh_token })
+                new RefreshToken({ user_id: new ObjectId(user._id), token: refresh_token })
             )
 
             return {

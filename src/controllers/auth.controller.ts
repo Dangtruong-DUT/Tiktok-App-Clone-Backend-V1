@@ -125,7 +125,10 @@ export const verifyEmailController = async (req: Request<ParamsDictionary, Verif
 
 export const resendVerifyEmailController = async (req: Request, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
-    const user = await usersServices.getUserById(user_id)
+    const user = await usersServices.getUserById({
+        user_id: user_id,
+        isSensitiveHidden: true
+    })
     // if user is not found throw an error
     if (user === null) {
         res.status(HTTP_STATUS.NOT_FOUND).json({

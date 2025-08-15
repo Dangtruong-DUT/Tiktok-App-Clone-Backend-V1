@@ -19,14 +19,30 @@ class UsersRepository {
         return await databaseService.users.insertOne(user)
     }
 
-    async findUserById(user_id: string, viewer_id?: string) {
-        return this.getUserProfileWithDetails({ target_user_id: user_id, viewer_id })
+    async findUserById({
+        user_id,
+        viewer_id,
+        isSensitiveHidden = true
+    }: {
+        user_id: string
+        viewer_id?: string
+        isSensitiveHidden?: boolean
+    }) {
+        return this.getUserProfileWithDetails({ target_user_id: user_id, viewer_id, isSensitiveHidden })
     }
 
-    async findUserByEmail(email: string, viewer_id?: string) {
+    async findUserByEmail({
+        email,
+        viewer_id,
+        isSensitiveHidden = true
+    }: {
+        email: string
+        viewer_id?: string
+        isSensitiveHidden?: boolean
+    }) {
         const user = await databaseService.users.findOne({ email }, { projection: { _id: 1 } })
         if (!user) return null
-        return this.getUserProfileWithDetails({ target_user_id: user._id.toString(), viewer_id })
+        return this.getUserProfileWithDetails({ target_user_id: user._id.toString(), viewer_id, isSensitiveHidden })
     }
 
     async findUserObjectByEmail(email: string) {
@@ -517,7 +533,15 @@ class UsersRepository {
         return await databaseService.followers.aggregate(pipeline).toArray()
     }
 
-    async getUserProfileWithDetails({ target_user_id, viewer_id }: { target_user_id: string; viewer_id?: string }) {
+    async getUserProfileWithDetails({
+        target_user_id,
+        viewer_id,
+        isSensitiveHidden = true
+    }: {
+        target_user_id: string
+        viewer_id?: string
+        isSensitiveHidden?: boolean
+    }) {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const targetUserId = new ObjectId(target_user_id)
 
@@ -635,17 +659,24 @@ class UsersRepository {
             })
         }
 
-        // Project để ẩn các trường nhạy cảm và cleanup
         pipeline.push({
             $project: {
-                password: 0,
-                email_verify_token: 0,
-                forgot_password_token: 0,
                 friend_ship: 0,
                 user_posts: 0,
                 likes_on_posts: 0
             }
         })
+
+        // Project để ẩn các trường nhạy cảm và cleanup
+        if (isSensitiveHidden) {
+            pipeline.push({
+                $project: {
+                    password: 0,
+                    email_verify_token: 0,
+                    forgot_password_token: 0
+                }
+            })
+        }
 
         const [result] = await databaseService.users.aggregate<UserType>(pipeline).toArray()
         return result

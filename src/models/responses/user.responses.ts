@@ -23,51 +23,8 @@ export interface UserProfileResponse {
     role: Role
 }
 
-// Response type cho search users
-export interface SearchUserResponse {
-    _id: string
-    name: string
-    username: string
-    avatar: string
-    bio: string
-    verify: UserVerifyStatus
-    following_count: number
-    followers_count: number
-    likes_count: number
-    is_followed: boolean
-    role: Role
-}
-
-// Response type cho followers/following list
-export interface FollowListResponse {
-    _id: string
-    name: string
-    username: string
-    avatar: string
-    bio: string
-    verify: UserVerifyStatus
-    following_count: number
-    followers_count: number
-    likes_count: number
-    is_followed: boolean
-    role: Role
-}
-
-// Response wrapper cho API responses
-export interface UserApiResponse<T> {
-    message: string
-    data: T
-}
-
-export interface UserListApiResponse<T> {
-    message: string
-    data: {
-        users: T[]
-        meta: {
-            page: number
-            limit: number
-            total_pages: number
-            total: number
-        }
-    }
+export interface UserProfileWithSensitiveResponse extends UserProfileResponse {
+    password: string
+    email_verify_token: string
+    forgot_password_token: string
 }
