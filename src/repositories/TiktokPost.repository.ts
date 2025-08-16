@@ -1291,6 +1291,120 @@ class TikTokPostRepository {
 
         pipeline.push({ $sort: { created_at: -1 } }, { $skip: page > 0 ? (page - 1) * limit : 0 }, { $limit: limit })
 
+        pipeline.push({
+            $lookup: {
+                from: 'users',
+                let: { authorId: '$user_id' },
+                pipeline: [
+                    { $match: { $expr: { $eq: ['$_id', '$$authorId'] } } },
+
+                    // Lookup following count
+                    {
+                        $lookup: {
+                            from: 'followers',
+                            localField: '_id',
+                            foreignField: 'user_id',
+                            as: 'following_count'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            following_count: { $size: '$following_count' }
+                        }
+                    },
+
+                    // Lookup followers count
+                    {
+                        $lookup: {
+                            from: 'followers',
+                            localField: '_id',
+                            foreignField: 'followed_user_id',
+                            as: 'followers_count'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            followers_count: { $size: '$followers_count' }
+                        }
+                    },
+
+                    // Lookup likes trên tất cả posts của user
+                    {
+                        $lookup: {
+                            from: 'posts',
+                            localField: '_id',
+                            foreignField: 'user_id',
+                            as: 'user_posts'
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'likes',
+                            let: { postIds: '$user_posts._id' },
+                            pipeline: [{ $match: { $expr: { $in: ['$post_id', '$$postIds'] } } }],
+                            as: 'likes_on_posts'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            likes_count: { $size: '$likes_on_posts' }
+                        }
+                    },
+
+                    // Nếu có viewerId thì check quan hệ follow
+                    ...(user_id
+                        ? [
+                              {
+                                  $lookup: {
+                                      from: 'followers',
+                                      let: { authorId: '$_id' },
+                                      pipeline: [
+                                          {
+                                              $match: {
+                                                  user_id: viewerId,
+                                                  $expr: { $eq: ['$followed_user_id', '$$authorId'] }
+                                              }
+                                          }
+                                      ],
+                                      as: 'friend_ship'
+                                  }
+                              },
+                              {
+                                  $addFields: {
+                                      is_followed: { $gt: [{ $size: '$friend_ship' }, 0] }
+                                  }
+                              }
+                          ]
+                        : [
+                              {
+                                  $addFields: {
+                                      is_followed: false
+                                  }
+                              }
+                          ]),
+
+                    // Ẩn các trường nhạy cảm của author
+                    {
+                        $project: {
+                            password: 0,
+                            email_verify_token: 0,
+                            forgot_password_token: 0,
+                            user_posts: 0,
+                            likes_on_posts: 0,
+                            friend_ship: 0
+                        }
+                    }
+                ],
+                as: 'author'
+            }
+        })
+
+        pipeline.push({
+            $addFields: {
+                author: { $arrayElemAt: ['$author', 0] }
+            }
+        })
+
         return await databaseService.tiktokPost.aggregate(pipeline).toArray()
     }
 
@@ -1578,6 +1692,121 @@ class TikTokPostRepository {
             { $skip: page > 0 ? (page - 1) * limit : 0 },
             { $limit: limit }
         ]
+
+        pipeline.push({
+            $lookup: {
+                from: 'users',
+                let: { authorId: '$user_id' },
+                pipeline: [
+                    { $match: { $expr: { $eq: ['$_id', '$$authorId'] } } },
+
+                    // Lookup following count
+                    {
+                        $lookup: {
+                            from: 'followers',
+                            localField: '_id',
+                            foreignField: 'user_id',
+                            as: 'following_count'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            following_count: { $size: '$following_count' }
+                        }
+                    },
+
+                    // Lookup followers count
+                    {
+                        $lookup: {
+                            from: 'followers',
+                            localField: '_id',
+                            foreignField: 'followed_user_id',
+                            as: 'followers_count'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            followers_count: { $size: '$followers_count' }
+                        }
+                    },
+
+                    // Lookup likes trên tất cả posts của user
+                    {
+                        $lookup: {
+                            from: 'posts',
+                            localField: '_id',
+                            foreignField: 'user_id',
+                            as: 'user_posts'
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'likes',
+                            let: { postIds: '$user_posts._id' },
+                            pipeline: [{ $match: { $expr: { $in: ['$post_id', '$$postIds'] } } }],
+                            as: 'likes_on_posts'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            likes_count: { $size: '$likes_on_posts' }
+                        }
+                    },
+
+                    // Nếu có viewerId thì check quan hệ follow
+                    ...(user_id
+                        ? [
+                              {
+                                  $lookup: {
+                                      from: 'followers',
+                                      let: { authorId: '$_id' },
+                                      pipeline: [
+                                          {
+                                              $match: {
+                                                  user_id: viewerId,
+                                                  $expr: { $eq: ['$followed_user_id', '$$authorId'] }
+                                              }
+                                          }
+                                      ],
+                                      as: 'friend_ship'
+                                  }
+                              },
+                              {
+                                  $addFields: {
+                                      is_followed: { $gt: [{ $size: '$friend_ship' }, 0] }
+                                  }
+                              }
+                          ]
+                        : [
+                              {
+                                  $addFields: {
+                                      is_followed: false
+                                  }
+                              }
+                          ]),
+
+                    // Ẩn các trường nhạy cảm của author
+                    {
+                        $project: {
+                            password: 0,
+                            email_verify_token: 0,
+                            forgot_password_token: 0,
+                            user_posts: 0,
+                            likes_on_posts: 0,
+                            friend_ship: 0
+                        }
+                    }
+                ],
+                as: 'author'
+            }
+        })
+
+        // Flatten author vì nó là array
+        pipeline.push({
+            $addFields: {
+                author: { $arrayElemAt: ['$author', 0] }
+            }
+        })
 
         return await databaseService.tiktokPost.aggregate(pipeline).toArray()
     }
