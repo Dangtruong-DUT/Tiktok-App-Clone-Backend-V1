@@ -3,6 +3,124 @@ import databaseService from '~/services/database.service'
 import TikTokPost from '~/models/schemas/TikTokPost.schemas'
 import { PosterType } from '~/constants/enum'
 
+// --- Pipeline helpers ---
+function lookupHashtags() {
+    return {
+        $lookup: {
+            from: 'hashtags',
+            localField: 'hashtags',
+            foreignField: '_id',
+            as: 'hashtags'
+        }
+    }
+}
+
+function lookupMentions() {
+    return {
+        $lookup: {
+            from: 'users',
+            localField: 'mentions',
+            foreignField: '_id',
+            as: 'mentions'
+        }
+    }
+}
+
+function addMentionsFields() {
+    return {
+        $addFields: {
+            mentions: {
+                $map: {
+                    input: '$mentions',
+                    as: 'mention',
+                    in: {
+                        _id: '$$mention._id',
+                        name: '$$mention.name',
+                        username: '$$mention.username',
+                        email: '$$mention.email'
+                    }
+                }
+            }
+        }
+    }
+}
+
+function lookupLikes() {
+    return {
+        $lookup: {
+            from: 'likes',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'likes'
+        }
+    }
+}
+
+function lookupBookmarks() {
+    return {
+        $lookup: {
+            from: 'bookmarks',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'bookmarks'
+        }
+    }
+}
+
+function addStatsFields() {
+    return {
+        $addFields: {
+            likes_count: { $size: '$likes' },
+            bookmarks_count: { $size: '$bookmarks' }
+        }
+    }
+}
+
+function lookupChildrenPosts() {
+    return {
+        $lookup: {
+            from: 'tiktok_post',
+            localField: '_id',
+            foreignField: 'parent_id',
+            as: 'children_posts'
+        }
+    }
+}
+
+function addChildrenCounts() {
+    return {
+        $addFields: {
+            comments_count: {
+                $size: {
+                    $filter: {
+                        input: '$children_posts',
+                        as: 'item',
+                        cond: { $eq: ['$$item.type', 2] }
+                    }
+                }
+            },
+            reposts_count: {
+                $size: {
+                    $filter: {
+                        input: '$children_posts',
+                        as: 'item',
+                        cond: { $eq: ['$$item.type', 1] }
+                    }
+                }
+            },
+            quotes_count: {
+                $size: {
+                    $filter: {
+                        input: '$children_posts',
+                        as: 'item',
+                        cond: { $eq: ['$$item.type', 3] }
+                    }
+                }
+            }
+        }
+    }
+}
+
 class TikTokPostRepository {
     private static instance: TikTokPostRepository
     static getInstance(): TikTokPostRepository {
@@ -320,109 +438,40 @@ class TikTokPostRepository {
 
     async findPostById(post_id: string) {
         const pipeline = [
-            {
-                $match: {
-                    _id: new ObjectId(post_id)
-                }
-            },
-            {
-                $lookup: {
-                    from: 'hashtags',
-                    localField: 'hashtags',
-                    foreignField: '_id',
-                    as: 'hashtags'
-                }
-            },
-            {
-                $lookup: {
-                    from: 'users',
-                    localField: 'mentions',
-                    foreignField: '_id',
-                    as: 'mentions'
-                }
-            },
-            {
-                $addFields: {
-                    mentions: {
-                        $map: {
-                            input: '$mentions',
-                            as: 'mention',
-                            in: {
-                                _id: '$$mention._id',
-                                name: '$$mention.name',
-                                ussername: '$$mention.username',
-                                email: '$$mention.email'
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                $lookup: {
-                    from: 'likes',
-                    localField: '_id',
-                    foreignField: 'post_id',
-                    as: 'likes_count'
-                }
-            },
-            {
-                $lookup: {
-                    from: 'bookmarks',
-                    localField: '_id',
-                    foreignField: 'post_id',
-                    as: 'bookmarks_count'
-                }
-            },
-            {
-                $addFields: {
-                    bookmarks_count: {
-                        $size: '$bookmarks_count'
-                    },
-                    likes_count: {
-                        $size: '$likes_count'
-                    }
-                }
-            },
-            {
-                $lookup: {
-                    from: 'tiktok_post',
-                    localField: '_id',
-                    foreignField: 'parent_id',
-                    as: 'post_children'
-                }
-            },
+            { $match: { _id: new ObjectId(post_id) } },
+            lookupHashtags(),
+            lookupMentions(),
+            addMentionsFields(),
+            lookupLikes(),
+            lookupBookmarks(),
+            addStatsFields(),
+            lookupChildrenPosts(),
             {
                 $addFields: {
                     repost_count: {
                         $size: {
                             $filter: {
-                                input: '$post_children',
+                                input: '$children_posts',
                                 as: 'item',
-                                cond: {
-                                    $eq: ['$$item.type', 1]
-                                }
+                                cond: { $eq: ['$$item.type', 1] }
                             }
                         }
                     },
                     comment_count: {
                         $size: {
                             $filter: {
-                                input: '$post_children',
+                                input: '$children_posts',
                                 as: 'item',
-                                cond: {
-                                    $eq: ['$$item.type', 2]
-                                }
+                                cond: { $eq: ['$$item.type', 2] }
                             }
                         }
                     },
                     quote_post_count: {
                         $size: {
                             $filter: {
-                                input: '$post_children',
+                                input: '$children_posts',
                                 as: 'item',
-                                cond: {
-                                    $eq: ['$$item.type', 3]
-                                }
+                                cond: { $eq: ['$$item.type', 3] }
                             }
                         }
                     }
@@ -436,7 +485,6 @@ class TikTokPostRepository {
                 }
             }
         ]
-
         const [result] = await databaseService.tiktokPost.aggregate<TikTokPost>(pipeline).toArray()
         return result
     }
