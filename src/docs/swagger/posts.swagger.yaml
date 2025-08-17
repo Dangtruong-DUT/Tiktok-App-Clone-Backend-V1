@@ -448,10 +448,30 @@ components:
                 mentions:
                     type: array
                     items:
-                        type: string
-                        format: mongoid
-                    example: []
-                    description: Danh sách user_id được mention
+                        type: object
+                        properties:
+                            _id:
+                                type: string
+                                format: mongoid
+                                example: '68806273dcf4b03c487e533d'
+                            name:
+                                type: string
+                                example: 'Nguyen Van A'
+                            username:
+                                type: string
+                                example: 'user123'
+                            email:
+                                type: string
+                                example: 'user@example.com'
+                    example:
+                        - _id: '68806273dcf4b03c487e533d'
+                          name: 'Nguyen Van A'
+                          username: 'user123'
+                          email: 'user@example.com'
+                    description: Danh sách user được mention
+                author:
+                    $ref: '#/components/schemas/User'
+                    description: Thông tin tác giả bài viết
                 created_at:
                     type: string
                     format: date-time

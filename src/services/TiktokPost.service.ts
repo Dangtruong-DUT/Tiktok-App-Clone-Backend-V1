@@ -48,31 +48,15 @@ class TikTokPostService {
         return post
     }
 
-    async getPostById(post_id: string) {
-        return await tikTokPostRepository.findPostById(post_id)
-    }
-
     async getPostDetail({ post_id, user_id }: { post_id: string; user_id?: string }) {
-        let is_liked = false
-        let is_bookmarked = false
-
-        if (user_id) {
-            is_liked = await likesBookmarksRepository.checkIsLiked(post_id, user_id)
-            is_bookmarked = await likesBookmarksRepository.checkIsBookmarked(post_id, user_id)
-        }
-
-        const post = await this.getPostById(post_id)
+        const post = await tikTokPostRepository.findPostById({ post_id, viewer_id: user_id })
         if (!post) {
             throw new ErrorWithStatus({
                 message: POST_MESSAGES.POST_NOT_FOUND,
                 status: HTTP_STATUS.NOT_FOUND
             })
         }
-        return {
-            ...post,
-            is_liked,
-            is_bookmarked
-        }
+        return post
     }
 
     async increasePostViews({ post_id, user_id }: { post_id: string; user_id?: string }) {

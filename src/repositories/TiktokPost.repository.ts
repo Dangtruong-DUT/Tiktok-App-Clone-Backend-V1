@@ -436,8 +436,8 @@ class TikTokPostRepository {
         return result?.total || 0
     }
 
-    async findPostById(post_id: string) {
-        const pipeline = [
+    async findPostById({ post_id, viewer_id }: { post_id: string; viewer_id?: string }) {
+        const pipeline: any[] = [
             { $match: { _id: new ObjectId(post_id) } },
             lookupHashtags(),
             lookupMentions(),
@@ -447,17 +447,38 @@ class TikTokPostRepository {
             addStatsFields(),
             lookupChildrenPosts(),
             {
+                $lookup: {
+                    from: 'likes',
+                    localField: '_id',
+                    foreignField: 'post_id',
+                    as: 'likes'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'bookmarks',
+                    localField: '_id',
+                    foreignField: 'post_id',
+                    as: 'bookmarks'
+                }
+            },
+            {
                 $addFields: {
-                    repost_count: {
-                        $size: {
-                            $filter: {
-                                input: '$children_posts',
-                                as: 'item',
-                                cond: { $eq: ['$$item.type', 1] }
-                            }
-                        }
-                    },
-                    comment_count: {
+                    likes_count: { $size: '$likes' },
+                    bookmarks_count: { $size: '$bookmarks' }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'tiktok_post',
+                    localField: '_id',
+                    foreignField: 'parent_id',
+                    as: 'children_posts'
+                }
+            },
+            {
+                $addFields: {
+                    comments_count: {
                         $size: {
                             $filter: {
                                 input: '$children_posts',
@@ -466,7 +487,16 @@ class TikTokPostRepository {
                             }
                         }
                     },
-                    quote_post_count: {
+                    reposts_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 1] }
+                            }
+                        }
+                    },
+                    quotes_count: {
                         $size: {
                             $filter: {
                                 input: '$children_posts',
@@ -478,13 +508,168 @@ class TikTokPostRepository {
                 }
             },
             {
+                $lookup: {
+                    from: 'likes',
+                    let: { postId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewer_id] }]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'likes_by_viewer'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'bookmarks',
+                    let: { postId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewer_id] }]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'bookmarks_by_viewer'
+                }
+            },
+            {
+                $addFields: {
+                    is_liked: { $gt: [{ $size: '$likes_by_viewer' }, 0] },
+                    is_bookmarked: { $gt: [{ $size: '$bookmarks_by_viewer' }, 0] }
+                }
+            },
+            {
                 $project: {
-                    post_children: 0,
-                    guest_views: 0,
-                    user_views: 0
+                    children_posts: 0,
+                    likes_by_viewer: 0,
+                    bookmarks_by_viewer: 0,
+                    likes: 0,
+                    bookmarks: 0
                 }
             }
         ]
+
+        pipeline.push({
+            $lookup: {
+                from: 'users',
+                let: { authorId: '$user_id' },
+                pipeline: [
+                    { $match: { $expr: { $eq: ['$_id', '$$authorId'] } } },
+
+                    // Lookup following count
+                    {
+                        $lookup: {
+                            from: 'followers',
+                            localField: '_id',
+                            foreignField: 'user_id',
+                            as: 'following_count'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            following_count: { $size: '$following_count' }
+                        }
+                    },
+
+                    // Lookup followers count
+                    {
+                        $lookup: {
+                            from: 'followers',
+                            localField: '_id',
+                            foreignField: 'followed_user_id',
+                            as: 'followers_count'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            followers_count: { $size: '$followers_count' }
+                        }
+                    },
+
+                    // Lookup likes trên tất cả posts của user
+                    {
+                        $lookup: {
+                            from: 'posts',
+                            localField: '_id',
+                            foreignField: 'user_id',
+                            as: 'user_posts'
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'likes',
+                            let: { postIds: '$user_posts._id' },
+                            pipeline: [{ $match: { $expr: { $in: ['$post_id', '$$postIds'] } } }],
+                            as: 'likes_on_posts'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            likes_count: { $size: '$likes_on_posts' }
+                        }
+                    },
+
+                    // Nếu có viewerId thì check quan hệ follow
+                    ...(viewer_id
+                        ? [
+                              {
+                                  $lookup: {
+                                      from: 'followers',
+                                      let: { authorId: '$_id' },
+                                      pipeline: [
+                                          {
+                                              $match: {
+                                                  user_id: viewer_id,
+                                                  $expr: { $eq: ['$followed_user_id', '$$authorId'] }
+                                              }
+                                          }
+                                      ],
+                                      as: 'friend_ship'
+                                  }
+                              },
+                              {
+                                  $addFields: {
+                                      is_followed: { $gt: [{ $size: '$friend_ship' }, 0] }
+                                  }
+                              }
+                          ]
+                        : [
+                              {
+                                  $addFields: {
+                                      is_followed: false
+                                  }
+                              }
+                          ]),
+
+                    // Ẩn các trường nhạy cảm của author
+                    {
+                        $project: {
+                            password: 0,
+                            email_verify_token: 0,
+                            forgot_password_token: 0,
+                            user_posts: 0,
+                            likes_on_posts: 0,
+                            friend_ship: 0
+                        }
+                    }
+                ],
+                as: 'author'
+            }
+        })
+
+        pipeline.push({
+            $addFields: {
+                author: { $arrayElemAt: ['$author', 0] }
+            }
+        })
+
         const [result] = await databaseService.tiktokPost.aggregate<TikTokPost>(pipeline).toArray()
         return result
     }

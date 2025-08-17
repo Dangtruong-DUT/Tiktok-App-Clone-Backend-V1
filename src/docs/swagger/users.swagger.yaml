@@ -558,7 +558,7 @@ components:
         PaginationMeta:
             type: object
             properties:
-                total:
+                total_pages:
                     type: integer
                     example: 100
                 page:
@@ -567,9 +567,3 @@ components:
                 limit:
                     type: integer
                     example: 10
-                has_next:
-                    type: boolean
-                    example: true
-                has_prev:
-                    type: boolean
-                    example: false

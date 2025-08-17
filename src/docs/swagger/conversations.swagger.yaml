@@ -133,32 +133,6 @@ components:
                 - page
                 - limit
                 - total_pages
-
-        PaginationInfo:
-            type: object
-            properties:
-                page:
-                    type: integer
-                    description: Trang hiện tại
-                    example: 1
-                limit:
-                    type: integer
-                    description: Số lượng item trên mỗi trang
-                    example: 10
-                total_page:
-                    type: integer
-                    description: Tổng số trang
-                    example: 5
-                total_items:
-                    type: integer
-                    description: Tổng số item
-                    example: 50
-            required:
-                - page
-                - limit
-                - total_page
-                - total_items
-
         ErrorResponse:
             type: object
             properties:
