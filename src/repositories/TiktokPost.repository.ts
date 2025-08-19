@@ -437,6 +437,7 @@ class TikTokPostRepository {
     }
 
     async findPostById({ post_id, viewer_id }: { post_id: string; viewer_id?: string }) {
+        const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const pipeline: any[] = [
             { $match: { _id: new ObjectId(post_id) } },
             lookupHashtags(),
@@ -515,7 +516,7 @@ class TikTokPostRepository {
                         {
                             $match: {
                                 $expr: {
-                                    $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewer_id] }]
+                                    $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewerId] }]
                                 }
                             }
                         }
@@ -531,7 +532,7 @@ class TikTokPostRepository {
                         {
                             $match: {
                                 $expr: {
-                                    $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewer_id] }]
+                                    $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewerId] }]
                                 }
                             }
                         }
@@ -617,7 +618,7 @@ class TikTokPostRepository {
                     },
 
                     // Nếu có viewerId thì check quan hệ follow
-                    ...(viewer_id
+                    ...(viewerId
                         ? [
                               {
                                   $lookup: {
@@ -626,7 +627,7 @@ class TikTokPostRepository {
                                       pipeline: [
                                           {
                                               $match: {
-                                                  user_id: viewer_id,
+                                                  user_id: viewerId,
                                                   $expr: { $eq: ['$followed_user_id', '$$authorId'] }
                                               }
                                           }

@@ -48,6 +48,7 @@ export const serveVideoController = async (req: Request<getVideoReqParam>, res: 
     const nameWithoutExtension = path.basename(name, path.extname(name))
     res.setHeader('Content-Type', 'video/mp4')
     res.setHeader('Accept-Ranges', 'bytes')
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
     await s3Service.sendFileFromS3(res, `videos/${nameWithoutExtension}/${name}`)
 }
 

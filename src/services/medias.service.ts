@@ -44,7 +44,7 @@ class MediasService {
                 return {
                     url: isProduction
                         ? `${envConfig.HOST}/api/static/images/${newFileNameWithExtension}`
-                        : `http://localhost:${envConfig.PORT}/api/static/images/${newFileNameWithExtension}`,
+                        : `http://localhost:${envConfig.PORT}/api/v1/static/images/${newFileNameWithExtension}`,
                     type: MediaType.IMAGE
                 }
             })
@@ -69,7 +69,7 @@ class MediasService {
                 return {
                     url: isProduction
                         ? `${envConfig.HOST}/api/static/videos/${newFilename}`
-                        : `http://localhost:${envConfig.PORT}/api/static/videos/${newFilename}`,
+                        : `http://localhost:${envConfig.PORT}/api/v1/static/videos/${newFilename}`,
                     type: MediaType.VIDEO
                 }
             })
@@ -87,7 +87,7 @@ class MediasService {
                 return {
                     url: isProduction
                         ? `${envConfig.HOST}/api/static/videos-hls/${nameFileWithoutExtension}/master.m3u8`
-                        : `http://localhost:${envConfig.PORT}/api/static/videos-hls/${nameFileWithoutExtension}/master.m3u8`,
+                        : `http://localhost:${envConfig.PORT}/api/v1/static/videos-hls/${nameFileWithoutExtension}/master.m3u8`,
                     type: MediaType.HLS_VIDEO
                 }
             })

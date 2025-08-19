@@ -6,6 +6,7 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import { POST_MESSAGES } from '~/constants/messages/post'
 import { validate } from '~/middlewares/validation.middlewares'
 import { ErrorWithStatus } from '~/models/Errors'
+import { TokenPayload } from '~/models/requests/common.requests'
 import tikTokPostService from '~/services/TiktokPost.service'
 import usersServices from '~/services/users.service'
 import { numberEnumToArray } from '~/utils/common'
@@ -26,7 +27,7 @@ const validatePostId: ParamSchema = {
                     status: HTTP_STATUS.NOT_FOUND
                 })
             }
-            const user_id = req.decoded_authorization?.user_id
+            const user_id = (req.decoded_authorization as TokenPayload)?.user_id
             const post = await tikTokPostService.getPostDetail({ post_id: value, user_id: user_id })
             if (!post) {
                 throw new ErrorWithStatus({
@@ -142,6 +143,7 @@ export const createTiktokPostValidator = validate(
                 }
             },
             medias: {
+                optional: true,
                 isArray: true,
                 errorMessage: POST_MESSAGES.MEDIA_FILES_MUST_BE_ARRAY,
                 custom: {

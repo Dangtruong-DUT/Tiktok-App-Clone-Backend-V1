@@ -9,6 +9,7 @@ import { UserVerifyStatus } from '~/constants/enum'
 import { USER_MESSAGES } from '~/constants/messages/user'
 import _ from 'lodash'
 import usersServices from '~/services/users.service'
+import { TokenPayload } from '~/models/requests/common.requests'
 
 /**
  * Middleware verify access token
@@ -86,8 +87,8 @@ export const authenticateRefreshToken = async (req: Request, res: Response, next
  */
 
 export const requireVerifiedUser = async (req: Request, res: Response, next: NextFunction) => {
-    const { user_id } = req.decoded_authorization || {}
-    const user = await usersServices.getUserById(user_id)
+    const { user_id } = (req.decoded_authorization as TokenPayload) || {}
+    const user = await usersServices.getUserById({ user_id })
 
     if (!user) {
         return next(

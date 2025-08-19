@@ -65,7 +65,12 @@ tiktokPostRouter.get('/friend', authenticate, paginationValidator, wrapRequestHa
  * }
  *
  */
-tiktokPostRouter.get('/foryou', paginationValidator, wrapRequestHandler(getForYouPostsController))
+tiktokPostRouter.get(
+    '/foryou',
+    isUserLoginValidator(authenticate),
+    paginationValidator,
+    wrapRequestHandler(getForYouPostsController)
+)
 
 /**
  * Description. Get post detail
