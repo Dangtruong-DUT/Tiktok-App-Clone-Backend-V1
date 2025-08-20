@@ -15,6 +15,7 @@ import { AddNewEmployeeReqBody } from '~/models/requests/account.request'
 import User from '~/models/schemas/User.schema'
 import { UserType } from '~/models/types/User.types'
 import { UserProfileResponse, UserProfileWithSensitiveResponse } from '~/models/responses/user.responses'
+import generateTimeBasedUsername from '~/utils/GenerateUserName'
 
 class UserService {
     private static instance: UserService
@@ -271,10 +272,13 @@ class UserService {
         return userWithOwnership
     }
     async addNewEmployee(data: Omit<AddNewEmployeeReqBody, 'confirm_password'>) {
+        const username = generateTimeBasedUsername()
         const newUser = new User({
             ...data,
+            username,
             password: hashPassword(data.password),
-            date_of_birth: new Date(data.date_of_birth)
+            date_of_birth: new Date(data.date_of_birth),
+            verify: UserVerifyStatus.VERIFIED
         })
         await usersRepository.insertUser(newUser)
     }
