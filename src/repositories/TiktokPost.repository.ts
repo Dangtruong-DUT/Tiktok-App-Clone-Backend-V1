@@ -122,6 +122,704 @@ function addChildrenCounts() {
 }
 
 class TikTokPostRepository {
+    async findUserPosts({
+        user_id,
+        viewer_id,
+        page = 1,
+        limit = 10
+    }: {
+        user_id: string
+        viewer_id?: string
+        page?: number
+        limit?: number
+    }): Promise<{ posts: any[]; total: number }> {
+        const viewerId = viewer_id ? new ObjectId(viewer_id) : null
+        const skip = (page - 1) * limit
+        const match = { user_id: new ObjectId(user_id), type: 0 }
+        const pipeline = [
+            { $match: match },
+            // --- same as findForYouPosts ---
+            {
+                $lookup: {
+                    from: 'hashtags',
+                    localField: 'hashtags',
+                    foreignField: '_id',
+                    as: 'hashtags'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'mentions',
+                    foreignField: '_id',
+                    as: 'mentions'
+                }
+            },
+            {
+                $addFields: {
+                    mentions: {
+                        $map: {
+                            input: '$mentions',
+                            as: 'mention',
+                            in: {
+                                _id: '$$mention._id',
+                                name: '$$mention.name',
+                                username: '$$mention.username',
+                                email: '$$mention.email'
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'likes',
+                    localField: '_id',
+                    foreignField: 'post_id',
+                    as: 'likes'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'bookmarks',
+                    localField: '_id',
+                    foreignField: 'post_id',
+                    as: 'bookmarks'
+                }
+            },
+            {
+                $addFields: {
+                    likes_count: { $size: '$likes' },
+                    bookmarks_count: { $size: '$bookmarks' }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'tiktok_post',
+                    localField: '_id',
+                    foreignField: 'parent_id',
+                    as: 'children_posts'
+                }
+            },
+            {
+                $addFields: {
+                    comments_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 2] }
+                            }
+                        }
+                    },
+                    reposts_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 1] }
+                            }
+                        }
+                    },
+                    quotes_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 3] }
+                            }
+                        }
+                    }
+                }
+            },
+            // Check liked/bookmarked by viewer
+            ...(viewerId
+                ? [
+                      {
+                          $lookup: {
+                              from: 'likes',
+                              let: { postId: '$_id' },
+                              pipeline: [
+                                  {
+                                      $match: {
+                                          $expr: {
+                                              $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewerId] }]
+                                          }
+                                      }
+                                  }
+                              ],
+                              as: 'likes_by_viewer'
+                          }
+                      },
+                      {
+                          $lookup: {
+                              from: 'bookmarks',
+                              let: { postId: '$_id' },
+                              pipeline: [
+                                  {
+                                      $match: {
+                                          $expr: {
+                                              $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewerId] }]
+                                          }
+                                      }
+                                  }
+                              ],
+                              as: 'bookmarks_by_viewer'
+                          }
+                      },
+                      {
+                          $addFields: {
+                              is_liked: { $gt: [{ $size: '$likes_by_viewer' }, 0] },
+                              is_bookmarked: { $gt: [{ $size: '$bookmarks_by_viewer' }, 0] }
+                          }
+                      },
+                      {
+                          $project: {
+                              children_posts: 0,
+                              likes_by_viewer: 0,
+                              bookmarks_by_viewer: 0,
+                              likes: 0,
+                              bookmarks: 0
+                          }
+                      }
+                  ]
+                : [
+                      {
+                          $addFields: {
+                              is_liked: false,
+                              is_bookmarked: false
+                          }
+                      },
+                      {
+                          $project: {
+                              children_posts: 0,
+                              likes: 0,
+                              bookmarks: 0
+                          }
+                      }
+                  ]),
+            { $sort: { created_at: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            // Author info
+            {
+                $lookup: {
+                    from: 'users',
+                    let: { authorId: '$user_id' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$_id', '$$authorId'] } } },
+                        {
+                            $lookup: {
+                                from: 'followers',
+                                localField: '_id',
+                                foreignField: 'user_id',
+                                as: 'following_count'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                following_count: { $size: '$following_count' }
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: 'followers',
+                                localField: '_id',
+                                foreignField: 'followed_user_id',
+                                as: 'followers_count'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                followers_count: { $size: '$followers_count' }
+                            }
+                        },
+                        // Hide sensitive fields
+                        {
+                            $project: {
+                                password: 0,
+                                email_verify_token: 0,
+                                forgot_password_token: 0
+                            }
+                        }
+                    ],
+                    as: 'author'
+                }
+            },
+            { $addFields: { author: { $arrayElemAt: ['$author', 0] } } }
+        ]
+        const posts = await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        const total = await databaseService.tiktokPost.countDocuments(match)
+        return { posts, total }
+    }
+
+    async findUserBookmarks({
+        user_id,
+        viewer_id,
+        page = 1,
+        limit = 10
+    }: {
+        user_id: string
+        viewer_id?: string
+        page?: number
+        limit?: number
+    }): Promise<{ posts: any[]; total: number }> {
+        const viewerId = viewer_id ? new ObjectId(viewer_id) : null
+        const skip = (page - 1) * limit
+        // Get bookmarked post ids
+        const bookmarks = await databaseService.bookmarks.find({ user_id: new ObjectId(user_id) }).toArray()
+        const postIds = bookmarks.map((b) => b.post_id)
+        const match = { _id: { $in: postIds }, type: 0 }
+        const pipeline = [
+            { $match: match },
+            // --- same as findUserPosts ---
+            {
+                $lookup: {
+                    from: 'hashtags',
+                    localField: 'hashtags',
+                    foreignField: '_id',
+                    as: 'hashtags'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'mentions',
+                    foreignField: '_id',
+                    as: 'mentions'
+                }
+            },
+            {
+                $addFields: {
+                    mentions: {
+                        $map: {
+                            input: '$mentions',
+                            as: 'mention',
+                            in: {
+                                _id: '$$mention._id',
+                                name: '$$mention.name',
+                                username: '$$mention.username',
+                                email: '$$mention.email'
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'likes',
+                    localField: '_id',
+                    foreignField: 'post_id',
+                    as: 'likes'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'bookmarks',
+                    localField: '_id',
+                    foreignField: 'post_id',
+                    as: 'bookmarks'
+                }
+            },
+            {
+                $addFields: {
+                    likes_count: { $size: '$likes' },
+                    bookmarks_count: { $size: '$bookmarks' }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'tiktok_post',
+                    localField: '_id',
+                    foreignField: 'parent_id',
+                    as: 'children_posts'
+                }
+            },
+            {
+                $addFields: {
+                    comments_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 2] }
+                            }
+                        }
+                    },
+                    reposts_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 1] }
+                            }
+                        }
+                    },
+                    quotes_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 3] }
+                            }
+                        }
+                    }
+                }
+            },
+            // Check liked/bookmarked by viewer
+            ...(viewerId
+                ? [
+                      {
+                          $lookup: {
+                              from: 'likes',
+                              let: { postId: '$_id' },
+                              pipeline: [
+                                  {
+                                      $match: {
+                                          $expr: {
+                                              $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewerId] }]
+                                          }
+                                      }
+                                  }
+                              ],
+                              as: 'likes_by_viewer'
+                          }
+                      },
+                      {
+                          $lookup: {
+                              from: 'bookmarks',
+                              let: { postId: '$_id' },
+                              pipeline: [
+                                  {
+                                      $match: {
+                                          $expr: {
+                                              $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewerId] }]
+                                          }
+                                      }
+                                  }
+                              ],
+                              as: 'bookmarks_by_viewer'
+                          }
+                      },
+                      {
+                          $addFields: {
+                              is_liked: { $gt: [{ $size: '$likes_by_viewer' }, 0] },
+                              is_bookmarked: { $gt: [{ $size: '$bookmarks_by_viewer' }, 0] }
+                          }
+                      },
+                      {
+                          $project: {
+                              children_posts: 0,
+                              likes_by_viewer: 0,
+                              bookmarks_by_viewer: 0,
+                              likes: 0,
+                              bookmarks: 0
+                          }
+                      }
+                  ]
+                : [
+                      {
+                          $addFields: {
+                              is_liked: false,
+                              is_bookmarked: false
+                          }
+                      },
+                      {
+                          $project: {
+                              children_posts: 0,
+                              likes: 0,
+                              bookmarks: 0
+                          }
+                      }
+                  ]),
+            { $sort: { created_at: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            // Author info
+            {
+                $lookup: {
+                    from: 'users',
+                    let: { authorId: '$user_id' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$_id', '$$authorId'] } } },
+                        {
+                            $lookup: {
+                                from: 'followers',
+                                localField: '_id',
+                                foreignField: 'user_id',
+                                as: 'following_count'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                following_count: { $size: '$following_count' }
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: 'followers',
+                                localField: '_id',
+                                foreignField: 'followed_user_id',
+                                as: 'followers_count'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                followers_count: { $size: '$followers_count' }
+                            }
+                        },
+                        // Hide sensitive fields
+                        {
+                            $project: {
+                                password: 0,
+                                email_verify_token: 0,
+                                forgot_password_token: 0
+                            }
+                        }
+                    ],
+                    as: 'author'
+                }
+            },
+            { $addFields: { author: { $arrayElemAt: ['$author', 0] } } }
+        ]
+        const posts = await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        const total = await databaseService.bookmarks.countDocuments({ user_id: new ObjectId(user_id) })
+        return { posts, total }
+    }
+
+    async findUserLikedPosts({
+        user_id,
+        viewer_id,
+        page = 1,
+        limit = 10
+    }: {
+        user_id: string
+        viewer_id?: string
+        page?: number
+        limit?: number
+    }): Promise<{ posts: any[]; total: number }> {
+        const viewerId = viewer_id ? new ObjectId(viewer_id) : null
+        const skip = (page - 1) * limit
+        // Get liked post ids
+        const likes = await databaseService.likes.find({ user_id: new ObjectId(user_id) }).toArray()
+        const postIds = likes.map((l) => l.post_id)
+        const match = { _id: { $in: postIds }, type: 0 }
+        const pipeline = [
+            { $match: match },
+            // --- same as findUserPosts ---
+            {
+                $lookup: {
+                    from: 'hashtags',
+                    localField: 'hashtags',
+                    foreignField: '_id',
+                    as: 'hashtags'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'mentions',
+                    foreignField: '_id',
+                    as: 'mentions'
+                }
+            },
+            {
+                $addFields: {
+                    mentions: {
+                        $map: {
+                            input: '$mentions',
+                            as: 'mention',
+                            in: {
+                                _id: '$$mention._id',
+                                name: '$$mention.name',
+                                username: '$$mention.username',
+                                email: '$$mention.email'
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'likes',
+                    localField: '_id',
+                    foreignField: 'post_id',
+                    as: 'likes'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'bookmarks',
+                    localField: '_id',
+                    foreignField: 'post_id',
+                    as: 'bookmarks'
+                }
+            },
+            {
+                $addFields: {
+                    likes_count: { $size: '$likes' },
+                    bookmarks_count: { $size: '$bookmarks' }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'tiktok_post',
+                    localField: '_id',
+                    foreignField: 'parent_id',
+                    as: 'children_posts'
+                }
+            },
+            {
+                $addFields: {
+                    comments_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 2] }
+                            }
+                        }
+                    },
+                    reposts_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 1] }
+                            }
+                        }
+                    },
+                    quotes_count: {
+                        $size: {
+                            $filter: {
+                                input: '$children_posts',
+                                as: 'item',
+                                cond: { $eq: ['$$item.type', 3] }
+                            }
+                        }
+                    }
+                }
+            },
+            // Check liked/bookmarked by viewer
+            ...(viewerId
+                ? [
+                      {
+                          $lookup: {
+                              from: 'likes',
+                              let: { postId: '$_id' },
+                              pipeline: [
+                                  {
+                                      $match: {
+                                          $expr: {
+                                              $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewerId] }]
+                                          }
+                                      }
+                                  }
+                              ],
+                              as: 'likes_by_viewer'
+                          }
+                      },
+                      {
+                          $lookup: {
+                              from: 'bookmarks',
+                              let: { postId: '$_id' },
+                              pipeline: [
+                                  {
+                                      $match: {
+                                          $expr: {
+                                              $and: [{ $eq: ['$post_id', '$$postId'] }, { $eq: ['$user_id', viewerId] }]
+                                          }
+                                      }
+                                  }
+                              ],
+                              as: 'bookmarks_by_viewer'
+                          }
+                      },
+                      {
+                          $addFields: {
+                              is_liked: { $gt: [{ $size: '$likes_by_viewer' }, 0] },
+                              is_bookmarked: { $gt: [{ $size: '$bookmarks_by_viewer' }, 0] }
+                          }
+                      },
+                      {
+                          $project: {
+                              children_posts: 0,
+                              likes_by_viewer: 0,
+                              bookmarks_by_viewer: 0,
+                              likes: 0,
+                              bookmarks: 0
+                          }
+                      }
+                  ]
+                : [
+                      {
+                          $addFields: {
+                              is_liked: false,
+                              is_bookmarked: false
+                          }
+                      },
+                      {
+                          $project: {
+                              children_posts: 0,
+                              likes: 0,
+                              bookmarks: 0
+                          }
+                      }
+                  ]),
+            { $sort: { created_at: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            // Author info
+            {
+                $lookup: {
+                    from: 'users',
+                    let: { authorId: '$user_id' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$_id', '$$authorId'] } } },
+                        {
+                            $lookup: {
+                                from: 'followers',
+                                localField: '_id',
+                                foreignField: 'user_id',
+                                as: 'following_count'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                following_count: { $size: '$following_count' }
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: 'followers',
+                                localField: '_id',
+                                foreignField: 'followed_user_id',
+                                as: 'followers_count'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                followers_count: { $size: '$followers_count' }
+                            }
+                        },
+                        // Hide sensitive fields
+                        {
+                            $project: {
+                                password: 0,
+                                email_verify_token: 0,
+                                forgot_password_token: 0
+                            }
+                        }
+                    ],
+                    as: 'author'
+                }
+            },
+            { $addFields: { author: { $arrayElemAt: ['$author', 0] } } }
+        ]
+        const posts = await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        const total = await databaseService.likes.countDocuments({ user_id: new ObjectId(user_id) })
+        return { posts, total }
+    }
     private static instance: TikTokPostRepository
     static getInstance(): TikTokPostRepository {
         if (!TikTokPostRepository.instance) {

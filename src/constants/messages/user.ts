@@ -28,5 +28,8 @@ export const USER_MESSAGES = {
     COVER_PHOTO_MUST_BE_A_VALID_URL: 'Cover photo must be a valid URL',
     COVER_PHOTO_LENGTH_MUST_BE_FROM_0_TO_400: 'Cover photo must be from 0 to 400 characters',
     PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT: 'New password must be different from current password',
-    REQUIRED_LOGIN: 'You must be logged in to perform this action'
+    REQUIRED_LOGIN: 'You must be logged in to perform this action',
+    GET_USER_POSTS_SUCCESS: 'User posts fetched successfully',
+    GET_USER_BOOKMARKS_SUCCESS: 'User bookmarks fetched successfully',
+    GET_USER_LIKED_POSTS_SUCCESS: 'User liked posts fetched successfully'
 } as const

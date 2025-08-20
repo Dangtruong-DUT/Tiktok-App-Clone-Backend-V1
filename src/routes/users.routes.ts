@@ -5,7 +5,10 @@ import {
     getMeProfileController,
     followUserController,
     unFollowUserController,
-    changePasswordController
+    changePasswordController,
+    getUserPostsController,
+    getUserBookmarksController,
+    getUserLikedPostsController
 } from '~/controllers/users.controller'
 import {
     changePasswordValidator,
@@ -16,6 +19,7 @@ import {
 import { wrapRequestHandler } from '~/utils/handlers'
 import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 import { isUserLoginValidator } from '~/middlewares/user.middlewares'
+import { paginationValidator } from '~/validations/pagination.validation'
 const userRouter = Router()
 
 /**
@@ -110,4 +114,56 @@ userRouter.put(
     changePasswordValidator,
     wrapRequestHandler(changePasswordController)
 )
+
+/**
+ * Get posts of user
+ * Path: /:user_id/posts
+ * method: GET
+ * query: {
+ * page: number
+ * limit: number
+ * }
+ *
+ */
+userRouter.get(
+    '/:user_id/posts',
+    isUserLoginValidator(authenticate),
+    paginationValidator,
+    wrapRequestHandler(getUserPostsController)
+)
+
+/**
+ * Get bookmarks of user
+ * Path: /:user_id/bookmarks
+ * method: GET
+ * query: {
+ * page: number
+ * limit: number
+ * }
+ *
+ */
+userRouter.get(
+    '/:user_id/bookmarks',
+    isUserLoginValidator(authenticate),
+    paginationValidator,
+    wrapRequestHandler(getUserBookmarksController)
+)
+
+/**
+ * Get liked posts of user
+ * Path: /:user_id/liked
+ * method: GET
+ * query: {
+ * page: number
+ * limit: number
+ * }
+ *
+ */
+userRouter.get(
+    '/:user_id/liked',
+    isUserLoginValidator(authenticate),
+    paginationValidator,
+    wrapRequestHandler(getUserLikedPostsController)
+)
+
 export default userRouter

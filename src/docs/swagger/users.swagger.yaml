@@ -5,12 +5,182 @@ info:
     version: 1.0.0
 
 servers:
-    - url: http://localhost:3000/api
+    - url: http://localhost:4000/api
       description: Local Development Server
     - url: https://api.tiktok-clone-2025.io/api
       description: Production Server
 
 paths:
+    /users/{user_id}/posts:
+        get:
+            summary: Lấy danh sách bài viết của user
+            description: Lấy danh sách bài viết đã đăng của user.
+            operationId: getUserPosts
+            tags:
+                - users
+            parameters:
+                - in: path
+                  name: user_id
+                  required: true
+                  schema:
+                      type: string
+                      format: mongoid
+                  description: ID của user
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                  description: Số trang (bắt đầu từ 1)
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                  description: Số lượng item trên mỗi trang
+            responses:
+                '200':
+                    description: Lấy danh sách bài viết thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'User posts fetched successfully'
+                                    data:
+                                        type: object
+                                        properties:
+                                            posts:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/Post'
+                                    meta:
+                                        $ref: '#/components/schemas/PaginationMeta'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+    /users/{user_id}/bookmarks:
+        get:
+            summary: Lấy danh sách bài viết đã bookmark của user
+            description: Lấy danh sách bài viết user đã lưu (bookmark).
+            operationId: getUserBookmarks
+            tags:
+                - users
+            parameters:
+                - in: path
+                  name: user_id
+                  required: true
+                  schema:
+                      type: string
+                      format: mongoid
+                  description: ID của user
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                  description: Số trang (bắt đầu từ 1)
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                  description: Số lượng item trên mỗi trang
+            responses:
+                '200':
+                    description: Lấy danh sách bài viết bookmark thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'User bookmarks fetched successfully'
+                                    data:
+                                        type: object
+                                        properties:
+                                            posts:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/Post'
+                                    meta:
+                                        $ref: '#/components/schemas/PaginationMeta'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+    /users/{user_id}/liked:
+        get:
+            summary: Lấy danh sách bài viết đã like của user
+            description: Lấy danh sách bài viết user đã like.
+            operationId: getUserLikedPosts
+            tags:
+                - users
+            parameters:
+                - in: path
+                  name: user_id
+                  required: true
+                  schema:
+                      type: string
+                      format: mongoid
+                  description: ID của user
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                  description: Số trang (bắt đầu từ 1)
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                  description: Số lượng item trên mỗi trang
+            responses:
+                '200':
+                    description: Lấy danh sách bài viết đã like thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'User liked posts fetched successfully'
+                                    data:
+                                        type: object
+                                        properties:
+                                            posts:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/Post'
+                                    meta:
+                                        $ref: '#/components/schemas/PaginationMeta'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
     /users/me:
         get:
             summary: Lấy thông tin người dùng hiện tại
@@ -367,6 +537,195 @@ paths:
 
 components:
     schemas:
+        Post:
+            type: object
+            properties:
+                _id:
+                    type: string
+                    format: mongoid
+                    example: '6881b9a17bffbd01e3f7ac59'
+                user_id:
+                    type: string
+                    format: mongoid
+                    example: '68806273dcf4b03c487e533d'
+                type:
+                    $ref: '#/components/schemas/PosterType'
+                audience:
+                    $ref: '#/components/schemas/Audience'
+                content:
+                    type: string
+                    example: 'xin chào đồng bào'
+                parent_id:
+                    type: string
+                    format: mongoid
+                    nullable: true
+                    example: null
+                    description: ID của bài viết gốc (dành cho comment/repost)
+                hashtags:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Hashtag'
+                    example:
+                        - _id: '6881b44868ffbcc12ea67971'
+                          name: 'cntt'
+                          created_at: '2025-07-24T04:19:20.099Z'
+                        - _id: '6881b44868ffbcc12ea67972'
+                          name: 'trg'
+                          created_at: '2025-07-24T04:19:20.100Z'
+                mentions:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            _id:
+                                type: string
+                                format: mongoid
+                                example: '68806273dcf4b03c487e533d'
+                            name:
+                                type: string
+                                example: 'Nguyen Van A'
+                            username:
+                                type: string
+                                example: 'user123'
+                            email:
+                                type: string
+                                example: 'user@example.com'
+                    example:
+                        - _id: '68806273dcf4b03c487e533d'
+                          name: 'Nguyen Van A'
+                          username: 'user123'
+                          email: 'user@example.com'
+                    description: Danh sách user được mention
+                author:
+                    $ref: '#/components/schemas/User'
+                    description: Thông tin tác giả bài viết
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Thời gian tạo theo chuẩn ISO 8601
+                    example: '2025-07-24T04:42:09.441Z'
+                updated_at:
+                    type: string
+                    format: date-time
+                    description: Thời gian cập nhật theo chuẩn ISO 8601
+                    example: '2025-07-28T06:46:25.694Z'
+                medias:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Media'
+                    example:
+                        - url: 'http://localhost:3000/api/static/video-stream/FLq1NUqa5QHF7Ipciz35v.mp4'
+                          type: 1
+                likes_count:
+                    type: integer
+                    minimum: 0
+                    example: 1
+                    description: Số lượt thích
+                bookmarks_count:
+                    type: integer
+                    minimum: 0
+                    example: 1
+                    description: Số lượt lưu
+                repost_count:
+                    type: integer
+                    minimum: 0
+                    example: 1
+                    description: Số lượt repost
+                comment_count:
+                    type: integer
+                    minimum: 0
+                    example: 33
+                    description: Số bình luận
+                quote_post_count:
+                    type: integer
+                    minimum: 0
+                    example: 2
+                    description: Số quote post
+                is_liked:
+                    type: boolean
+                    example: false
+                    description: Người dùng hiện tại đã thích bài viết chưa
+                is_bookmarked:
+                    type: boolean
+                    example: false
+                    description: Người dùng hiện tại đã lưu bài viết chưa
+                guest_views:
+                    type: integer
+                    minimum: 0
+                    example: 5
+                    description: Số lượt xem từ khách (không đăng nhập)
+                user_views:
+                    type: integer
+                    minimum: 0
+                    example: 15
+                    description: Số lượt xem từ người dùng đã đăng nhập
+            required:
+                - _id
+                - user_id
+                - type
+                - audience
+                - content
+                - parent_id
+                - hashtags
+                - mentions
+                - created_at
+                - updated_at
+                - medias
+                - likes_count
+                - bookmarks_count
+                - repost_count
+                - comment_count
+                - quote_post_count
+                - is_liked
+                - is_bookmarked
+                - guest_views
+                - user_views
+        Media:
+            type: object
+            properties:
+                url:
+                    type: string
+                    format: uri
+                    example: 'http://localhost:3000/api/static/video-stream/FLq1NUqa5QHF7Ipciz35v.mp4'
+                type:
+                    $ref: '#/components/schemas/MediaType'
+            required:
+                - url
+                - type
+        Hashtag:
+            type: object
+            properties:
+                _id:
+                    type: string
+                    format: mongoid
+                    example: '6881b44868ffbcc12ea67971'
+                name:
+                    type: string
+                    example: 'cntt'
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Thời gian tạo theo chuẩn ISO 8601
+                    example: '2025-07-24T04:19:20.099Z'
+            required:
+                - _id
+                - name
+                - created_at
+        Audience:
+            type: number
+            description: Đối tượng được phép xem bài viết
+            enum: [PUBLIC, PRIVATE, FRIENDS]
+            example: 0
+        PosterType:
+            type: number
+            description: Loại hành động đăng bài
+            enum: [POST, RE_POST, COMMENT, QUOTE_POST]
+            example: 0
+        MediaType:
+            type: number
+            description: Loại media
+            enum: [IMAGE, VIDEO, HLS_VIDEO]
+            example: 1
         User:
             type: object
             properties:

@@ -7,9 +7,51 @@ import { POST_MESSAGES } from '~/constants/messages/post'
 import { PosterType } from '~/constants/enum'
 import tikTokPostRepository from '~/repositories/TiktokPost.repository'
 import hashtagRepository from '~/repositories/hashtag.repository'
-import likesBookmarksRepository from '~/repositories/likesBookmarks.repository'
 
 class TikTokPostService {
+    async getUserPosts({
+        user_id,
+        viewer_id,
+        page = 1,
+        limit = 10
+    }: {
+        user_id: string
+        viewer_id?: string
+        page?: number
+        limit?: number
+    }) {
+        // Implement fetching user posts with correct pipeline and meta
+        // You may want to use a similar aggregation as in repository, but for now, call repository (to be refactored if needed)
+        return await tikTokPostRepository.findUserPosts({ user_id, viewer_id, page, limit })
+    }
+
+    async getUserBookmarks({
+        user_id,
+        viewer_id,
+        page = 1,
+        limit = 10
+    }: {
+        user_id: string
+        viewer_id?: string
+        page?: number
+        limit?: number
+    }) {
+        return await tikTokPostRepository.findUserBookmarks({ user_id, viewer_id, page, limit })
+    }
+
+    async getUserLikedPosts({
+        user_id,
+        viewer_id,
+        page = 1,
+        limit = 10
+    }: {
+        user_id: string
+        viewer_id?: string
+        page?: number
+        limit?: number
+    }) {
+        return await tikTokPostRepository.findUserLikedPosts({ user_id, viewer_id, page, limit })
+    }
     private static instance: TikTokPostService
     private constructor() {}
     static getInstance(): TikTokPostService {

@@ -1,6 +1,8 @@
+import { USER_MESSAGES } from '~/constants/messages/user'
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import usersServices from '~/services/users.service'
+
 import {
     ChangePasswordRequestBody,
     followUserReqBody,
@@ -9,10 +11,10 @@ import {
     UpdateUserRequestBody
 } from '~/models/requests/user.requests'
 
-import { USER_MESSAGES } from '~/constants/messages/user'
 import { ErrorWithStatus } from '~/models/Errors'
 import { TokenPayload } from '~/models/requests/common.requests'
 import HTTP_STATUS from '~/constants/httpStatus'
+import TiktokPostService from '~/services/TiktokPost.service'
 
 export const getMeProfileController = async (req: Request, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
@@ -76,5 +78,80 @@ export const changePasswordController = async (
     await usersServices.changePassword(user_id, password)
     res.json({
         message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESS
+    })
+}
+
+export const getUserPostsController = async (req: Request, res: Response) => {
+    const { user_id } = req.params
+    const viewer_id = req?.decoded_authorization?.user_id as string | undefined
+    const { page = 1, limit = 10 } = req.query
+    const pageNum = Number(page) || 1
+    const limitNum = Number(limit) || 10
+    const { posts, total } = await TiktokPostService.getUserPosts({
+        user_id,
+        viewer_id,
+        page: pageNum,
+        limit: limitNum
+    })
+    res.json({
+        message: USER_MESSAGES.GET_USER_POSTS_SUCCESS,
+        data: {
+            posts
+        },
+        meta: {
+            page: pageNum,
+            limit: limitNum,
+            total
+        }
+    })
+}
+
+export const getUserBookmarksController = async (req: Request, res: Response) => {
+    const { user_id } = req.params
+    const viewer_id = req?.decoded_authorization?.user_id as string | undefined
+    const { page = 1, limit = 10 } = req.query
+    const pageNum = Number(page) || 1
+    const limitNum = Number(limit) || 10
+    const { posts, total } = await TiktokPostService.getUserBookmarks({
+        user_id,
+        viewer_id,
+        page: pageNum,
+        limit: limitNum
+    })
+    res.json({
+        message: USER_MESSAGES.GET_USER_BOOKMARKS_SUCCESS,
+        data: {
+            posts
+        },
+        meta: {
+            page: pageNum,
+            limit: limitNum,
+            total
+        }
+    })
+}
+
+export const getUserLikedPostsController = async (req: Request, res: Response) => {
+    const { user_id } = req.params
+    const viewer_id = req?.decoded_authorization?.user_id as string | undefined
+    const { page = 1, limit = 10 } = req.query
+    const pageNum = Number(page) || 1
+    const limitNum = Number(limit) || 10
+    const { posts, total } = await TiktokPostService.getUserLikedPosts({
+        user_id,
+        viewer_id,
+        page: pageNum,
+        limit: limitNum
+    })
+    res.json({
+        message: USER_MESSAGES.GET_USER_LIKED_POSTS_SUCCESS,
+        data: {
+            posts
+        },
+        meta: {
+            page: pageNum,
+            limit: limitNum,
+            total
+        }
     })
 }
