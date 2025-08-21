@@ -50,6 +50,7 @@ class TikTokPostRepository {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : new ObjectId('000000000000000000000000')
         const matchStage = {
             $match: {
+                type: PosterType.POST,
                 _id: { $ne: new ObjectId(post_id) },
                 $or: [
                     { user_id: authorId },
@@ -96,6 +97,7 @@ class TikTokPostRepository {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : new ObjectId('000000000000000000000000')
         const matchStage = {
             $match: {
+                type: PosterType.POST,
                 _id: { $ne: new ObjectId(post_id) },
                 $or: [
                     { user_id: authorId },
@@ -161,7 +163,7 @@ class TikTokPostRepository {
         const skip = (page - 1) * limit
         const bookmarks = await databaseService.bookmarks.find({ user_id: new ObjectId(user_id) }).toArray()
         const postIds = bookmarks.map((b) => b.post_id)
-        const match = { _id: { $in: postIds }, type: 0 }
+        const match = { _id: { $in: postIds }, type: PosterType.POST }
         const pipeline = [
             { $match: match },
             lookupFriendship(viewerId),
@@ -201,7 +203,7 @@ class TikTokPostRepository {
         const skip = (page - 1) * limit
         const likes = await databaseService.likes.find({ user_id: new ObjectId(user_id) }).toArray()
         const postIds = likes.map((l) => l.post_id)
-        const match = { _id: { $in: postIds }, type: 0 }
+        const match = { _id: { $in: postIds }, type: PosterType.POST }
         const pipeline = [
             { $match: match },
             lookupFriendship(viewerId),
@@ -244,7 +246,7 @@ class TikTokPostRepository {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const skip = page > 0 ? (page - 1) * limit : 0
         const pipeline = [
-            { $match: { $text: { $search: query }, type: 0 } },
+            { $match: { $text: { $search: query }, type: PosterType.POST } },
             lookupFriendship(viewerId),
             matchAudience(viewerId),
             lookupHashtags(),
@@ -266,7 +268,7 @@ class TikTokPostRepository {
     async countSearchPostsByQueryContent({ query, viewer_id }: { query: string; viewer_id?: string }) {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const pipeline = [
-            { $match: { $text: { $search: query }, type: 0 } },
+            { $match: { $text: { $search: query }, type: PosterType.POST } },
             lookupFriendship(viewerId),
             matchAudience(viewerId),
             { $count: 'total' }
@@ -363,7 +365,7 @@ class TikTokPostRepository {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const skip = page > 0 ? (page - 1) * limit : 0
         const pipeline = [
-            { $match: { $text: { $search: query } } },
+            { $match: { $text: { $search: query }, type: PosterType.POST } },
             {
                 $lookup: {
                     from: 'tiktok_post',
@@ -506,7 +508,7 @@ class TikTokPostRepository {
         const viewerId = user_id ? new ObjectId(user_id) : new ObjectId('000000000000000000000000')
         const skip = page > 0 ? (page - 1) * limit : 0
         const pipeline = [
-            { $match: { type: 0 } },
+            { $match: { type: PosterType.POST } },
             lookupFriendship(viewerId),
             matchAudience(viewerId),
             lookupHashtags(),
