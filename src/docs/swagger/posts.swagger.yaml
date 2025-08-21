@@ -105,8 +105,8 @@ paths:
 
     /posts/friend:
         get:
-            summary: Lấy bài viết của bạn bè
-            description: Lấy danh sách bài viết từ những người đang theo dõi.
+            summary: Lấy bài viết bạn bè
+            description: Lấy danh sách bài viết của bạn bè (friend posts).
             operationId: getFriendPosts
             tags:
                 - posts
@@ -130,7 +130,7 @@ paths:
                   description: Số lượng item trên mỗi trang
             responses:
                 '200':
-                    description: Lấy danh sách bài viết thành công
+                    description: Lấy danh sách bài viết bạn bè thành công
                     content:
                         application/json:
                             schema:
@@ -138,7 +138,7 @@ paths:
                                 properties:
                                     message:
                                         type: string
-                                        example: 'Lấy danh sách bài viết thành công'
+                                        example: 'Lấy danh sách bài viết bạn bè thành công'
                                     data:
                                         type: object
                                         properties:
@@ -394,6 +394,64 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
+    /posts/{post_id}/relations:
+        get:
+            summary: Lấy bài viết liên quan
+            description: Lấy danh sách bài viết liên quan đến một post cụ thể.
+            operationId: getRelatedPosts
+            tags:
+                - posts
+            security:
+                - bearerAuth: []
+            parameters:
+                - in: path
+                  name: post_id
+                  required: true
+                  schema:
+                      type: string
+                  description: ID của bài viết gốc
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                  description: Số trang (bắt đầu từ 1)
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                  description: Số lượng item trên mỗi trang
+            responses:
+                '200':
+                    description: Lấy danh sách bài viết liên quan thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Lấy danh sách bài viết liên quan thành công'
+                                    data:
+                                        type: object
+                                        properties:
+                                            posts:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/Post'
+                                    meta:
+                                        $ref: '#/components/schemas/PaginationMeta'
                 '401':
                     description: Không có quyền truy cập
                     content:

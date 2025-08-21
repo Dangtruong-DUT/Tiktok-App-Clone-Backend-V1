@@ -47,11 +47,9 @@ class TikTokPostRepository {
                   .split('')
                   .join('|')
             : ''
-        const skip = (page - 1) * limit
         const viewerId = viewer_id ? new ObjectId(viewer_id) : new ObjectId('000000000000000000000000')
         const matchStage = {
             $match: {
-                type: 0,
                 _id: { $ne: new ObjectId(post_id) },
                 $or: [
                     { user_id: authorId },
@@ -60,6 +58,7 @@ class TikTokPostRepository {
                 ]
             }
         }
+        const skip = (page - 1) * limit
         const pipeline = [
             matchStage,
             lookupFriendship(viewerId),
@@ -94,7 +93,7 @@ class TikTokPostRepository {
                   .split('')
                   .join('|')
             : ''
-        const viewerId = viewer_id ? new ObjectId(viewer_id) : null
+        const viewerId = viewer_id ? new ObjectId(viewer_id) : new ObjectId('000000000000000000000000')
         const matchStage = {
             $match: {
                 _id: { $ne: new ObjectId(post_id) },
@@ -183,7 +182,7 @@ class TikTokPostRepository {
             addAuthorField()
         ]
         const posts = await databaseService.tiktokPost.aggregate(pipeline).toArray()
-        const total = posts.length
+        const total = bookmarks.length
         return { posts, total }
     }
 
@@ -223,7 +222,7 @@ class TikTokPostRepository {
             addAuthorField()
         ]
         const posts = await databaseService.tiktokPost.aggregate(pipeline).toArray()
-        const total = posts.length
+        const total = likes.length
         return { posts, total }
     }
 
