@@ -40,6 +40,7 @@ export const uploadHLSVideosController = async (req: Request, res: Response) => 
 
 export const serveImageController = async (req: Request<getImageReqParams>, res: Response) => {
     const { name } = req.params
+    res.setHeader('Content-Type', 'image/jpeg')
     await s3Service.sendFileFromS3(res, `images/${name}`)
 }
 

@@ -27,19 +27,22 @@ class MediasService {
 
     async UploadImages(req: Request) {
         const files = await handleUploadImages(req)
+        const fileTempPath: string[] = []
         const urls = await Promise.all(
             files.map(async (file) => {
                 const newFileName = getFileNameWithoutExtension(file.newFilename)
                 const newFileNameWithExtension = `${newFileName}.jpg`
                 const newPath = path.resolve(UPLOAD_IMAGE_DIR, newFileNameWithExtension)
-                await sharp(file.filepath).jpeg().toFile(newPath)
+                const buffer = await fs.readFile(file.filepath)
+                await sharp(buffer).jpeg().toFile(newPath)
+
                 await s3Service.uploadImageToS3({
                     fileName: newFileNameWithExtension,
                     absoluteFilePath: newPath
                 })
 
-                // Clean up local files
-                await Promise.all([fs.unlink(file.filepath), fs.unlink(newPath)])
+                fileTempPath.push(newPath)
+                fileTempPath.push(file.filepath)
 
                 return {
                     url: isProduction
@@ -49,6 +52,9 @@ class MediasService {
                 }
             })
         )
+
+        await Promise.all(fileTempPath.map((filePath) => fs.unlink(filePath)))
+
         return urls
     }
     async UploadVideos(req: Request) {
