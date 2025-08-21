@@ -93,6 +93,7 @@ export const getUserPostsController = async (req: Request, res: Response) => {
         page: pageNum,
         limit: limitNum
     })
+    const total_pages = Math.ceil(total / limitNum)
     res.json({
         message: USER_MESSAGES.GET_USER_POSTS_SUCCESS,
         data: {
@@ -101,7 +102,7 @@ export const getUserPostsController = async (req: Request, res: Response) => {
         meta: {
             page: pageNum,
             limit: limitNum,
-            total
+            total_pages
         }
     })
 }
@@ -118,6 +119,7 @@ export const getUserBookmarksController = async (req: Request, res: Response) =>
         page: pageNum,
         limit: limitNum
     })
+    const total_pages = Math.ceil(total / limitNum)
     res.json({
         message: USER_MESSAGES.GET_USER_BOOKMARKS_SUCCESS,
         data: {
@@ -126,7 +128,7 @@ export const getUserBookmarksController = async (req: Request, res: Response) =>
         meta: {
             page: pageNum,
             limit: limitNum,
-            total
+            total_pages
         }
     })
 }
@@ -143,6 +145,7 @@ export const getUserLikedPostsController = async (req: Request, res: Response) =
         page: pageNum,
         limit: limitNum
     })
+    const total_pages = Math.ceil(total / limitNum)
     res.json({
         message: USER_MESSAGES.GET_USER_LIKED_POSTS_SUCCESS,
         data: {
@@ -151,7 +154,7 @@ export const getUserLikedPostsController = async (req: Request, res: Response) =
         meta: {
             page: pageNum,
             limit: limitNum,
-            total
+            total_pages
         }
     })
 }
