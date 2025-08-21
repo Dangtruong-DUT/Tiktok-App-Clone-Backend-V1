@@ -192,7 +192,7 @@ export const createTiktokPostValidator = validate(
     )
 )
 
-export const getPostDetailValidator = validate(
+export const checkPostIsExistsValidator = validate(
     checkSchema(
         {
             post_id: validatePostId

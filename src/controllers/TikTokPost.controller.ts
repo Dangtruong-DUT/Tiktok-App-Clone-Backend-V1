@@ -180,3 +180,25 @@ export const getForYouPostsController = async (req: Request, res: Response) => {
         }
     })
 }
+
+export const getRelatedPostsController = async (req: Request, res: Response) => {
+    const { post_id } = req.params
+    const { page = 1, limit = 10 } = req.query as any
+    const user_id = (req.decoded_authorization as TokenPayload)?.user_id
+    const { posts, total } = await tikTokPostService.getRelatedPosts({
+        post_id,
+        page: Number(page),
+        limit: Number(limit),
+        user_id
+    })
+    const totalPage = Math.ceil(total / Number(limit))
+    return res.json({
+        message: POST_MESSAGES.GET_RELATED_POSTS_SUCCESS,
+        data: { posts },
+        meta: {
+            page: Number(page),
+            limit: Number(limit),
+            total_pages: totalPage
+        }
+    })
+}

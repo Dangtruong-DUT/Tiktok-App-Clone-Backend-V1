@@ -6,6 +6,7 @@ import {
     getForYouPostsController,
     getFriendPostsController,
     getPostDetailController,
+    getRelatedPostsController,
     likesTiktokPostController,
     unBookMarksTiktokPostController,
     unLikesTiktokPostController
@@ -19,7 +20,7 @@ import {
     bookMarksTiktokPostValidator,
     createTiktokPostValidator,
     getChildrenPostsValidator,
-    getPostDetailValidator,
+    checkPostIsExistsValidator,
     likeTiktokPostValidator,
     unBookMarksTiktokValidator,
     unLikeTiktokPostValidator
@@ -81,7 +82,7 @@ tiktokPostRouter.get(
 tiktokPostRouter.get(
     '/:post_id',
     isUserLoginValidator(authenticate),
-    getPostDetailValidator,
+    checkPostIsExistsValidator,
     wrapRequestHandler(audienceValidator),
     wrapRequestHandler(getPostDetailController)
 )
@@ -174,6 +175,23 @@ tiktokPostRouter.delete(
     requireVerifiedUser,
     unBookMarksTiktokValidator,
     wrapRequestHandler(unBookMarksTiktokPostController)
+)
+
+/**
+ * Description. Get related posts
+ * Path: /:post_id/relations
+ * method: GET
+ * query: {
+ *   page: number
+ *   limit: number
+ * }
+ */
+tiktokPostRouter.get(
+    '/:post_id/relations',
+    isUserLoginValidator(authenticate),
+    paginationValidator,
+    checkPostIsExistsValidator,
+    wrapRequestHandler(getRelatedPostsController)
 )
 
 export default tiktokPostRouter

@@ -1,5 +1,6 @@
 // Message về Post, Like, Comment, Bookmark
 export const POST_MESSAGES = {
+    GET_RELATED_POSTS_SUCCESS: 'Related posts fetched successfully',
     POST_SUCCESS: 'Post created successfully',
     POST_UPDATE_SUCCESS: 'Post updated successfully',
     POST_DELETE_SUCCESS: 'Post deleted successfully',
