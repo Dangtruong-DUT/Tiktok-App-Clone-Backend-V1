@@ -22,7 +22,11 @@ class TikTokPostService {
     }) {
         // Implement fetching user posts with correct pipeline and meta
         // You may want to use a similar aggregation as in repository, but for now, call repository (to be refactored if needed)
-        return await tikTokPostRepository.findUserPosts({ user_id, viewer_id, page, limit })
+        const [posts, total] = await Promise.all([
+            tikTokPostRepository.findUserPosts({ user_id, viewer_id, page, limit }),
+            tikTokPostRepository.countUserPosts({ user_id, viewer_id })
+        ])
+        return { posts, total }
     }
 
     async getUserBookmarks({

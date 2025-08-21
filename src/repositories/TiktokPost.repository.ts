@@ -14,6 +14,7 @@ import {
 } from './pipelines/postCommonPipelines'
 import { lookupFriendship, matchAudience, lookupViewerStats } from './pipelines/postViewerPipelines'
 import { lookupAuthor, addAuthorField } from './pipelines/postAuthorPipelines'
+import { T } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs'
 
 class TikTokPostRepository {
     private static instance: TikTokPostRepository
@@ -120,7 +121,7 @@ class TikTokPostRepository {
         viewer_id?: string
         page?: number
         limit?: number
-    }): Promise<{ posts: unknown[]; total: number }> {
+    }) {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const skip = (page - 1) * limit
         const match = { user_id: new ObjectId(user_id), type: 0 }
@@ -143,9 +144,15 @@ class TikTokPostRepository {
             lookupAuthor(),
             addAuthorField()
         ]
-        const posts = await databaseService.tiktokPost.aggregate(pipeline).toArray()
-        const total = posts.length
-        return { posts, total }
+        return await databaseService.tiktokPost.aggregate(pipeline).toArray()
+    }
+
+    async countUserPosts({ user_id, viewer_id }: { user_id: string; viewer_id?: string }) {
+        const viewerId = viewer_id ? new ObjectId(viewer_id) : null
+        const match = { user_id: new ObjectId(user_id), type: 0 }
+        const pipeline = [{ $match: match }, lookupFriendship(viewerId), matchAudience(viewerId), { $count: 'total' }]
+        const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        return result?.total || 0
     }
 
     async findUserBookmarks({
