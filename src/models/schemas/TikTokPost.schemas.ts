@@ -16,6 +16,7 @@ interface TikTokPostType {
     created_at?: Date
     updated_at?: Date
     medias: Media[]
+    thumbnail_url?: string
 }
 
 export default class TikTokPost {
@@ -32,6 +33,8 @@ export default class TikTokPost {
     created_at: Date
     updated_at: Date
     medias: Media[]
+    thumbnail_url?: string
+
     constructor({
         _id,
         user_id,
@@ -45,7 +48,8 @@ export default class TikTokPost {
         user_views,
         created_at,
         updated_at,
-        medias
+        medias,
+        thumbnail_url
     }: TikTokPostType) {
         const date = new Date()
         this._id = _id || new ObjectId()
@@ -62,5 +66,7 @@ export default class TikTokPost {
         this.created_at = created_at || date
         this.updated_at = updated_at || date
         this.medias = medias
+
+        this.thumbnail_url = thumbnail_url || ''
     }
 }

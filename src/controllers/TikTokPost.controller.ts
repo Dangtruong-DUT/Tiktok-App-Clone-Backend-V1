@@ -20,7 +20,7 @@ export const createTikTokPostController = async (
     req: Request<ParamsDictionary, CreateTikTokPostBodyReq>,
     res: Response
 ) => {
-    const payload = req.body
+    const payload = req.body as CreateTikTokPostBodyReq
     const { user_id } = req.decoded_authorization as TokenPayload
     const data = await tikTokPostService.createPost({ payload, user_id })
     if (!data) {

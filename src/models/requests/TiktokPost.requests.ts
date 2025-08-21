@@ -10,6 +10,7 @@ export interface CreateTikTokPostBodyReq {
     hashtags: string[]
     mentions: string[]
     medias: Media[]
+    thumbnail_url: string
 }
 
 export interface GetPostDetailParamsReq extends ParamsDictionary {

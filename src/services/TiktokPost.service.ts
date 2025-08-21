@@ -79,7 +79,8 @@ class TikTokPostService {
                 mentions: payload.mentions,
                 medias: payload.medias,
                 parent_id: payload.parent_id,
-                user_views: 0
+                user_views: 0,
+                thumbnail_url: payload.thumbnail_url || ''
             })
         )
         const post = await this.getPostDetail({

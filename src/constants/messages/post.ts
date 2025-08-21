@@ -44,5 +44,8 @@ export const POST_MESSAGES = {
     GET_CHILDREN_POSTS_SUCCESS: 'Get children posts successfully',
     GET_FRIEND_POSTS_SUCCESS: 'Get friend posts successfully',
     VIDEO_NOT_FOUND: 'Video not found',
-    GET_FOR_YOU_POSTS_SUCCESS: 'Get for you posts successfully'
+    GET_FOR_YOU_POSTS_SUCCESS: 'Get for you posts successfully',
+    THUMBNAIL_URL_MUST_BE_STRING: 'Thumbnail URL must be a string',
+    THUMBNAIL_URL_MUST_BE_PROVIDED: 'Thumbnail URL must be provided',
+    THUMBNAIL_URL_MUST_BE_A_VALID_URL: 'Thumbnail URL must be a valid URL'
 } as const

@@ -164,8 +164,30 @@ export const createTiktokPostValidator = validate(
                         return true
                     }
                 }
+            },
+            thumbnail_url: {
+                trim: true,
+                optional: true,
+                isURL: {
+                    errorMessage: POST_MESSAGES.THUMBNAIL_URL_MUST_BE_A_VALID_URL
+                },
+                custom: {
+                    options: (value, { req }) => {
+                        if (
+                            (req.body.type === PosterType.POST || req.body.type === PosterType.QUOTE_POST) &&
+                            isEmpty(value)
+                        ) {
+                            throw new Error(POST_MESSAGES.THUMBNAIL_URL_MUST_BE_PROVIDED)
+                        }
+                        if (typeof value !== 'string') {
+                            throw new Error(POST_MESSAGES.THUMBNAIL_URL_MUST_BE_STRING)
+                        }
+                        return true
+                    }
+                }
             }
         },
+
         ['body']
     )
 )
