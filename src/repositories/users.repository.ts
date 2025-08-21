@@ -190,7 +190,7 @@ class UsersRepository {
             // Lookup likes count từ posts của user này
             {
                 $lookup: {
-                    from: 'posts',
+                    from: 'tiktok_post',
                     localField: '_id',
                     foreignField: 'user_id',
                     as: 'user_posts'
@@ -324,7 +324,7 @@ class UsersRepository {
             // Lookup likes count từ posts của user này
             {
                 $lookup: {
-                    from: 'posts',
+                    from: 'tiktok_post',
                     localField: 'user._id',
                     foreignField: 'user_id',
                     as: 'user_posts'
@@ -451,7 +451,7 @@ class UsersRepository {
             // Lookup likes count từ posts của user này
             {
                 $lookup: {
-                    from: 'posts',
+                    from: 'tiktok_post',
                     localField: 'followed_user._id',
                     foreignField: 'user_id',
                     as: 'user_posts'
@@ -586,7 +586,7 @@ class UsersRepository {
             // Lookup likes count từ posts của user này
             {
                 $lookup: {
-                    from: 'posts',
+                    from: 'tiktok_post',
                     localField: '_id',
                     foreignField: 'user_id',
                     as: 'user_posts'

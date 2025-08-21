@@ -5,6 +5,7 @@ export function lookupAuthor() {
             let: { authorId: '$user_id' },
             pipeline: [
                 { $match: { $expr: { $eq: ['$_id', '$$authorId'] } } },
+                // Lookup following count
                 {
                     $lookup: {
                         from: 'followers',
@@ -18,6 +19,7 @@ export function lookupAuthor() {
                         following_count: { $size: '$following_count' }
                     }
                 },
+                // Lookup followers count
                 {
                     $lookup: {
                         from: 'followers',
@@ -31,11 +33,42 @@ export function lookupAuthor() {
                         followers_count: { $size: '$followers_count' }
                     }
                 },
+                // Lookup all posts of this user
+                {
+                    $lookup: {
+                        from: 'tiktok_post',
+                        localField: '_id',
+                        foreignField: 'user_id',
+                        as: 'user_posts'
+                    }
+                },
+                // Lookup all likes on those posts
+                {
+                    $lookup: {
+                        from: 'likes',
+                        let: { postIds: '$user_posts._id' },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: { $in: ['$post_id', '$$postIds'] }
+                                }
+                            }
+                        ],
+                        as: 'likes_on_posts'
+                    }
+                },
+                {
+                    $addFields: {
+                        likes_count: { $size: '$likes_on_posts' }
+                    }
+                },
                 {
                     $project: {
                         password: 0,
                         email_verify_token: 0,
-                        forgot_password_token: 0
+                        forgot_password_token: 0,
+                        user_posts: 0,
+                        likes_on_posts: 0
                     }
                 }
             ],
