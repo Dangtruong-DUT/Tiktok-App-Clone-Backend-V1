@@ -48,5 +48,6 @@ export const POST_MESSAGES = {
     GET_FOR_YOU_POSTS_SUCCESS: 'Get for you posts successfully',
     THUMBNAIL_URL_MUST_BE_STRING: 'Thumbnail URL must be a string',
     THUMBNAIL_URL_MUST_BE_PROVIDED: 'Thumbnail URL must be provided',
-    THUMBNAIL_URL_MUST_BE_A_VALID_URL: 'Thumbnail URL must be a valid URL'
+    THUMBNAIL_URL_MUST_BE_A_VALID_URL: 'Thumbnail URL must be a valid URL',
+    GET_POSTS_NO_FOLLOWING_SUCCESS: 'Get posts no following successfully'
 } as const

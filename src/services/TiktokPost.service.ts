@@ -256,6 +256,33 @@ class TikTokPostService {
             total
         }
     }
+    async getPostsNoFollowing({ page, limit, user_id }: { page?: number; limit?: number; user_id: string }) {
+        const [posts, total] = await Promise.all([
+            tikTokPostRepository.findPostsNoFollowing({ page, limit, user_id }),
+            tikTokPostRepository.countPostsNoFollowing(user_id)
+        ])
+        console.log('Posts no following:', posts)
+        const postsAfterIncreaseViews = await Promise.all(
+            posts.map(async (post: { _id?: ObjectId; [key: string]: unknown }) => {
+                let mutateData = {}
+                if (post && post._id) {
+                    mutateData = await this.increasePostViews({
+                        post_id: post._id.toString(),
+                        user_id
+                    })
+                }
+                return {
+                    ...post,
+                    ...mutateData
+                }
+            })
+        )
+
+        return {
+            posts: postsAfterIncreaseViews,
+            total
+        }
+    }
 }
 
 export default TikTokPostService.getInstance()

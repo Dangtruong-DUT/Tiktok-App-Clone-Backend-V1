@@ -202,3 +202,27 @@ export const getRelatedPostsController = async (req: Request, res: Response) => 
         }
     })
 }
+
+export async function getPostsNoFollowingController(req: Request, res: Response) {
+    const user_id = (req.decoded_authorization as TokenPayload)?.user_id
+    const { page = 1, limit = 10 } = req.query as unknown as GetChildrenPostsQueryReq
+    const { posts, total } = await tikTokPostService.getPostsNoFollowing({
+        page: Number(page),
+        limit: Number(limit),
+        user_id
+    })
+
+    const totalPage = Math.ceil(total / Number(limit))
+
+    return res.json({
+        message: POST_MESSAGES.GET_POSTS_NO_FOLLOWING_SUCCESS,
+        data: {
+            posts
+        },
+        meta: {
+            page: Number(page),
+            limit: Number(limit),
+            total_pages: totalPage
+        }
+    })
+}

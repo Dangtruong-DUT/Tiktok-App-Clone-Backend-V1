@@ -6,6 +6,7 @@ import {
     getForYouPostsController,
     getFriendPostsController,
     getPostDetailController,
+    getPostsNoFollowingController,
     getRelatedPostsController,
     likesTiktokPostController,
     unBookMarksTiktokPostController,
@@ -74,17 +75,21 @@ tiktokPostRouter.get(
 )
 
 /**
- * Description. Get post detail
- * Path: /:post_id
+ * Get liked posts of user
+ * Path: /:user_id/liked
  * method: GET
- * */
+ * query: {
+ * page: number
+ * limit: number
+ * }
+ *
+ */
 
 tiktokPostRouter.get(
-    '/:post_id',
+    '/not-following',
     isUserLoginValidator(authenticate),
-    checkPostIsExistsValidator,
-    wrapRequestHandler(audienceValidator),
-    wrapRequestHandler(getPostDetailController)
+    paginationValidator,
+    wrapRequestHandler(getPostsNoFollowingController)
 )
 
 /**
@@ -192,6 +197,20 @@ tiktokPostRouter.get(
     paginationValidator,
     checkPostIsExistsValidator,
     wrapRequestHandler(getRelatedPostsController)
+)
+
+/**
+ * Description. Get post detail
+ * Path: /:post_id
+ * method: GET
+ * */
+
+tiktokPostRouter.get(
+    '/:post_id',
+    isUserLoginValidator(authenticate),
+    checkPostIsExistsValidator,
+    wrapRequestHandler(audienceValidator),
+    wrapRequestHandler(getPostDetailController)
 )
 
 export default tiktokPostRouter

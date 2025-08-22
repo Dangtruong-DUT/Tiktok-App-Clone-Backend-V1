@@ -11,6 +11,58 @@ servers:
       description: Production Server
 
 paths:
+    /posts/not-following:
+        get:
+            summary: Lấy bài viết từ người dùng chưa follow
+            description: Lấy danh sách bài viết từ những người dùng mà bạn chưa follow.
+            operationId: getNotFollowingPosts
+            tags:
+                - posts
+            security:
+                - bearerAuth: []
+            parameters:
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                  description: Số trang (bắt đầu từ 1)
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                  description: Số lượng item trên mỗi trang
+            responses:
+                '200':
+                    description: Lấy danh sách bài viết thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Lấy danh sách bài viết thành công'
+                                    data:
+                                        type: object
+                                        properties:
+                                            posts:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/Post'
+                                    meta:
+                                        $ref: '#/components/schemas/PaginationMeta'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+
     /posts/foryou:
         get:
             summary: Lấy bài viết for you

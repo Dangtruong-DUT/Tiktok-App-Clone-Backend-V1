@@ -14,7 +14,7 @@ import {
 } from './pipelines/postCommonPipelines'
 import { lookupFriendship, matchAudience, lookupViewerStats } from './pipelines/postViewerPipelines'
 import { lookupAuthor, addAuthorField } from './pipelines/postAuthorPipelines'
-import { T } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs'
+import { $, T } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs'
 
 class TikTokPostRepository {
     private static instance: TikTokPostRepository
@@ -542,6 +542,57 @@ class TikTokPostRepository {
             { $match: { type: 0 } },
             lookupFriendship(viewerId),
             matchAudience(viewerId),
+            { $count: 'total' }
+        ]
+        const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        return result?.total || 0
+    }
+
+    async findPostsNoFollowing({ page = 0, limit = 10, user_id }: { page?: number; limit?: number; user_id: string }) {
+        const viewerId = new ObjectId(user_id)
+        const skip = page > 0 ? (page - 1) * limit : 0
+        const pipeline = [
+            { $match: { user_id: { $ne: viewerId } } },
+            lookupFriendship(viewerId),
+            matchAudience(viewerId),
+            lookupHashtags(),
+            lookupMentions(),
+            addMentionsFields(),
+            lookupLikes(),
+            lookupBookmarks(),
+            addStatsFields(),
+            lookupChildrenPosts(),
+            addChildrenCounts(),
+            ...lookupViewerStats(viewerId),
+            { $sort: { created_at: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            lookupAuthor(),
+            addAuthorField(),
+            {
+                $group: {
+                    _id: '$user_id',
+                    latestPost: { $first: '$$ROOT' }
+                }
+            },
+            {
+                $replaceRoot: { newRoot: { $mergeObjects: '$latestPost' } }
+            }
+        ]
+        return await databaseService.tiktokPost.aggregate(pipeline).toArray()
+    }
+    async countPostsNoFollowing(user_id: string) {
+        const viewerId = new ObjectId(user_id)
+        const pipeline = [
+            { $match: { user_id: { $ne: viewerId } } },
+            lookupFriendship(viewerId),
+            matchAudience(viewerId),
+            {
+                $group: {
+                    _id: '$user_id',
+                    latestPost: { $first: '$$ROOT' }
+                }
+            },
             { $count: 'total' }
         ]
         const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
