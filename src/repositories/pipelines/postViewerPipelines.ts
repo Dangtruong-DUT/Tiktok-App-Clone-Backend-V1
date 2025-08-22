@@ -1,4 +1,6 @@
 import { ObjectId } from 'mongodb'
+import { $ } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs'
+import { Audience } from '~/constants/enum'
 
 export function lookupFriendship(viewerId: ObjectId | null) {
     return {
@@ -24,22 +26,68 @@ export function lookupFriendship(viewerId: ObjectId | null) {
     }
 }
 
-export function matchAudience(viewerId: ObjectId | null) {
+export function LookUpFollowing(viewerId: ObjectId | null) {
     return {
-        $match: {
-            $expr: {
-                $or: [
-                    { $eq: ['$audience', 0] },
-                    {
-                        $and: [{ $eq: ['$audience', 2] }, { $gte: [{ $size: '$friendship' }, 1] }]
-                    },
-                    {
-                        $and: [{ $eq: ['$audience', 1] }, { $eq: ['$user_id', viewerId] }]
-                    }
-                ]
-            }
+        $lookup: {
+            from: 'followers',
+            let: { postUserId: '$user_id' },
+            pipeline: viewerId
+                ? [
+                      {
+                          $match: {
+                              $expr: {
+                                  $and: [
+                                      { $eq: ['$user_id', viewerId] },
+                                      { $eq: ['$followed_user_id', '$$postUserId'] }
+                                  ]
+                              }
+                          }
+                      }
+                  ]
+                : [],
+            as: 'following'
         }
     }
+}
+
+export function matchAudience(viewerId: ObjectId | null) {
+    return [
+        {
+            $match: {
+                $expr: {
+                    $or: [
+                        { $eq: ['$audience', Audience.PUBLIC] },
+                        {
+                            $and: [{ $eq: ['$audience', Audience.FRIENDS] }, { $gte: [{ $size: '$friendship' }, 1] }]
+                        },
+                        {
+                            $and: [{ $eq: ['$audience', Audience.PRIVATE] }, { $eq: ['$user_id', viewerId] }]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            $project: {
+                friendship: 0
+            }
+        }
+    ]
+}
+
+export function isMatchFollowing() {
+    return [
+        {
+            $match: {
+                $expr: { $gte: [{ $size: '$following' }, 1] }
+            }
+        },
+        {
+            $project: {
+                following: 0
+            }
+        }
+    ]
 }
 
 export function lookupViewerStats(viewerId: ObjectId | null) {

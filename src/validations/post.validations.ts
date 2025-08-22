@@ -168,9 +168,6 @@ export const createTiktokPostValidator = validate(
             thumbnail_url: {
                 trim: true,
                 optional: true,
-                isURL: {
-                    errorMessage: POST_MESSAGES.THUMBNAIL_URL_MUST_BE_A_VALID_URL
-                },
                 custom: {
                     options: (value, { req }) => {
                         if (

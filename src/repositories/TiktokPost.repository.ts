@@ -12,7 +12,13 @@ import {
     lookupChildrenPosts,
     addChildrenCounts
 } from './pipelines/postCommonPipelines'
-import { lookupFriendship, matchAudience, lookupViewerStats } from './pipelines/postViewerPipelines'
+import {
+    lookupFriendship,
+    matchAudience,
+    lookupViewerStats,
+    LookUpFollowing,
+    isMatchFollowing
+} from './pipelines/postViewerPipelines'
 import { lookupAuthor, addAuthorField } from './pipelines/postAuthorPipelines'
 import { $, T } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs'
 
@@ -64,7 +70,7 @@ class TikTokPostRepository {
         const pipeline = [
             matchStage,
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             lookupHashtags(),
             lookupMentions(),
             addMentionsFields(),
@@ -107,7 +113,7 @@ class TikTokPostRepository {
                 ]
             }
         }
-        const pipeline = [matchStage, lookupFriendship(viewerId), matchAudience(viewerId), { $count: 'total' }]
+        const pipeline = [matchStage, lookupFriendship(viewerId), ...matchAudience(viewerId), { $count: 'total' }]
         const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
         return result?.total || 0
     }
@@ -128,7 +134,7 @@ class TikTokPostRepository {
         const pipeline = [
             { $match: match },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             lookupHashtags(),
             lookupMentions(),
             addMentionsFields(),
@@ -150,7 +156,12 @@ class TikTokPostRepository {
     async countUserPosts({ user_id, viewer_id }: { user_id: string; viewer_id?: string }) {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const match = { user_id: new ObjectId(user_id), type: 0 }
-        const pipeline = [{ $match: match }, lookupFriendship(viewerId), matchAudience(viewerId), { $count: 'total' }]
+        const pipeline = [
+            { $match: match },
+            lookupFriendship(viewerId),
+            ...matchAudience(viewerId),
+            { $count: 'total' }
+        ]
         const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
         return result?.total || 0
     }
@@ -174,7 +185,7 @@ class TikTokPostRepository {
         const pipeline = [
             { $match: match },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             lookupHashtags(),
             lookupMentions(),
             addMentionsFields(),
@@ -214,7 +225,7 @@ class TikTokPostRepository {
         const pipeline = [
             { $match: match },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             lookupHashtags(),
             lookupMentions(),
             addMentionsFields(),
@@ -255,7 +266,7 @@ class TikTokPostRepository {
         const pipeline = [
             { $match: { $text: { $search: query }, type: PosterType.POST } },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             lookupHashtags(),
             lookupMentions(),
             addMentionsFields(),
@@ -277,7 +288,7 @@ class TikTokPostRepository {
         const pipeline = [
             { $match: { $text: { $search: query }, type: PosterType.POST } },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             { $count: 'total' }
         ]
         const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
@@ -339,9 +350,11 @@ class TikTokPostRepository {
         const viewerId = new ObjectId(user_id)
         const skip = page > 0 ? (page - 1) * limit : 0
         const pipeline = [
-            { $match: { type: 0 } },
+            { $match: { type: PosterType.POST } },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
+            LookUpFollowing(viewerId),
+            ...isMatchFollowing(),
             lookupHashtags(),
             lookupMentions(),
             addMentionsFields(),
@@ -350,6 +363,8 @@ class TikTokPostRepository {
             addStatsFields(),
             lookupChildrenPosts(),
             addChildrenCounts(),
+            lookupAuthor(),
+            addAuthorField(),
             ...lookupViewerStats(viewerId),
             { $sort: { created_at: -1 } },
             { $skip: skip },
@@ -384,7 +399,7 @@ class TikTokPostRepository {
             { $unwind: '$post' },
             { $replaceRoot: { newRoot: '$post' } },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             lookupHashtags(),
             lookupMentions(),
             addMentionsFields(),
@@ -416,7 +431,7 @@ class TikTokPostRepository {
             { $unwind: '$post' },
             { $replaceRoot: { newRoot: '$post' } },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             { $count: 'total' }
         ]
         const [result] = await databaseService.hashtags.aggregate(pipeline).toArray()
@@ -428,7 +443,7 @@ class TikTokPostRepository {
         const pipeline = [
             { $match: { type: 0 } },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             { $count: 'total' }
         ]
         const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
@@ -453,7 +468,7 @@ class TikTokPostRepository {
         const pipeline = [
             { $match: { parent_id: new ObjectId(post_id), type: Number(type) } },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             lookupHashtags(),
             lookupMentions(),
             addMentionsFields(),
@@ -490,7 +505,7 @@ class TikTokPostRepository {
                 }
             },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             { $count: 'total' }
         ]
         const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
@@ -517,7 +532,7 @@ class TikTokPostRepository {
         const pipeline = [
             { $match: { type: PosterType.POST } },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             lookupHashtags(),
             lookupMentions(),
             addMentionsFields(),
@@ -539,9 +554,9 @@ class TikTokPostRepository {
     async countForYouPosts(user_id?: string) {
         const viewerId = user_id ? new ObjectId(user_id) : new ObjectId('000000000000000000000000')
         const pipeline = [
-            { $match: { type: 0 } },
+            { $match: { type: PosterType.POST } },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             { $count: 'total' }
         ]
         const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
@@ -553,8 +568,9 @@ class TikTokPostRepository {
         const skip = page > 0 ? (page - 1) * limit : 0
         const pipeline = [
             { $match: { user_id: { $ne: viewerId } } },
+            { $match: { type: PosterType.POST } },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             lookupHashtags(),
             lookupMentions(),
             addMentionsFields(),
@@ -585,8 +601,9 @@ class TikTokPostRepository {
         const viewerId = new ObjectId(user_id)
         const pipeline = [
             { $match: { user_id: { $ne: viewerId } } },
+            { $match: { type: PosterType.POST } },
             lookupFriendship(viewerId),
-            matchAudience(viewerId),
+            ...matchAudience(viewerId),
             {
                 $group: {
                     _id: '$user_id',
