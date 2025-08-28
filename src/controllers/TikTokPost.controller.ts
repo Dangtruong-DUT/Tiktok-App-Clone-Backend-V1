@@ -6,7 +6,8 @@ import {
     CreateTikTokPostBodyReq,
     GetChildrenPostsParamReq,
     GetChildrenPostsQueryReq,
-    GetPostDetailParamsReq
+    GetPostDetailParamsReq,
+    UpdateTiktokPostBodyReq
 } from '~/models/requests/TiktokPost.requests'
 import { TiktokLikeReqBody, UnLikeReqParams } from '~/models/requests/likes.requests'
 import likePostService from '~/services/likes.service'
@@ -63,6 +64,44 @@ export const getPostDetailController = async (req: Request<GetPostDetailParamsRe
         message: POST_MESSAGES.GET_POST_DETAIL_SUCCESS,
         data: tiktokPost
     })
+}
+
+export const deletePostController = async (req: Request<ParamsDictionary>, res: Response) => {
+    const post = req.post
+    const user_id = (req.decoded_authorization as TokenPayload)?.user_id
+
+    if (post == undefined)
+        throw new ErrorWithStatus({ message: POST_MESSAGES.POST_NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
+
+    if (post.author._id.toString() !== user_id.toString()) {
+        throw new ErrorWithStatus({
+            message: POST_MESSAGES.FORBIDDEN_DELETE_POST,
+            status: HTTP_STATUS.FORBIDDEN
+        })
+    }
+
+    await tikTokPostService.deletePost({ post_id: post._id.toString() })
+
+    return res.json({ message: POST_MESSAGES.DELETE_POST_SUCCESS })
+}
+
+export const updatePostController = async (req: Request<ParamsDictionary, UpdateTiktokPostBodyReq>, res: Response) => {
+    const post = req.post
+    const user_id = (req.decoded_authorization as TokenPayload)?.user_id
+
+    if (post == undefined)
+        throw new ErrorWithStatus({ message: POST_MESSAGES.POST_NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
+
+    if (post.author._id.toString() !== user_id.toString()) {
+        throw new ErrorWithStatus({
+            message: POST_MESSAGES.FORBIDDEN_DELETE_POST,
+            status: HTTP_STATUS.FORBIDDEN
+        })
+    }
+
+    await tikTokPostService.updatePost({ post_id: post._id.toString(), payload: req.body })
+
+    return res.json({ message: POST_MESSAGES.POST_UPDATE_SUCCESS })
 }
 
 export const likesTiktokPostController = async (req: Request<ParamsDictionary, TiktokLikeReqBody>, res: Response) => {

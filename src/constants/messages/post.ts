@@ -49,5 +49,8 @@ export const POST_MESSAGES = {
     THUMBNAIL_URL_MUST_BE_STRING: 'Thumbnail URL must be a string',
     THUMBNAIL_URL_MUST_BE_PROVIDED: 'Thumbnail URL must be provided',
     THUMBNAIL_URL_MUST_BE_A_VALID_URL: 'Thumbnail URL must be a valid URL',
-    GET_POSTS_NO_FOLLOWING_SUCCESS: 'Get posts no following successfully'
+    GET_POSTS_NO_FOLLOWING_SUCCESS: 'Get posts no following successfully',
+    FORBIDDEN_DELETE_POST: 'You do not have permission to delete this post',
+    DELETE_POST_SUCCESS: 'Delete post success',
+    UPDATE_POST_SUCCESS: 'Update post success'
 } as const

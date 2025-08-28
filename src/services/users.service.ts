@@ -176,11 +176,17 @@ class UserService {
         return userWithOwnership
     }
 
+    async checkUserNameExist(username: string) {
+        return await usersRepository.findUserByUsername(username)
+    }
+
     async updateUserById(user_id: string, payload: UpdateUserRequestBody): Promise<UserProfileResponse> {
         const result = await usersRepository.updateUser(user_id, {
             $set: {
-                ...payload,
-                updated_at: '$$NOW'
+                ...payload
+            },
+            $currentDate: {
+                updated_at: true
             }
         })
 

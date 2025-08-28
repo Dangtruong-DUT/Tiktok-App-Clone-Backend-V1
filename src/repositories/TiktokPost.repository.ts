@@ -21,6 +21,8 @@ import {
 } from './pipelines/postViewerPipelines'
 import { lookupAuthor, addAuthorField } from './pipelines/postAuthorPipelines'
 import { $, T } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs'
+import { TiktokPostResponseType } from '~/models/responses/post.response'
+import { UpdateTiktokPostBodyReq } from '~/models/requests/TiktokPost.requests'
 
 class TikTokPostRepository {
     private static instance: TikTokPostRepository
@@ -86,7 +88,7 @@ class TikTokPostRepository {
             lookupAuthor(),
             addAuthorField()
         ]
-        return await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        return await databaseService.tiktokPost.aggregate<TiktokPostResponseType>(pipeline).toArray()
     }
 
     async countRelatedPosts({ post_id, viewer_id }: { post_id: string; viewer_id?: string }) {
@@ -311,7 +313,7 @@ class TikTokPostRepository {
             lookupAuthor(),
             addAuthorField()
         ]
-        const [result] = await databaseService.tiktokPost.aggregate<TikTokPost>(pipeline).toArray()
+        const [result] = await databaseService.tiktokPost.aggregate<TiktokPostResponseType>(pipeline).toArray()
         return result
     }
 
@@ -370,7 +372,7 @@ class TikTokPostRepository {
             { $skip: skip },
             { $limit: limit }
         ]
-        return await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        return await databaseService.tiktokPost.aggregate<TiktokPostResponseType>(pipeline).toArray()
     }
 
     async searchPostsByHashtagName({
@@ -413,7 +415,7 @@ class TikTokPostRepository {
             { $skip: skip },
             { $limit: limit }
         ]
-        return await databaseService.hashtags.aggregate(pipeline).toArray()
+        return await databaseService.hashtags.aggregate<TiktokPostResponseType>(pipeline).toArray()
     }
 
     async countSearchPostsByHashtagName({ query, viewer_id }: { query: string; viewer_id?: string }) {
@@ -484,7 +486,7 @@ class TikTokPostRepository {
             lookupAuthor(),
             addAuthorField()
         ]
-        return await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        return await databaseService.tiktokPost.aggregate<TiktokPostResponseType>(pipeline).toArray()
     }
 
     async countChildrenPosts({
@@ -548,7 +550,7 @@ class TikTokPostRepository {
             lookupAuthor(),
             addAuthorField()
         ]
-        return await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        return await databaseService.tiktokPost.aggregate<TiktokPostResponseType>(pipeline).toArray()
     }
 
     async countForYouPosts(user_id?: string) {
@@ -595,7 +597,7 @@ class TikTokPostRepository {
                 $replaceRoot: { newRoot: { $mergeObjects: '$latestPost' } }
             }
         ]
-        return await databaseService.tiktokPost.aggregate(pipeline).toArray()
+        return await databaseService.tiktokPost.aggregate<TiktokPostResponseType>(pipeline).toArray()
     }
     async countPostsNoFollowing(user_id: string) {
         const viewerId = new ObjectId(user_id)
@@ -614,6 +616,14 @@ class TikTokPostRepository {
         ]
         const [result] = await databaseService.tiktokPost.aggregate(pipeline).toArray()
         return result?.total || 0
+    }
+
+    async delete(post_id: string) {
+        await databaseService.tiktokPost.deleteOne({ _id: new ObjectId(post_id) })
+    }
+
+    async update(post_id: string, updateFields: object) {
+        await databaseService.tiktokPost.updateOne({ _id: new ObjectId(post_id) }, updateFields)
     }
 }
 

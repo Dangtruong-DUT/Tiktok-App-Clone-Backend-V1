@@ -1,15 +1,3 @@
-openapi: 3.0.4
-info:
-    title: Tiktok-Clone-2025 - OpenAPI 1.0 (Auth Module)
-    description: Authentication and authorization endpoints for Tiktok Clone API
-    version: 1.0.0
-
-servers:
-    - url: http://localhost:4000/api
-      description: Local Development Server
-    - url: https://api.tiktok-clone-2025.io/api
-      description: Production Server
-
 paths:
     /auth/login/google:
         get:

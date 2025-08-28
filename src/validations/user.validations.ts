@@ -42,7 +42,7 @@ export const updateUserValidator = validate(
                         const decoded_authorization = (req as Request).decoded_authorization
                         const { user_id } = decoded_authorization as TokenPayload
 
-                        const user = await usersServices.getUserByUserName(value)
+                        const user = await usersServices.checkUserNameExist(value)
                         if (user && user._id && user._id.toString() !== user_id) {
                             throw new Error(USER_MESSAGES.USERNAME_ALREADY_EXISTS)
                         }

@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
     bookMarksTiktokPostController,
     createTikTokPostController,
+    deletePostController,
     getChildrenPostsController,
     getForYouPostsController,
     getFriendPostsController,
@@ -10,7 +11,8 @@ import {
     getRelatedPostsController,
     likesTiktokPostController,
     unBookMarksTiktokPostController,
-    unLikesTiktokPostController
+    unLikesTiktokPostController,
+    updatePostController
 } from '~/controllers/TikTokPost.controller'
 import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 import { audienceValidator } from '~/middlewares/post.middlewares'
@@ -24,7 +26,8 @@ import {
     checkPostIsExistsValidator,
     likeTiktokPostValidator,
     unBookMarksTiktokValidator,
-    unLikeTiktokPostValidator
+    unLikeTiktokPostValidator,
+    updatePostValidator
 } from '~/validations/post.validations'
 
 const tiktokPostRouter = Router()
@@ -211,6 +214,23 @@ tiktokPostRouter.get(
     checkPostIsExistsValidator,
     wrapRequestHandler(audienceValidator),
     wrapRequestHandler(getPostDetailController)
+)
+
+tiktokPostRouter.delete(
+    '/:post_id',
+    authenticate,
+    requireVerifiedUser,
+    checkPostIsExistsValidator,
+    wrapRequestHandler(deletePostController)
+)
+
+tiktokPostRouter.patch(
+    '/:post_id',
+    authenticate,
+    requireVerifiedUser,
+    checkPostIsExistsValidator,
+    updatePostValidator,
+    wrapRequestHandler(updatePostController)
 )
 
 export default tiktokPostRouter

@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb'
 import { Media } from '../Common'
 import { PosterType, Audience } from '~/constants/enum'
 
-interface TikTokPostType {
+export interface TikTokPostType {
     _id?: ObjectId
     user_id: ObjectId
     type: PosterType

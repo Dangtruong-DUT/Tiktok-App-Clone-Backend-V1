@@ -13,6 +13,14 @@ export interface CreateTikTokPostBodyReq {
     thumbnail_url: string
 }
 
+export interface UpdateTiktokPostBodyReq {
+    content?: string
+    hashtags?: string[]
+    mentions?: string[]
+    medias?: Media[]
+    thumbnail_url?: string
+}
+
 export interface GetPostDetailParamsReq extends ParamsDictionary {
     post_id: string
 }
@@ -24,5 +32,5 @@ export interface GetChildrenPostsParamReq extends ParamsDictionary {
 export interface GetChildrenPostsQueryReq {
     page?: number
     limit?: number
-    type: PosterType // 2: comments, 1: re·post, 3: quotes
+    type: PosterType
 }

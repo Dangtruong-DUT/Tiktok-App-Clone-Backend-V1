@@ -1,7 +1,9 @@
 import { checkSchema, ParamSchema } from 'express-validator'
 import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
+import { optional } from 'node_modules/zod/v4/mini/external.cjs'
 import { Audience, MediaType, PosterType } from '~/constants/enum'
+
 import HTTP_STATUS from '~/constants/httpStatus'
 import { POST_MESSAGES } from '~/constants/messages/post'
 import { validate } from '~/middlewares/validation.middlewares'
@@ -167,7 +169,114 @@ export const createTiktokPostValidator = validate(
             },
             thumbnail_url: {
                 trim: true,
+                custom: {
+                    options: (value, { req }) => {
+                        if (
+                            (req.body.type === PosterType.POST || req.body.type === PosterType.QUOTE_POST) &&
+                            isEmpty(value)
+                        ) {
+                            throw new Error(POST_MESSAGES.THUMBNAIL_URL_MUST_BE_PROVIDED)
+                        }
+                        if (typeof value !== 'string') {
+                            throw new Error(POST_MESSAGES.THUMBNAIL_URL_MUST_BE_STRING)
+                        }
+                        return true
+                    }
+                }
+            }
+        },
+
+        ['body']
+    )
+)
+
+export const updatePostValidator = validate(
+    checkSchema(
+        {
+            audience: {
                 optional: true,
+                isIn: {
+                    options: [numberEnumToArray(Audience)],
+                    errorMessage: POST_MESSAGES.INVALID_AUDIENCE_TYPE
+                }
+            },
+            content: {
+                optional: true,
+                isString: true,
+                isLength: {
+                    options: { max: 500 },
+                    errorMessage: POST_MESSAGES.CONTENT_MAX_LENGTH
+                },
+                custom: {
+                    options: (value: string, { req }) => {
+                        const type = req.body.type
+                        const medias = req.body.medias
+                        const mentions = req.body.mentions
+
+                        if (
+                            !(typeof value === 'string' && value.trim()) &&
+                            [PosterType.COMMENT, PosterType.QUOTE_POST].includes(type) &&
+                            isEmpty(medias) &&
+                            isEmpty(mentions)
+                        ) {
+                            throw new Error(POST_MESSAGES.CONTENT_REQUIRED)
+                        }
+                        return true
+                    }
+                },
+                trim: true
+            },
+            hashtags: {
+                isArray: true,
+                optional: true,
+                errorMessage: POST_MESSAGES.HASHTAGS_MUST_BE_ARRAY,
+                custom: {
+                    options: (value: string[]) => {
+                        if (!value.every((item) => typeof item === 'string')) {
+                            throw new Error(POST_MESSAGES.HASHTAG_MUST_BE_STRING)
+                        }
+                        return true
+                    }
+                }
+            },
+            mentions: {
+                optional: true,
+                isArray: true,
+                errorMessage: POST_MESSAGES.MENTIONS_MUST_BE_ARRAY,
+                custom: {
+                    options: async (value: string[]) => {
+                        const results = await Promise.all(
+                            value.map(async (item) => {
+                                const user = await usersServices.getUserById({ user_id: item })
+                                return user !== null
+                            })
+                        )
+                        if (!results.every(Boolean)) {
+                            throw new Error(POST_MESSAGES.INVALID_MENTION)
+                        }
+                        return true
+                    }
+                }
+            },
+            medias: {
+                optional: true,
+                isArray: true,
+                errorMessage: POST_MESSAGES.MEDIA_FILES_MUST_BE_ARRAY,
+                custom: {
+                    options: (value, { req }) => {
+                        if (
+                            !value.every((item: any) => {
+                                return typeof item.url === 'string' && Object.values(MediaType).includes(item.type)
+                            })
+                        ) {
+                            throw new Error(POST_MESSAGES.INVALID_MEDIA_TYPE)
+                        }
+                        return true
+                    }
+                }
+            },
+            thumbnail_url: {
+                trim: true,
                 custom: {
                     options: (value, { req }) => {
                         if (

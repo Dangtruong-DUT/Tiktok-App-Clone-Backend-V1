@@ -1,15 +1,3 @@
-openapi: 3.0.4
-info:
-    title: Tiktok-Clone-2025 - OpenAPI 1.0 (Posts Module)
-    description: Post management endpoints for Tiktok Clone API
-    version: 1.0.0
-
-servers:
-    - url: http://localhost:4000/api
-      description: Local Development Server
-    - url: https://api.tiktok-clone-2025.io/api
-      description: Production Server
-
 paths:
     /posts/not-following:
         get:
@@ -235,6 +223,147 @@ paths:
                                         example: 'Lấy chi tiết bài viết thành công'
                                     data:
                                         $ref: '#/components/schemas/Post'
+                '404':
+                    description: Không tìm thấy bài viết
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+        delete:
+            summary: Xóa bài viết
+            description: Xóa một bài viết. Chỉ người tạo bài viết mới có thể xóa.
+            operationId: deletePost
+            tags:
+                - posts
+            security:
+                - bearerAuth: []
+            parameters:
+                - in: path
+                  name: post_id
+                  required: true
+                  schema:
+                      type: string
+                      format: mongoid
+                  description: ID của bài viết cần xóa
+            responses:
+                '200':
+                    description: Xóa bài viết thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Xóa bài viết thành công'
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+                '403':
+                    description: Không có quyền xóa bài viết này
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '404':
+                    description: Không tìm thấy bài viết
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+        patch:
+            summary: Cập nhật bài viết
+            description: Cập nhật nội dung của một bài viết. Chỉ người tạo bài viết mới có thể cập nhật.
+            operationId: updatePost
+            tags:
+                - posts
+            security:
+                - bearerAuth: []
+            parameters:
+                - in: path
+                  name: post_id
+                  required: true
+                  schema:
+                      type: string
+                      format: mongoid
+                  description: ID của bài viết cần cập nhật
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                audience:
+                                    $ref: '#/components/schemas/Audience'
+                                content:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 2000
+                                    example: 'Nội dung bài viết đã được cập nhật #cntt #trg'
+                                hashtags:
+                                    type: array
+                                    items:
+                                        type: string
+                                    example: ['cntt', 'trg', 'hoc it']
+                                    description: Danh sách tên hashtag (không bao gồm dấu #)
+                                mentions:
+                                    type: array
+                                    items:
+                                        type: string
+                                        format: mongoid
+                                    example: []
+                                    description: Danh sách user_id được mention
+                                medias:
+                                    type: array
+                                    items:
+                                        $ref: '#/components/schemas/Media'
+                                    example:
+                                        - url: 'http://localhost:4000/api/v1/static/videos/UfNIVbfVK36NsQ0NwERoe.mp4'
+                                          type: 1
+                                    description: Danh sách media (hình ảnh/video) của bài viết
+            responses:
+                '200':
+                    description: Cập nhật bài viết thành công
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Cập nhật bài viết thành công'
+                                    data:
+                                        $ref: '#/components/schemas/Post'
+                '400':
+                    description: Lỗi xử lý
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Không có quyền truy cập
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnauthorizedResponse'
+                '403':
+                    description: Không có quyền cập nhật bài viết này
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
                 '404':
                     description: Không tìm thấy bài viết
                     content:
@@ -698,10 +827,11 @@ components:
                 medias:
                     type: array
                     items:
-                        type: string
-                        format: mongoid
-                    example: ['media_id_1', 'media_id_2']
-                    description: Danh sách ID của media đã upload
+                        $ref: '#/components/schemas/Media'
+                    example:
+                        - url: 'http://localhost:4000/api/v1/static/videos/UfNIVbfVK36NsQ0NwERoe.mp4'
+                          type: 1
+                    description: Danh sách media (hình ảnh/video) của bài viết
             required:
                 - type
                 - audience
@@ -733,7 +863,8 @@ components:
                 url:
                     type: string
                     format: uri
-                    example: 'http://localhost:3000/api/static/video-stream/FLq1NUqa5QHF7Ipciz35v.mp4'
+                    description: URL của media
+                    example: 'http://localhost:4000/api/v1/static/videos/UfNIVbfVK36NsQ0NwERoe.mp4'
                 type:
                     $ref: '#/components/schemas/MediaType'
             required:
@@ -774,8 +905,8 @@ components:
 
         MediaType:
             type: number
-            description: Loại media
-            enum: [IMAGE, VIDEO, HLS_VIDEO]
+            description: Loại media (IMAGE=0, VIDEO=1, HLS_VIDEO=2)
+            enum: [0, 1, 2]
             example: 1
 
         PaginationMeta:

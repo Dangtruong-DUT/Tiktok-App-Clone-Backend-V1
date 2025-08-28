@@ -1,4 +1,4 @@
-import { CreateTikTokPostBodyReq } from '~/models/requests/TiktokPost.requests'
+import { CreateTikTokPostBodyReq, UpdateTiktokPostBodyReq } from '~/models/requests/TiktokPost.requests'
 import TikTokPost from '~/models/schemas/TikTokPost.schemas'
 import { ObjectId } from 'mongodb'
 import { ErrorWithStatus } from '~/models/Errors'
@@ -7,6 +7,7 @@ import { POST_MESSAGES } from '~/constants/messages/post'
 import { PosterType } from '~/constants/enum'
 import tikTokPostRepository from '~/repositories/TiktokPost.repository'
 import hashtagRepository from '~/repositories/hashtag.repository'
+import { TiktokPostResponseType } from '~/models/responses/post.response'
 
 class TikTokPostService {
     async getUserPosts({
@@ -144,7 +145,7 @@ class TikTokPostService {
         ])
 
         const postsAfterIncreaseViews = await Promise.all(
-            posts.map(async (post: { _id?: ObjectId; [key: string]: unknown }) => {
+            posts.map(async (post: TiktokPostResponseType) => {
                 let mutateData = {}
                 if (post && post._id) {
                     mutateData = await this.increasePostViews({
@@ -172,7 +173,7 @@ class TikTokPostService {
         ])
 
         const postsAfterIncreaseViews = await Promise.all(
-            posts.map(async (post: { _id?: ObjectId; [key: string]: unknown }) => {
+            posts.map(async (post: TiktokPostResponseType) => {
                 let mutateData = {}
                 if (post && post._id) {
                     mutateData = await this.increasePostViews({
@@ -200,7 +201,7 @@ class TikTokPostService {
         ])
 
         const postsAfterIncreaseViews = await Promise.all(
-            posts.map(async (post: { _id?: ObjectId; [key: string]: unknown }) => {
+            posts.map(async (post: TiktokPostResponseType) => {
                 let mutateData = {}
                 if (post && post._id) {
                     mutateData = await this.increasePostViews({
@@ -237,7 +238,7 @@ class TikTokPostService {
             tikTokPostRepository.countRelatedPosts({ post_id, viewer_id: user_id })
         ])
         const postsAfterIncreaseViews = await Promise.all(
-            posts.map(async (post: { _id?: ObjectId; [key: string]: unknown }) => {
+            posts.map(async (post: TiktokPostResponseType) => {
                 let mutateData = {}
                 if (post && post._id) {
                     mutateData = await this.increasePostViews({
@@ -262,7 +263,7 @@ class TikTokPostService {
             tikTokPostRepository.countPostsNoFollowing(user_id)
         ])
         const postsAfterIncreaseViews = await Promise.all(
-            posts.map(async (post: { _id?: ObjectId; [key: string]: unknown }) => {
+            posts.map(async (post: TiktokPostResponseType) => {
                 let mutateData = {}
                 if (post && post._id) {
                     mutateData = await this.increasePostViews({
@@ -281,6 +282,25 @@ class TikTokPostService {
             posts: postsAfterIncreaseViews,
             total
         }
+    }
+
+    async deletePost({ post_id }: { post_id: string }) {
+        await tikTokPostRepository.delete(post_id)
+    }
+
+    async updatePost({ post_id, payload }: { post_id: string; payload: UpdateTiktokPostBodyReq }) {
+        let hashtags
+        if (payload.hashtags) hashtags = await this.checkAndCreateHashtags(payload.hashtags)
+
+        await tikTokPostRepository.update(post_id, {
+            $set: {
+                ...payload,
+                ...(hashtags !== undefined && { hashtags })
+            },
+            $currentDate: {
+                updated_at: true
+            }
+        })
     }
 }
 
