@@ -8,6 +8,7 @@ import { PosterType } from '~/constants/enum'
 import tikTokPostRepository from '~/repositories/TiktokPost.repository'
 import hashtagRepository from '~/repositories/hashtag.repository'
 import { TiktokPostResponseType } from '~/models/responses/post.response'
+import _ from 'lodash'
 
 class TikTokPostService {
     async getUserPosts({
@@ -292,9 +293,11 @@ class TikTokPostService {
         let hashtags
         if (payload.hashtags) hashtags = await this.checkAndCreateHashtags(payload.hashtags)
 
+        const data = _.omitBy(payload, _.isNil)
+
         await tikTokPostRepository.update(post_id, {
             $set: {
-                ...payload,
+                ...data,
                 ...(hashtags !== undefined && { hashtags })
             },
             $currentDate: {

@@ -277,6 +277,7 @@ export const updatePostValidator = validate(
             },
             thumbnail_url: {
                 trim: true,
+                optional: true,
                 custom: {
                     options: (value, { req }) => {
                         if (

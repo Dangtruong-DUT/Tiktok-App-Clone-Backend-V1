@@ -48,10 +48,33 @@ export const serveImageController = async (req: Request<getImageReqParams>, res:
 export const serveVideoController = async (req: Request<getVideoReqParam>, res: Response) => {
     const { name } = req.params
     const nameWithoutExtension = path.basename(name, path.extname(name))
+    const key = `videos/${nameWithoutExtension}/${name}`
+
+    const range = req.headers.range
+    const fileSize = await s3Service.getFileSize(key)
+
     res.setHeader('Content-Type', 'video/mp4')
-    res.setHeader('Accept-Ranges', 'bytes')
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
-    await s3Service.sendFileFromS3(res, `videos/${nameWithoutExtension}/${name}`)
+
+    if (!range) {
+        res.setHeader('Content-Length', fileSize.toString())
+        await s3Service.sendFileFromS3(res, key)
+        return
+    }
+
+    const parts = range.replace(/bytes=/, '').split('-')
+    const start = parseInt(parts[0], 10)
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
+    const chunkSize = end - start + 1
+
+    res.writeHead(206, {
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunkSize,
+        'Content-Type': 'video/mp4'
+    })
+
+    await s3Service.sendFileFromS3(res, key, { start, end })
 }
 
 export const serveM3u8HLSController = async (req: Request<getVideoHLSReqParam>, res: Response) => {

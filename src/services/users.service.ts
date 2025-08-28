@@ -16,6 +16,7 @@ import User from '~/models/schemas/User.schema'
 import { UserType } from '~/models/types/User.types'
 import { UserProfileResponse, UserProfileWithSensitiveResponse } from '~/models/responses/user.responses'
 import generateTimeBasedUsername from '~/utils/GenerateUserName'
+import _ from 'lodash'
 
 class UserService {
     private static instance: UserService
@@ -181,9 +182,10 @@ class UserService {
     }
 
     async updateUserById(user_id: string, payload: UpdateUserRequestBody): Promise<UserProfileResponse> {
+        const data = _.omitBy(payload, _.isNil)
         const result = await usersRepository.updateUser(user_id, {
             $set: {
-                ...payload
+                ...data
             },
             $currentDate: {
                 updated_at: true

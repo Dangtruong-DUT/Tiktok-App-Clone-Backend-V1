@@ -62,7 +62,8 @@ export function matchAudience(viewerId: ObjectId | null) {
                         },
                         {
                             $and: [{ $eq: ['$audience', Audience.PRIVATE] }, { $eq: ['$user_id', viewerId] }]
-                        }
+                        },
+                        { $eq: ['$user_id', viewerId] }
                     ]
                 }
             }

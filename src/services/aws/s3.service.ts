@@ -88,13 +88,27 @@ class S3Service {
         })
     }
 
-    public async sendFileFromS3(res: Response, filePath: string) {
-        const data = await this.s3Client.getObject({
+    public async sendFileFromS3(res: Response, filePath: string, range?: { start: number; end: number }) {
+        const params: any = {
             Bucket: this.bucketName,
             Key: filePath
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }
+
+        if (range) {
+            params.Range = `bytes=${range.start}-${range.end}`
+        }
+
+        const data = await this.s3Client.getObject(params)
         ;(data.Body as any).pipe(res)
+    }
+    async getFileSize(filePath: string): Promise<number> {
+        const params = {
+            Bucket: this.bucketName,
+            Key: filePath
+        }
+
+        const headObject = await this.s3Client.headObject(params)
+        return headObject.ContentLength || 0
     }
 }
 
