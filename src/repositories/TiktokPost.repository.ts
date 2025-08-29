@@ -276,6 +276,8 @@ class TikTokPostRepository {
             lookupChildrenPosts(),
             addChildrenCounts(),
             ...lookupViewerStats(viewerId),
+            lookupAuthor(),
+            addAuthorField(),
             { $sort: { created_at: -1 } },
             { $skip: skip },
             { $limit: limit }
