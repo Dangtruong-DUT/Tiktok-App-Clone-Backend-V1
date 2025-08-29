@@ -52,10 +52,10 @@ class SearchService {
                 page,
                 viewer_id: user_id
             }),
-            tikTokPostRepository.countSearchUsersByUsername({
-                query: q
-            })
+            usersRepository.countUsersByQuery(q)
         ])
+
+        console.log(users)
         return { users, total }
     }
 }

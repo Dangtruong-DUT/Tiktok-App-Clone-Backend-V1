@@ -17,6 +17,7 @@ import { UserType } from '~/models/types/User.types'
 import { UserProfileResponse, UserProfileWithSensitiveResponse } from '~/models/responses/user.responses'
 import generateTimeBasedUsername from '~/utils/GenerateUserName'
 import _ from 'lodash'
+import { $ } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs'
 
 class UserService {
     private static instance: UserService
@@ -229,8 +230,10 @@ class UserService {
     async changePassword(user_id: string, password: string) {
         return await usersRepository.updateUser(user_id, {
             $set: {
-                password: hashPassword(password),
-                updated_at: '$$NOW'
+                password: hashPassword(password)
+            },
+            $currentDate: {
+                updated_at: true
             }
         })
     }

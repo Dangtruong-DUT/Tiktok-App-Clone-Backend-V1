@@ -2,6 +2,7 @@ import { Request } from 'express'
 import { checkSchema } from 'express-validator'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages/user'
+import { VALIDATION_MESSAGES } from '~/constants/messages/validation'
 import { REGEX_USERNAME } from '~/constants/regex'
 import { validate } from '~/middlewares/validation.middlewares'
 import { ErrorWithStatus } from '~/models/Errors'
@@ -89,7 +90,10 @@ export const changePasswordValidator = validate(
     checkSchema(
         {
             current_password: {
-                ...passwordSchema,
+                trim: true,
+                notEmpty: {
+                    errorMessage: VALIDATION_MESSAGES.PASSWORD_IS_REQUIRED
+                },
                 custom: {
                     options: async (value: string, { req }) => {
                         const decoded_authorization = (req as Request).decoded_authorization

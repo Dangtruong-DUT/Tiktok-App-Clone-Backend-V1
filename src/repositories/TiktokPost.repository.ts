@@ -514,7 +514,7 @@ class TikTokPostRepository {
         return result?.total || 0
     }
 
-    async countSearchUsersByUsername({ query }: { query: string }) {
+    async countSearchUser({ query }: { query: string }) {
         const pipeline = [
             {
                 $match: {

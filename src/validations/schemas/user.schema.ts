@@ -117,23 +117,17 @@ export const usernameSchema: ParamSchema = {
 
 export const avatarSchema: ParamSchema = {
     optional: true,
-    isURL: {
-        errorMessage: USER_MESSAGES.AVATAR_MUST_BE_A_VALID_URL
-    },
+    trim: true,
     isLength: {
         options: {
             max: 400
         },
         errorMessage: USER_MESSAGES.AVATAR_LENGTH_MUST_BE_FROM_0_TO_400
-    },
-    trim: true
+    }
 }
 
 export const coverPhotoSchema: ParamSchema = {
     optional: true,
-    isURL: {
-        errorMessage: USER_MESSAGES.COVER_PHOTO_MUST_BE_A_VALID_URL
-    },
     isLength: {
         options: {
             max: 400

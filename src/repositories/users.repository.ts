@@ -1,10 +1,21 @@
-import { ObjectId } from 'mongodb'
+import { ObjectId, ReturnDocument } from 'mongodb'
 import databaseService from '~/services/database.service'
 import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
 import Follower from '~/models/schemas/Follower.schemas'
-import { Role } from '~/constants/enum'
 import { UserType } from '~/models/types/User.types'
+import { searchUsersPipeline, countUsersByQueryPipeline } from './pipelines/user/search.pipeline'
+import {
+    getUserProfilePipeline,
+    getUserFollowersPipeline,
+    getUserFollowingPipeline
+} from './pipelines/user/profile.pipeline'
+import { employeeMatchPipeline, superAdminMatchPipeline } from './pipelines/user/employee.pipeline'
+import {
+    createFollowerPipeline,
+    deleteFollowerPipeline,
+    checkFriendshipStatusPipeline
+} from './pipelines/user/follower.pipeline'
 
 class UsersRepository {
     private get safeUserProjection() {
@@ -92,26 +103,18 @@ class UsersRepository {
 
     // Follower operations
     async createFollower(follower: Follower) {
-        return await databaseService.followers.findOneAndUpdate(
-            {
-                user_id: follower.user_id,
-                followed_user_id: follower.followed_user_id
-            },
-            {
-                $setOnInsert: follower
-            },
-            {
-                upsert: true,
-                returnDocument: 'after'
-            }
-        )
+        const { filter, update, options } = createFollowerPipeline(follower)
+        // Ensure options.returnDocument uses the ReturnDocument enum
+        const fixedOptions = {
+            ...options,
+            returnDocument: ReturnDocument.AFTER
+        }
+        return await databaseService.followers.findOneAndUpdate(filter, update, fixedOptions)
     }
 
     async deleteFollower(user_id: string, followed_user_id: string) {
-        return await databaseService.followers.deleteOne({
-            user_id: new ObjectId(user_id),
-            followed_user_id: new ObjectId(followed_user_id)
-        })
+        const query = deleteFollowerPipeline(new ObjectId(user_id), new ObjectId(followed_user_id))
+        return await databaseService.followers.deleteOne(query)
     }
 
     async countFollowers(user_id: string) {
@@ -127,24 +130,14 @@ class UsersRepository {
     }
 
     async checkFriendshipStatus(user_id: string, target_user_id: string) {
-        const friendship = await databaseService.followers.findOne({
-            $or: [
-                {
-                    user_id: new ObjectId(user_id),
-                    followed_user_id: new ObjectId(target_user_id)
-                },
-                {
-                    user_id: new ObjectId(target_user_id),
-                    followed_user_id: new ObjectId(user_id)
-                }
-            ]
-        })
+        const query = checkFriendshipStatusPipeline(new ObjectId(user_id), new ObjectId(target_user_id))
+        const friendship = await databaseService.followers.findOne(query)
         return !!friendship
     }
 
     async searchUsers({
         query,
-        page = 0,
+        page = 1,
         limit = 10,
         viewer_id
     }: {
@@ -154,382 +147,24 @@ class UsersRepository {
         viewer_id?: string
     }) {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
-
-        const pipeline: object[] = [
-            {
-                $match: {
-                    $text: { $search: query }
-                }
-            },
-            {
-                $lookup: {
-                    from: 'followers',
-                    localField: '_id',
-                    foreignField: 'user_id',
-                    as: 'following_count'
-                }
-            },
-            {
-                $addFields: {
-                    following_count: { $size: '$following_count' }
-                }
-            },
-            {
-                $lookup: {
-                    from: 'followers',
-                    localField: '_id',
-                    foreignField: 'followed_user_id',
-                    as: 'followers_count'
-                }
-            },
-            {
-                $addFields: {
-                    followers_count: { $size: '$followers_count' }
-                }
-            },
-            // Lookup likes count từ posts của user này
-            {
-                $lookup: {
-                    from: 'tiktok_post',
-                    localField: '_id',
-                    foreignField: 'user_id',
-                    as: 'user_posts'
-                }
-            },
-            {
-                $lookup: {
-                    from: 'likes',
-                    let: { postIds: '$user_posts._id' },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $in: ['$post_id', '$$postIds']
-                                }
-                            }
-                        }
-                    ],
-                    as: 'likes_on_posts'
-                }
-            },
-            {
-                $addFields: {
-                    likes_count: { $size: '$likes_on_posts' }
-                }
-            },
-            {
-                $lookup: viewerId
-                    ? {
-                          from: 'followers',
-                          let: { user_id: '$_id' },
-                          pipeline: [
-                              {
-                                  $match: {
-                                      $expr: {
-                                          $and: [
-                                              { $eq: ['$user_id', viewerId] },
-                                              { $eq: ['$followed_user_id', '$$user_id'] }
-                                          ]
-                                      }
-                                  }
-                              }
-                          ],
-                          as: 'friend_ship'
-                      }
-                    : {
-                          from: 'followers',
-                          pipeline: [],
-                          as: 'friend_ship'
-                      }
-            },
-            {
-                $addFields: {
-                    is_followed: viewerId ? { $gt: [{ $size: '$friend_ship' }, 0] } : false
-                }
-            },
-            {
-                $project: {
-                    password: 0,
-                    email_verify_token: 0,
-                    forgot_password_token: 0,
-                    friend_ship: 0,
-                    user_posts: 0,
-                    likes_on_posts: 0
-                }
-            },
-            { $skip: page * limit },
-            { $limit: limit }
-        ]
-
+        const pipeline = searchUsersPipeline(query, viewerId, page, limit)
         return await databaseService.users.aggregate(pipeline).toArray()
     }
     async countUsersByQuery(query: string) {
-        const pipeline = [
-            {
-                $match: {
-                    $text: { $search: query }
-                }
-            },
-            {
-                $count: 'total'
-            }
-        ]
-
+        const pipeline = countUsersByQueryPipeline(query)
         const [result] = await databaseService.users.aggregate(pipeline).toArray()
         return result?.total || 0
     }
 
     async getUserFollowers(user_id: string, page = 0, limit = 10, viewer_id?: string) {
-        const pipeline: object[] = [
-            {
-                $match: { followed_user_id: new ObjectId(user_id) }
-            },
-            {
-                $lookup: {
-                    from: 'users',
-                    localField: 'user_id',
-                    foreignField: '_id',
-                    as: 'user'
-                }
-            },
-            { $unwind: '$user' },
-            // Lookup following count cho mỗi user
-            {
-                $lookup: {
-                    from: 'followers',
-                    localField: 'user._id',
-                    foreignField: 'user_id',
-                    as: 'user_following_count'
-                }
-            },
-            {
-                $addFields: {
-                    'user.following_count': { $size: '$user_following_count' }
-                }
-            },
-            // Lookup followers count cho mỗi user
-            {
-                $lookup: {
-                    from: 'followers',
-                    localField: 'user._id',
-                    foreignField: 'followed_user_id',
-                    as: 'user_followers_count'
-                }
-            },
-            {
-                $addFields: {
-                    'user.followers_count': { $size: '$user_followers_count' }
-                }
-            },
-            // Lookup likes count từ posts của user này
-            {
-                $lookup: {
-                    from: 'tiktok_post',
-                    localField: 'user._id',
-                    foreignField: 'user_id',
-                    as: 'user_posts'
-                }
-            },
-            {
-                $lookup: {
-                    from: 'likes',
-                    let: { postIds: '$user_posts._id' },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $in: ['$post_id', '$$postIds']
-                                }
-                            }
-                        }
-                    ],
-                    as: 'likes_on_posts'
-                }
-            },
-            {
-                $addFields: {
-                    'user.likes_count': { $size: '$likes_on_posts' }
-                }
-            }
-        ]
-
-        // Nếu có viewer_id, kiểm tra relationship
-        if (viewer_id) {
-            pipeline.push(
-                {
-                    $lookup: {
-                        from: 'followers',
-                        let: { userId: '$user._id' },
-                        pipeline: [
-                            {
-                                $match: {
-                                    user_id: new ObjectId(viewer_id),
-                                    $expr: { $eq: ['$followed_user_id', '$$userId'] }
-                                }
-                            }
-                        ],
-                        as: 'friend_ship'
-                    }
-                },
-                {
-                    $addFields: {
-                        'user.is_followed': { $gt: [{ $size: '$friend_ship' }, 0] }
-                    }
-                }
-            )
-        } else {
-            pipeline.push({
-                $addFields: {
-                    'user.is_followed': false
-                }
-            })
-        }
-
-        pipeline.push(
-            {
-                $project: {
-                    'user.password': 0,
-                    'user.email_verify_token': 0,
-                    'user.forgot_password_token': 0,
-                    user_following_count: 0,
-                    user_followers_count: 0,
-                    user_posts: 0,
-                    likes_on_posts: 0,
-                    friend_ship: 0
-                }
-            },
-            { $sort: { created_at: -1 } },
-            { $skip: page * limit },
-            { $limit: limit }
-        )
-
+        const viewerId = viewer_id ? new ObjectId(viewer_id) : null
+        const pipeline = getUserFollowersPipeline(new ObjectId(user_id), viewerId, page, limit)
         return await databaseService.followers.aggregate(pipeline).toArray()
     }
 
     async getUserFollowing(user_id: string, page = 0, limit = 10, viewer_id?: string) {
-        const pipeline: object[] = [
-            {
-                $match: { user_id: new ObjectId(user_id) }
-            },
-            {
-                $lookup: {
-                    from: 'users',
-                    localField: 'followed_user_id',
-                    foreignField: '_id',
-                    as: 'followed_user'
-                }
-            },
-            { $unwind: '$followed_user' },
-            // Lookup following count
-            {
-                $lookup: {
-                    from: 'followers',
-                    localField: 'followed_user._id',
-                    foreignField: 'user_id',
-                    as: 'user_following_count'
-                }
-            },
-            {
-                $addFields: {
-                    'followed_user.following_count': { $size: '$user_following_count' }
-                }
-            },
-            // Lookup followers count
-            {
-                $lookup: {
-                    from: 'followers',
-                    localField: 'followed_user._id',
-                    foreignField: 'followed_user_id',
-                    as: 'user_followers_count'
-                }
-            },
-            {
-                $addFields: {
-                    'followed_user.followers_count': { $size: '$user_followers_count' }
-                }
-            },
-            // Lookup likes count từ posts của user này
-            {
-                $lookup: {
-                    from: 'tiktok_post',
-                    localField: 'followed_user._id',
-                    foreignField: 'user_id',
-                    as: 'user_posts'
-                }
-            },
-            {
-                $lookup: {
-                    from: 'likes',
-                    let: { postIds: '$user_posts._id' },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $in: ['$post_id', '$$postIds']
-                                }
-                            }
-                        }
-                    ],
-                    as: 'likes_on_posts'
-                }
-            },
-            {
-                $addFields: {
-                    'followed_user.likes_count': { $size: '$likes_on_posts' }
-                }
-            }
-        ]
-
-        // Nếu có viewer_id, kiểm tra relationship
-        if (viewer_id) {
-            pipeline.push(
-                {
-                    $lookup: {
-                        from: 'followers',
-                        let: { userId: '$followed_user._id' },
-                        pipeline: [
-                            {
-                                $match: {
-                                    user_id: new ObjectId(viewer_id),
-                                    $expr: { $eq: ['$followed_user_id', '$$userId'] }
-                                }
-                            }
-                        ],
-                        as: 'friend_ship'
-                    }
-                },
-                {
-                    $addFields: {
-                        'followed_user.is_followed': { $gt: [{ $size: '$friend_ship' }, 0] }
-                    }
-                }
-            )
-        } else {
-            pipeline.push({
-                $addFields: {
-                    'followed_user.is_followed': false
-                }
-            })
-        }
-
-        pipeline.push(
-            {
-                $project: {
-                    'followed_user.password': 0,
-                    'followed_user.email_verify_token': 0,
-                    'followed_user.forgot_password_token': 0,
-                    user_following_count: 0,
-                    user_followers_count: 0,
-                    user_posts: 0,
-                    likes_on_posts: 0,
-                    friend_ship: 0
-                }
-            },
-            { $sort: { created_at: -1 } },
-            { $skip: page * limit },
-            { $limit: limit }
-        )
-
+        const viewerId = viewer_id ? new ObjectId(viewer_id) : null
+        const pipeline = getUserFollowingPipeline(new ObjectId(user_id), viewerId, page, limit)
         return await databaseService.followers.aggregate(pipeline).toArray()
     }
 
@@ -544,158 +179,28 @@ class UsersRepository {
     }) {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const targetUserId = new ObjectId(target_user_id)
-
-        const pipeline: object[] = [
-            {
-                $match: {
-                    _id: targetUserId
-                }
-            },
-            // Lookup following count (số người mà user này đang follow)
-            {
-                $lookup: {
-                    from: 'followers',
-                    localField: '_id',
-                    foreignField: 'user_id',
-                    as: 'following_count'
-                }
-            },
-            {
-                $addFields: {
-                    following_count: {
-                        $size: '$following_count'
-                    }
-                }
-            },
-            // Lookup followers count (số người follow user này)
-            {
-                $lookup: {
-                    from: 'followers',
-                    localField: '_id',
-                    foreignField: 'followed_user_id',
-                    as: 'followers_count'
-                }
-            },
-            {
-                $addFields: {
-                    followers_count: {
-                        $size: '$followers_count'
-                    }
-                }
-            },
-            // Lookup likes count từ posts của user này
-            {
-                $lookup: {
-                    from: 'tiktok_post',
-                    localField: '_id',
-                    foreignField: 'user_id',
-                    as: 'user_posts'
-                }
-            },
-            {
-                $lookup: {
-                    from: 'likes',
-                    let: { postIds: '$user_posts._id' },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $in: ['$post_id', '$$postIds']
-                                }
-                            }
-                        }
-                    ],
-                    as: 'likes_on_posts'
-                }
-            },
-            {
-                $addFields: {
-                    likes_count: {
-                        $size: '$likes_on_posts'
-                    }
-                }
-            }
-        ]
-
-        // Nếu có viewer_id, kiểm tra relationship
-        if (viewerId) {
-            pipeline.push(
-                {
-                    $lookup: {
-                        from: 'followers',
-                        let: {
-                            user_id: '$_id'
-                        },
-                        pipeline: [
-                            {
-                                $match: {
-                                    user_id: viewerId,
-                                    $expr: { $eq: ['$followed_user_id', '$$user_id'] }
-                                }
-                            }
-                        ],
-                        as: 'friend_ship'
-                    }
-                },
-                {
-                    $addFields: {
-                        is_followed: {
-                            $gt: [
-                                {
-                                    $size: '$friend_ship'
-                                },
-                                0
-                            ]
-                        }
-                    }
-                }
-            )
-        } else {
-            // Nếu là guest, mặc định is_followed = false
-            pipeline.push({
-                $addFields: {
-                    is_followed: false
-                }
-            })
-        }
-
-        pipeline.push({
-            $project: {
-                friend_ship: 0,
-                user_posts: 0,
-                likes_on_posts: 0
-            }
-        })
-
-        // Project để ẩn các trường nhạy cảm và cleanup
-        if (isSensitiveHidden) {
-            pipeline.push({
-                $project: {
-                    password: 0,
-                    email_verify_token: 0,
-                    forgot_password_token: 0
-                }
-            })
-        }
-
+        const pipeline = getUserProfilePipeline(targetUserId, viewerId, isSensitiveHidden)
         const [result] = await databaseService.users.aggregate<UserType>(pipeline).toArray()
         return result
     }
 
     async getEmployees({ page = 0, limit = 10 }: { page?: number; limit?: number } = {}) {
+        const pipeline = employeeMatchPipeline()
         return await databaseService.users
-            .find({ role: { $in: [Role.SUPER_ADMIN, Role.ADMIN] } }, { projection: this.safeUserProjection })
+            .find(pipeline[0].$match, { projection: this.safeUserProjection })
             .skip(page * limit)
             .limit(limit)
             .toArray()
     }
+
     async countEmployees() {
-        return await databaseService.users.countDocuments({ role: { $in: [Role.SUPER_ADMIN, Role.ADMIN] } })
+        const pipeline = employeeMatchPipeline()
+        return await databaseService.users.countDocuments(pipeline[0].$match)
     }
 
     async isExitSuperAdmin() {
-        const count = await databaseService.users.countDocuments({ role: Role.SUPER_ADMIN })
-        return count > 0
+        const pipeline = superAdminMatchPipeline()
+        return (await databaseService.users.countDocuments(pipeline[0].$match)) > 0
     }
 }
 
