@@ -16,6 +16,7 @@ import {
     deleteFollowerPipeline,
     checkFriendshipStatusPipeline
 } from './pipelines/user/follower.pipeline'
+import { UserProfileResponse, UserProfileWithSensitiveResponse } from '~/models/responses'
 
 class UsersRepository {
     private get safeUserProjection() {
@@ -101,10 +102,8 @@ class UsersRepository {
         return await databaseService.refreshToken.findOne({ token })
     }
 
-    // Follower operations
     async createFollower(follower: Follower) {
         const { filter, update, options } = createFollowerPipeline(follower)
-        // Ensure options.returnDocument uses the ReturnDocument enum
         const fixedOptions = {
             ...options,
             returnDocument: ReturnDocument.AFTER
@@ -148,7 +147,7 @@ class UsersRepository {
     }) {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const pipeline = searchUsersPipeline(query, viewerId, page, limit)
-        return await databaseService.users.aggregate(pipeline).toArray()
+        return await databaseService.users.aggregate<UserProfileResponse>(pipeline).toArray()
     }
     async countUsersByQuery(query: string) {
         const pipeline = countUsersByQueryPipeline(query)
@@ -159,13 +158,13 @@ class UsersRepository {
     async getUserFollowers(user_id: string, page = 0, limit = 10, viewer_id?: string) {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const pipeline = getUserFollowersPipeline(new ObjectId(user_id), viewerId, page, limit)
-        return await databaseService.followers.aggregate(pipeline).toArray()
+        return await databaseService.followers.aggregate<UserProfileResponse>(pipeline).toArray()
     }
 
     async getUserFollowing(user_id: string, page = 0, limit = 10, viewer_id?: string) {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const pipeline = getUserFollowingPipeline(new ObjectId(user_id), viewerId, page, limit)
-        return await databaseService.followers.aggregate(pipeline).toArray()
+        return await databaseService.followers.aggregate<UserProfileResponse>(pipeline).toArray()
     }
 
     async getUserProfileWithDetails({
@@ -180,14 +179,16 @@ class UsersRepository {
         const viewerId = viewer_id ? new ObjectId(viewer_id) : null
         const targetUserId = new ObjectId(target_user_id)
         const pipeline = getUserProfilePipeline(targetUserId, viewerId, isSensitiveHidden)
-        const [result] = await databaseService.users.aggregate<UserType>(pipeline).toArray()
+        const [result] = await databaseService.users
+            .aggregate<UserProfileResponse | UserProfileWithSensitiveResponse>(pipeline)
+            .toArray()
         return result
     }
 
     async getEmployees({ page = 0, limit = 10 }: { page?: number; limit?: number } = {}) {
         const pipeline = employeeMatchPipeline()
         return await databaseService.users
-            .find(pipeline[0].$match, { projection: this.safeUserProjection })
+            .find<UserProfileResponse>(pipeline[0].$match, { projection: this.safeUserProjection })
             .skip(page * limit)
             .limit(limit)
             .toArray()

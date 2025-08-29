@@ -20,9 +20,7 @@ import {
     isMatchFollowing
 } from './pipelines/postViewerPipelines'
 import { lookupAuthor, addAuthorField } from './pipelines/postAuthorPipelines'
-import { $, T } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs'
 import { TiktokPostResponseType } from '~/models/responses/post.response'
-import { UpdateTiktokPostBodyReq } from '~/models/requests/TiktokPost.requests'
 
 class TikTokPostRepository {
     private static instance: TikTokPostRepository
