@@ -9,12 +9,12 @@ export const searchController = async (req: Request, res: Response) => {
     const query = decodeURIComponent(q)
     const user_id = (req.decoded_authorization as TokenPayload)?.user_id
     const { posts, total } = await searchService.search({ q: query, page: Number(page), limit: Number(limit), user_id })
-    const total_Pages = Math.ceil(total / Number(limit))
+    const total_pages = Math.ceil(total / Number(limit))
     return res.json({
         message: SEARCH_MESSAGES.SEARCH_SUCCESS,
         data: posts,
         meta: {
-            total_Pages,
+            total_pages,
             page: Number(page),
             limit: Number(limit)
         }
@@ -31,12 +31,12 @@ export const searchHashtagsController = async (req: Request, res: Response) => {
         limit: Number(limit),
         user_id
     })
-    const total_Pages = Math.ceil(total / Number(limit))
+    const total_pages = Math.ceil(total / Number(limit))
     return res.json({
         message: SEARCH_MESSAGES.SEARCH_HASHTAGS_SUCCESS,
         data: posts,
         meta: {
-            total_Pages,
+            total_pages,
             page: Number(page),
             limit: Number(limit)
         }
@@ -53,12 +53,12 @@ export const searchUsersController = async (req: Request, res: Response) => {
         limit: Number(limit),
         user_id
     })
-    const total_Pages = Math.ceil(total / Number(limit))
+    const total_pages = Math.ceil(total / Number(limit))
     return res.json({
         message: SEARCH_MESSAGES.SEARCH_SUCCESS,
         data: users,
         meta: {
-            total_Pages,
+            total_pages,
             page: Number(page),
             limit: Number(limit)
         }

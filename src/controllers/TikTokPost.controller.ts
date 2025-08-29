@@ -113,7 +113,6 @@ export const likesTiktokPostController = async (req: Request<ParamsDictionary, T
         data
     })
 }
-
 export const unLikesTiktokPostController = async (req: Request<UnLikeReqParams>, res: Response) => {
     const { user_id } = req.decoded_authorization as TokenPayload
     const { post_id } = req.params
