@@ -56,6 +56,115 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/UnauthorizedResponse'
 
+    /users/me/indicators:
+        get:
+            tags:
+                - users
+            summary: Get user's content statistics
+            description: Get statistics about user's posts including likes, views, and comments counts
+            security:
+                - bearerAuth: []
+            parameters:
+                - in: query
+                  name: fromDate
+                  schema:
+                      type: string
+                      format: date-time
+                  description: Start date for statistics (default is 7 days ago)
+                  example: '2023-08-23T00:00:00.000Z'
+                  required: false
+                - in: query
+                  name: toDate
+                  schema:
+                      type: string
+                      format: date-time
+                  description: End date for statistics (default is current date)
+                  example: '2023-08-30T23:59:59.999Z'
+                  required: false
+            responses:
+                '200':
+                    description: Successfully retrieved statistics
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Indicators retrieved successfully'
+                                    data:
+                                        type: object
+                                        properties:
+                                            likes_count:
+                                                type: number
+                                                example: 150
+                                                description: Total number of likes
+                                            guests_view:
+                                                type: number
+                                                example: 300
+                                                description: Total number of guest views
+                                            users_view:
+                                                type: number
+                                                example: 200
+                                                description: Total number of authenticated user views
+                                            comments_count:
+                                                type: number
+                                                example: 45
+                                                description: Total number of comments
+                                            Indicator:
+                                                type: array
+                                                items:
+                                                    type: object
+                                                    properties:
+                                                        date:
+                                                            type: string
+                                                            example: '23-08-30'
+                                                            description: Date in YY-MM-DD format
+                                                        likes_count:
+                                                            type: number
+                                                            example: 25
+                                                            description: Number of likes for this date
+                                                        guests_view:
+                                                            type: number
+                                                            example: 50
+                                                            description: Number of guest views for this date
+                                                        users_view:
+                                                            type: number
+                                                            example: 35
+                                                            description: Number of authenticated user views for this date
+                                                        comments_count:
+                                                            type: number
+                                                            example: 10
+                                                            description: Number of comments for this date
+                '400':
+                    description: Invalid date range or format
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Invalid date range'
+                                    errors:
+                                        type: object
+                                        properties:
+                                            fromDate:
+                                                type: string
+                                                example: 'Invalid start date format'
+                                            toDate:
+                                                type: string
+                                                example: 'Invalid end date format'
+                '401':
+                    description: Unauthorized - Invalid or missing access token
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Unauthorized'
     /users/{user_id}/bookmarks:
         get:
             summary: Lấy danh sách bài viết đã bookmark của user
