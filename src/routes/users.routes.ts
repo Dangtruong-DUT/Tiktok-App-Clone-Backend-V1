@@ -20,6 +20,8 @@ import { wrapRequestHandler } from '~/utils/handlers'
 import { authenticate, requireVerifiedUser } from '~/middlewares/auth.middlewares'
 import { isUserLoginValidator } from '~/middlewares/user.middlewares'
 import { paginationValidator } from '~/validations/pagination.validation'
+import { getUserIndicatorsController } from '~/controllers/stats.controller'
+import { GetUserIndicatorsValidate } from '~/validations/stats.validation'
 const userRouter = Router()
 
 /**
@@ -166,6 +168,11 @@ userRouter.get(
     wrapRequestHandler(getUserLikedPostsController)
 )
 
-
+userRouter.get(
+    '/me/indicators',
+    authenticate,
+    GetUserIndicatorsValidate,
+    wrapRequestHandler(getUserIndicatorsController)
+)
 
 export default userRouter

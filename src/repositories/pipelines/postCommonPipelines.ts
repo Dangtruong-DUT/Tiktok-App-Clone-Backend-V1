@@ -1,5 +1,3 @@
-import { ObjectId } from 'mongodb'
-
 export function lookupHashtags() {
     return {
         $lookup: {

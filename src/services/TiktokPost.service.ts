@@ -11,6 +11,15 @@ import { TiktokPostResponseType } from '~/models/responses/post.response'
 import _ from 'lodash'
 
 class TikTokPostService {
+    private static instance: TikTokPostService
+    private constructor() {}
+    static getInstance(): TikTokPostService {
+        if (!TikTokPostService.instance) {
+            TikTokPostService.instance = new TikTokPostService()
+        }
+        return TikTokPostService.instance
+    }
+
     async getUserPosts({
         user_id,
         viewer_id,
@@ -22,8 +31,6 @@ class TikTokPostService {
         page?: number
         limit?: number
     }) {
-        // Implement fetching user posts with correct pipeline and meta
-        // You may want to use a similar aggregation as in repository, but for now, call repository (to be refactored if needed)
         const [posts, total] = await Promise.all([
             tikTokPostRepository.findUserPosts({ user_id, viewer_id, page, limit }),
             tikTokPostRepository.countUserPosts({ user_id, viewer_id })
@@ -57,14 +64,6 @@ class TikTokPostService {
         limit?: number
     }) {
         return await tikTokPostRepository.findUserLikedPosts({ user_id, viewer_id, page, limit })
-    }
-    private static instance: TikTokPostService
-    private constructor() {}
-    static getInstance(): TikTokPostService {
-        if (!TikTokPostService.instance) {
-            TikTokPostService.instance = new TikTokPostService()
-        }
-        return TikTokPostService.instance
     }
 
     async checkAndCreateHashtags(hashtags: string[]) {
