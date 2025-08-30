@@ -55,7 +55,6 @@ class SearchService {
             usersRepository.countUsersByQuery(q)
         ])
 
-        console.log(users)
         return { users, total }
     }
 }
