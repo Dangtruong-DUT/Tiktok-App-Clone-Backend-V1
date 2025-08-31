@@ -20,14 +20,14 @@ databaseService.connect().then(async () => {
 
 initOwnerAccount()
 
-//https://www.npmjs.com/package/express-rate-limit
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 20000,
-    standardHeaders: 'draft-8',
-    legacyHeaders: false,
-    ipv6Subnet: 56
-})
+// //https://www.npmjs.com/package/express-rate-limit
+// const limiter = rateLimit({
+//     windowMs: 15 * 60 * 1000,
+//     limit: 10000000,
+//     standardHeaders: 'draft-8',
+//     legacyHeaders: false,
+//     ipv6Subnet: 56
+// })
 
 const app = express()
 const httpServer = createServer(app)
@@ -42,7 +42,7 @@ app.use(
         origin: whitelist
     })
 )
-app.use(limiter)
+// app.use(limiter)
 
 app.use(express.json())
 app.use('/api/v1', apiRouter)
