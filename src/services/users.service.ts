@@ -128,7 +128,7 @@ class UserService {
         }
 
         const isOwner = viewer_id === user._id?.toString()
-        const userWithOwnership: UserType = {
+        const userWithOwnership: UserProfileResponse = {
             ...user,
             isOwner
         }
@@ -170,7 +170,7 @@ class UserService {
         }
 
         const isOwner = viewerId === user._id?.toString()
-        const userWithOwnership: UserType = {
+        const userWithOwnership: UserProfileResponse = {
             ...user,
             isOwner
         }
@@ -206,7 +206,7 @@ class UserService {
                 status: HTTP_STATUS.NOT_FOUND
             })
         }
-        const userWithOwnership: UserType = {
+        const userWithOwnership: UserProfileResponse = {
             ...user,
             isOwner: true
         }
@@ -252,17 +252,11 @@ class UserService {
     }
 
     async getUserFollowers(user_id: string, page = 0, limit = 10, viewer_id?: string): Promise<UserProfileResponse[]> {
-        const followers = (await usersRepository.getUserFollowers(user_id, page, limit, viewer_id)) as {
-            user: UserType
-        }[]
-        return followers.map((follower) => follower.user)
+        return await usersRepository.getUserFollowers(user_id, page, limit, viewer_id)
     }
 
     async getUserFollowing(user_id: string, page = 0, limit = 10, viewer_id?: string): Promise<UserProfileResponse[]> {
-        const following = (await usersRepository.getUserFollowing(user_id, page, limit, viewer_id)) as {
-            followed_user: UserType
-        }[]
-        return following.map((follow) => follow.followed_user)
+        return await usersRepository.getUserFollowing(user_id, page, limit, viewer_id)
     }
 
     async getUserProfileWithDetails(target_user_id: string, viewer_id?: string): Promise<UserProfileResponse> {
@@ -275,7 +269,7 @@ class UserService {
         }
 
         const isOwner = viewer_id === user._id?.toString()
-        const userWithOwnership: UserType = {
+        const userWithOwnership: UserProfileResponse = {
             ...user,
             isOwner
         }

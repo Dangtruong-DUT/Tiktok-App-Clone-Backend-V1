@@ -4,11 +4,11 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import { POST_MESSAGES } from '~/constants/messages/post'
 import { USER_MESSAGES } from '~/constants/messages/user'
 import { ErrorWithStatus } from '~/models/Errors'
-import TikTokPost from '~/models/schemas/TikTokPost.schemas'
+import { TiktokPostResponseType } from '~/models/responses/post.response'
 import usersServices from '~/services/users.service'
 
 export async function audienceValidator(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const post = req.post as TikTokPost
+    const post = req.post as TiktokPostResponseType
     const user_id = req.decoded_authorization?.user_id
     const owner_id = post.user_id.toString()
 

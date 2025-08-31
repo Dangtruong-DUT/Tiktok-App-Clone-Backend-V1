@@ -39,6 +39,7 @@ export function createRandomPost() {
         mentions: [],
         medias: [],
         parent_id: null,
+        thumbnail_url: '',
         type: PosterType.POST
     }
     return post
