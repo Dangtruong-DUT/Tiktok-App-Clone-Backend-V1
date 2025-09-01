@@ -102,7 +102,7 @@ class AuthService {
         const { id_token, access_token } = await getOauthGoogleToken(code)
         const userInfo = await getOauthGoogleUserInfo({ id_token, access_token })
         const isExists = await usersRepository.checkEmailExists(userInfo.email)
-
+        console.log(userInfo)
         if (userInfo.email_verified === false) {
             throw new ErrorWithStatus({
                 message: 'Email not verified',

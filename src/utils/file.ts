@@ -73,7 +73,7 @@ export const handleUploadVideos = (req: Request) => {
     const form = formidable({
         uploadDir: UPLOAD_VIDEO_TEMP_DIR,
         maxFiles: 1,
-        maxFileSize: 50 * 1024 * 1024, // 50MB
+        maxFileSize: 1024 * 1024 * 1024, // 1GB
         filter: ({ name, mimetype }) => {
             const valid = name === 'file' && Boolean(mimetype?.startsWith('video/'))
             if (!valid) {
