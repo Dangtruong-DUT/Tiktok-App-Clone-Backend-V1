@@ -36,7 +36,7 @@ initFolder()
 app.use(helmet())
 app.use(
     cors({
-        origin: envConfig.FRONTEND_URL
+        origin: '*'
     })
 )
 app.use(limiter)
