@@ -20,14 +20,12 @@ databaseService.connect().then(async () => {
 
 initOwnerAccount()
 
-// //https://www.npmjs.com/package/express-rate-limit
-// const limiter = rateLimit({
-//     windowMs: 15 * 60 * 1000,
-//     limit: 10000000,
-//     standardHeaders: 'draft-8',
-//     legacyHeaders: false,
-//     ipv6Subnet: 56
-// })
+const limiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 phút
+    limit: 300, // tối đa 300 request / IP
+    standardHeaders: true,
+    legacyHeaders: false
+})
 
 const app = express()
 const httpServer = createServer(app)
@@ -35,14 +33,13 @@ const port = envConfig.PORT || 3000
 
 // create folder upload
 initFolder()
-const whitelist = '*'
 app.use(helmet())
 app.use(
     cors({
-        origin: whitelist
+        origin: envConfig.FRONTEND_URL
     })
 )
-// app.use(limiter)
+app.use(limiter)
 
 app.use(express.json())
 app.use('/api/v1', apiRouter)
