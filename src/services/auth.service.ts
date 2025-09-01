@@ -44,7 +44,7 @@ class AuthService {
 
         await sesEmailService.sendVerifyEmail({
             toAddress: user.email,
-            link: `${envConfig.FRONTEND_URL}/verify-email?token=${email_verify_token}`
+            link: `${envConfig.FRONTEND_URL}/en/verify-email?token=${email_verify_token}`
         })
 
         const [access_token, refresh_token] = await signAccessAndRefreshToken({
