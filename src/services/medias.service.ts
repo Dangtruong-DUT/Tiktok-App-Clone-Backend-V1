@@ -36,7 +36,7 @@ class MediasService {
                 const buffer = await fs.readFile(file.filepath)
                 await sharp(buffer).jpeg().toFile(newPath)
 
-                await s3Service.uploadImageToS3({
+                const { Location } = await s3Service.uploadImageToS3({
                     fileName: newFileNameWithExtension,
                     absoluteFilePath: newPath
                 })
@@ -45,9 +45,7 @@ class MediasService {
                 fileTempPath.push(file.filepath)
 
                 return {
-                    url: isProduction
-                        ? `${envConfig.HOST}/api/v1/static/images/${newFileNameWithExtension}`
-                        : `http://localhost:${envConfig.PORT}/api/v1/static/images/${newFileNameWithExtension}`,
+                    url: Location,
                     type: MediaType.IMAGE
                 }
             })
@@ -63,7 +61,7 @@ class MediasService {
             files.map(async (file) => {
                 const newFilename = file.newFilename as string
                 const idVideo = getFileNameWithoutExtension(newFilename)
-                await s3Service.uploadVideoToS3({
+                const { Location } = await s3Service.uploadVideoToS3({
                     fileName: file.newFilename as string,
                     absoluteFilePath: file.filepath,
                     idVideo
@@ -73,9 +71,7 @@ class MediasService {
                 await fs.rm(dirPath, { recursive: true, force: true })
 
                 return {
-                    url: isProduction
-                        ? `${envConfig.HOST}/api/v1/static/videos/${newFilename}`
-                        : `http://localhost:${envConfig.PORT}/api/v1/static/videos/${newFilename}`,
+                    url: Location as string,
                     type: MediaType.VIDEO
                 }
             })
