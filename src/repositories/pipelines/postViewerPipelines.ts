@@ -58,7 +58,10 @@ export function matchAudience(viewerId: ObjectId | null) {
                     $or: [
                         { $eq: ['$audience', Audience.PUBLIC] },
                         {
-                            $and: [{ $eq: ['$audience', Audience.FRIENDS] }, { $gte: [{ $size: '$friendship' }, 1] }]
+                            $and: [
+                                { $eq: ['$audience', Audience.FRIENDS] },
+                                { $gte: [{ $size: { $ifNull: ['$friendship', []] } }, 1] }
+                            ]
                         },
                         {
                             $and: [{ $eq: ['$audience', Audience.PRIVATE] }, { $eq: ['$user_id', viewerId] }]

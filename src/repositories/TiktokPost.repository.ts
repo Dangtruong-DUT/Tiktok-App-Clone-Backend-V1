@@ -565,8 +565,8 @@ class TikTokPostRepository {
         return result?.total || 0
     }
 
-    async findPostsNoFollowing({ page = 0, limit = 10, user_id }: { page?: number; limit?: number; user_id: string }) {
-        const viewerId = new ObjectId(user_id)
+    async findPostsNoFollowing({ page = 0, limit = 10, user_id }: { page?: number; limit?: number; user_id?: string }) {
+        const viewerId = user_id ? new ObjectId(user_id) : null
         const skip = page > 0 ? (page - 1) * limit : 0
         const pipeline = [
             { $match: { user_id: { $ne: viewerId } } },
@@ -583,8 +583,6 @@ class TikTokPostRepository {
             addChildrenCounts(),
             ...lookupViewerStats(viewerId),
             { $sort: { created_at: -1 } },
-            { $skip: skip },
-            { $limit: limit },
             lookupAuthor(),
             addAuthorField(),
             {
@@ -595,12 +593,14 @@ class TikTokPostRepository {
             },
             {
                 $replaceRoot: { newRoot: { $mergeObjects: '$latestPost' } }
-            }
+            },
+            { $skip: skip },
+            { $limit: limit }
         ]
         return await databaseService.tiktokPost.aggregate<TiktokPostResponseType>(pipeline).toArray()
     }
-    async countPostsNoFollowing(user_id: string) {
-        const viewerId = new ObjectId(user_id)
+    async countPostsNoFollowing(user_id?: string) {
+        const viewerId = user_id ? new ObjectId(user_id) : null
         const pipeline = [
             { $match: { user_id: { $ne: viewerId } } },
             { $match: { type: PosterType.POST } },

@@ -257,7 +257,7 @@ class TikTokPostService {
             total
         }
     }
-    async getPostsNoFollowing({ page, limit, user_id }: { page?: number; limit?: number; user_id: string }) {
+    async getPostsNoFollowing({ page, limit, user_id }: { page?: number; limit?: number; user_id?: string }) {
         const [posts, total] = await Promise.all([
             tikTokPostRepository.findPostsNoFollowing({ page, limit, user_id }),
             tikTokPostRepository.countPostsNoFollowing(user_id)
