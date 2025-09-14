@@ -39,5 +39,7 @@ export const envSchema = z.object({
     FRONTEND_URL: z.string().url(),
 
     INITIAL_PASSWORD_OWNER: z.string().min(1),
-    INITIAL_EMAIL_OWNER: z.string().email()
+    INITIAL_EMAIL_OWNER: z.string().email(),
+    GMAIL_USER: z.string().email(),
+    GMAIL_APP_PASSWORD: z.string().min(1)
 })

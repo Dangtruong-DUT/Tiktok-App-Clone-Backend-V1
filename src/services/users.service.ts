@@ -10,14 +10,13 @@ import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages/user'
 import { envConfig } from '~/config/envConfig'
-import sesEmailService from '~/services/aws/ses.email.service'
 import { AddNewEmployeeReqBody } from '~/models/requests/account.request'
 import User from '~/models/schemas/User.schema'
 import { UserType } from '~/models/types/User.types'
 import { UserProfileResponse, UserProfileWithSensitiveResponse } from '~/models/responses/user.responses'
 import generateTimeBasedUsername from '~/utils/GenerateUserName'
 import _ from 'lodash'
-import { $ } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs'
+import gmailEmailService from '~/services/SMTP/GmailEmail.service'
 
 class UserService {
     private static instance: UserService
@@ -62,7 +61,7 @@ class UserService {
             usersRepository.findUserById({ user_id }),
             signEmailVerifyToken(user_id, Role.USER)
         ])
-        await sesEmailService.sendVerifyEmail({
+        await gmailEmailService.sendVerifyEmail({
             toAddress: user.email,
             link: `${envConfig.FRONTEND_URL}/en/verify-email?token=${email_verify_token}`
         })
@@ -83,7 +82,7 @@ class UserService {
             usersRepository.findUserById({ user_id })
         ])
         await Promise.all([
-            sesEmailService.sendForgotPasswordEmail({
+            gmailEmailService.sendForgotPasswordEmail({
                 toAddress: user.email,
                 link: `${envConfig.FRONTEND_URL}/en/reset-password?token=${forgot_password_token}`
             }),

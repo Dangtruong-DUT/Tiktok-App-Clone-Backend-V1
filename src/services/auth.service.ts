@@ -7,12 +7,12 @@ import { getOauthGoogleToken, getOauthGoogleUserInfo } from '~/helpers/oauth'
 import usersRepository from '~/repositories/users.repository'
 import { hashPassword } from '~/utils/crypto'
 import { Role, UserVerifyStatus } from '~/constants/enum'
-import sesEmailService from '~/services/aws/ses.email.service'
 import { envConfig } from '~/config/envConfig'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
 import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages/user'
+import gmailEmailService from '~/services/SMTP/GmailEmail.service'
 
 class AuthService {
     static instance: AuthService
@@ -42,7 +42,7 @@ class AuthService {
 
         const user = await usersRepository.findUserById({ user_id: user_id.toString() })
 
-        await sesEmailService.sendVerifyEmail({
+        await gmailEmailService.sendVerifyEmail({
             toAddress: user.email,
             link: `${envConfig.FRONTEND_URL}/en/verify-email?token=${email_verify_token}`
         })
